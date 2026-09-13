@@ -1,0 +1,606 @@
+/* =========================================
+   KALASETU - ALL CATEGORIES
+   SAME THEME AS CUSTOMER HOME
+   ========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f6ebdd;
+    color: #33231e;
+}
+
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+.top-header {
+    width: 100%;
+    min-height: 78px;
+    background: #fffaf4;
+
+    display: flex;
+    align-items: center;
+
+    padding: 10px 42px;
+    gap: 28px;
+
+    border-bottom: 1px solid #eadbca;
+}
+
+
+/* =========================================
+   LOGO
+   SAME STYLE AS CUSTOMER HOME
+   ========================================= */
+
+.logo-area {
+    width: 190px;
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    flex-shrink: 0;
+}
+
+.logo-area img {
+    width: 75px;
+    height: 75px;
+
+    object-fit: contain;
+    display: block;
+
+    border-radius: 50%;
+}
+
+
+/* =========================================
+   SEARCH
+   ========================================= */
+
+.search-area {
+    flex: 1;
+    max-width: 590px;
+
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+
+    margin-left: 15px;
+
+    background: #ffffff;
+
+    border: 1px solid #d8c6b4;
+    border-radius: 22px;
+
+    overflow: hidden;
+}
+
+.search-area input {
+    flex: 1;
+
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    padding: 0 18px;
+
+    font-size: 14px;
+    color: #33231e;
+}
+
+.search-area input::placeholder {
+    color: #9a8576;
+}
+
+.search-btn {
+    width: 48px;
+    height: 100%;
+
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn svg {
+    width: 19px;
+    height: 19px;
+
+    stroke: #5d463b;
+}
+
+
+/* =========================================
+   HEADER ICONS
+   ========================================= */
+
+.header-icons {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-left: auto;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    background: transparent;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.icon-btn:hover {
+    background: #eee0d1;
+}
+
+.icon-btn svg {
+    width: 21px;
+    height: 21px;
+
+    fill: none;
+    stroke: #4d382f;
+
+    stroke-width: 1.7;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* =========================================
+   NAVIGATION
+   ========================================= */
+
+.main-nav {
+    width: 100%;
+    height: 49px;
+
+    background: #fffaf4;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 45px;
+
+    border-bottom: 1px solid #eadbca;
+}
+
+.main-nav a {
+    position: relative;
+
+    text-decoration: none;
+
+    color: #4d3930;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    padding: 16px 2px;
+}
+
+.main-nav a:hover {
+    color: #81533e;
+}
+
+.main-nav a.active {
+    color: #81533e;
+}
+
+.main-nav a.active::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    bottom: 6px;
+
+    height: 2px;
+
+    background: #81533e;
+
+    border-radius: 2px;
+}
+
+
+/* =========================================
+   MAIN CONTENT
+   ========================================= */
+
+.categories-page {
+    max-width: 1250px;
+
+    margin: 0 auto;
+
+    padding: 42px 35px 65px;
+}
+
+
+/* =========================================
+   PAGE TITLE
+   ========================================= */
+
+.page-title {
+    text-align: center;
+
+    margin-bottom: 30px;
+}
+
+.page-title h1 {
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: 30px;
+
+    font-weight: 500;
+
+    color: #493128;
+
+    letter-spacing: 0.2px;
+}
+
+.page-title p {
+    margin-top: 9px;
+
+    font-size: 13px;
+
+    color: #806c5f;
+}
+
+
+/* =========================================
+   RESULT BAR
+   ========================================= */
+
+.result-bar {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+
+    padding: 0 2px;
+}
+
+#resultCount {
+    font-size: 13px;
+
+    color: #765e50;
+}
+
+.clear-btn {
+    display: none;
+
+    border: 1px solid #cbb5a3;
+
+    background: transparent;
+
+    color: #765443;
+
+    padding: 6px 14px;
+
+    border-radius: 18px;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.clear-btn:hover {
+    background: #eadbce;
+}
+
+
+/* =========================================
+   CATEGORY GRID
+   ========================================= */
+
+.category-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 23px;
+}
+
+
+/* =========================================
+   CATEGORY CARD
+   ========================================= */
+
+.category-card {
+    background: #fffaf5;
+
+    border: 1px solid #e2d2c2;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 8px 20px rgba(79, 53, 40, 0.10);
+}
+
+
+/* =========================================
+   CATEGORY IMAGE
+   ========================================= */
+
+.category-image {
+    width: 100%;
+    height: 205px;
+
+    background: #eee2d6;
+
+    overflow: hidden;
+}
+
+.category-image img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover
+.category-image img {
+    transform: scale(1.03);
+}
+
+
+/* =========================================
+   CATEGORY TEXT
+   ========================================= */
+
+.category-info {
+    padding: 15px 12px 17px;
+
+    text-align: center;
+}
+
+.category-info h3 {
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: 16px;
+
+    font-weight: 500;
+
+    color: #4b342b;
+}
+
+
+/* =========================================
+   NO RESULTS
+   ========================================= */
+
+.no-results {
+    display: none;
+
+    text-align: center;
+
+    padding: 65px 20px;
+}
+
+.no-results h2 {
+    font-family: Georgia, serif;
+
+    font-weight: 500;
+
+    color: #50372d;
+
+    margin-bottom: 8px;
+}
+
+.no-results p {
+    font-size: 13px;
+
+    color: #806c5f;
+}
+
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+footer {
+    background: #443229;
+
+    color: #eadfd5;
+
+    text-align: center;
+
+    padding: 35px 20px;
+}
+
+.footer-logo img {
+    width: 75px;
+
+    height: auto;
+
+    max-height: 50px;
+
+    object-fit: contain;
+
+    margin-bottom: 8px;
+}
+
+footer p {
+    font-size: 12px;
+
+    color: #cdbbae;
+}
+
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 1050px) {
+
+    .top-header {
+        padding: 10px 25px;
+    }
+
+    .category-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+    .main-nav {
+        gap: 30px;
+    }
+}
+
+
+/* =========================================
+   MOBILE / SMALL TABLET
+   ========================================= */
+
+@media (max-width: 760px) {
+
+    .top-header {
+        flex-wrap: wrap;
+
+        padding: 10px 18px;
+
+        gap: 12px;
+    }
+
+    /*
+       Keep logo circular and use the
+       same logo image styling.
+    */
+    .logo-area {
+        width: 190px;
+        height: 70px;
+
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        flex-shrink: 0;
+    }
+
+    .logo-area img {
+        width: 75px;
+        height: 75px;
+
+        object-fit: contain;
+        display: block;
+
+        border-radius: 50%;
+    }
+
+    .header-icons {
+        margin-left: auto;
+    }
+
+    .search-area {
+        order: 3;
+
+        flex-basis: 100%;
+
+        max-width: none;
+
+        margin-left: 0;
+    }
+
+    .main-nav {
+        justify-content: flex-start;
+
+        overflow-x: auto;
+
+        padding: 0 20px;
+
+        gap: 30px;
+    }
+
+    .main-nav a {
+        white-space: nowrap;
+    }
+
+    .categories-page {
+        padding: 35px 20px 50px;
+    }
+
+    .category-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 18px;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 500px) {
+
+    .page-title h1 {
+        font-size: 25px;
+    }
+
+    .page-title p {
+        font-size: 12px;
+    }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-image {
+        height: 220px;
+    }
+
+    .category-info h3 {
+        font-size: 16px;
+    }
+}

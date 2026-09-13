@@ -29,7 +29,7 @@ body {
     position: absolute;
     inset: 0;
 
-    background: rgba(246, 235, 221, 0.68);
+    background: rgba(246, 235, 221, 0.20);
 }
 
 .pending-card {

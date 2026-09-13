@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
 
     const form = document.getElementById("addCraftForm");
@@ -7,9 +6,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let imageData = "";
 
+    /* ============================= */
+    /*       EDIT MODE CHECK          */
+    /* ============================= */
+
+    const editingIndex =
+        localStorage.getItem("editingCraftIndex");
+
+
+    if (
+        editingIndex !== null &&
+        editingIndex !== "" &&
+        !isNaN(editingIndex)
+    ) {
+        loadEditingCraft(Number(editingIndex));
+    }
+
 
     /* ============================= */
-    /*        IMAGE PREVIEW            */
+    /*         IMAGE PREVIEW          */
     /* ============================= */
 
     craftImage.addEventListener("change", function () {
@@ -17,19 +32,22 @@ document.addEventListener("DOMContentLoaded", function () {
         const file = this.files[0];
 
         if (!file) {
-            imageData = "";
-            imagePreview.innerHTML = "";
-            imagePreview.style.display = "none";
             return;
         }
+
 
         if (!file.type.startsWith("image/")) {
-            alert("Please select an image file.");
+
+            alert("Please select a valid image file.");
+
             this.value = "";
+
             return;
         }
 
+
         const reader = new FileReader();
+
 
         reader.onload = function (event) {
 
@@ -39,14 +57,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 `<img src="${imageData}" alt="Craft Preview">`;
 
             imagePreview.style.display = "block";
+
         };
 
+
         reader.readAsDataURL(file);
+
     });
 
 
     /* ============================= */
-    /*          ADD / EDIT CRAFT       */
+    /*          FORM SUBMIT           */
     /* ============================= */
 
     form.addEventListener("submit", function (event) {
@@ -67,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("craftStory").value.trim();
 
 
-        /* Check required fields */
+        /* Validation */
 
         if (
             name === "" ||
@@ -75,15 +96,9 @@ document.addEventListener("DOMContentLoaded", function () {
             price === "" ||
             story === ""
         ) {
+
             alert("Please fill all craft details.");
-            return;
-        }
 
-
-        /* Check image */
-
-        if (!imageData) {
-            alert("Please upload a craft image.");
             return;
         }
 
@@ -95,30 +110,111 @@ document.addEventListener("DOMContentLoaded", function () {
         const savedCrafts =
             localStorage.getItem("creatorCrafts");
 
+
         if (savedCrafts) {
 
             try {
-                crafts = JSON.parse(savedCrafts);
+
+                crafts =
+                    JSON.parse(savedCrafts);
+
             } catch (error) {
+
                 crafts = [];
+
             }
 
         }
+
 
         if (!Array.isArray(crafts)) {
             crafts = [];
         }
 
 
-        /* Check edit mode */
+        /* ============================= */
+        /*          EDIT MODE             */
+        /* ============================= */
 
-        const editingIndex =
-            localStorage.getItem("editingCraftIndex");
+        if (
+            editingIndex !== null &&
+            editingIndex !== "" &&
+            !isNaN(editingIndex)
+        ) {
+
+            const index =
+                Number(editingIndex);
 
 
-        /* Create craft object */
+            if (!crafts[index]) {
 
-        const craft = {
+                alert("Craft not found.");
+
+                return;
+            }
+
+
+            crafts[index].name =
+                name;
+
+            crafts[index].category =
+                category;
+
+            crafts[index].price =
+                price;
+
+            crafts[index].story =
+                story;
+
+
+            if (imageData !== "") {
+
+                crafts[index].image =
+                    imageData;
+
+            }
+
+
+            crafts[index].status =
+                crafts[index].status ||
+                "Under Review";
+
+
+            localStorage.setItem(
+                "creatorCrafts",
+                JSON.stringify(crafts)
+            );
+
+
+            localStorage.removeItem(
+                "editingCraftIndex"
+            );
+
+
+            alert("Craft updated successfully!");
+
+
+            window.location.href =
+                "creator-my-crafts.html";
+
+
+            return;
+        }
+
+
+        /* ============================= */
+        /*          NEW CRAFT              */
+        /* ============================= */
+
+        if (imageData === "") {
+
+            alert("Please upload a craft image.");
+
+            return;
+        }
+
+
+        const newCraft = {
 
             name: name,
 
@@ -130,65 +226,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
             image: imageData,
 
-            status: "Pending"
+            status: "Under Review",
+
+            createdAt:
+                new Date().toISOString()
 
         };
 
 
-        /* ============================= */
-        /*          EDIT CRAFT             */
-        /* ============================= */
-
-        if (
-            editingIndex !== null &&
-            editingIndex !== "" &&
-            !isNaN(editingIndex)
-        ) {
-
-            const index = Number(editingIndex);
-
-            if (crafts[index]) {
-
-                crafts[index] = craft;
-
-            } else {
-
-                crafts.push(craft);
-
-            }
-
-            localStorage.removeItem("editingCraftIndex");
+        crafts.push(newCraft);
 
 
-            localStorage.setItem(
-                "creatorCrafts",
-                JSON.stringify(crafts)
-            );
-
-            alert("Craft updated successfully.");
-
-        }
+        localStorage.setItem(
+            "creatorCrafts",
+            JSON.stringify(crafts)
+        );
 
 
-        /* ============================= */
-        /*          ADD NEW CRAFT          */
-        /* ============================= */
-
-        else {
-
-            crafts.push(craft);
-
-            localStorage.setItem(
-                "creatorCrafts",
-                JSON.stringify(crafts)
-            );
-
-            alert("Craft added successfully.");
-
-        }
+        alert("Craft added successfully!");
 
 
-        /* Go to My Crafts */
+        /* Move to My Crafts */
 
         window.location.href =
             "creator-my-crafts.html";
@@ -199,10 +257,95 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 /* ============================= */
-/*          BACK BUTTON            */
+/*       EDIT CRAFT LOAD         */
+/* ============================= */
+
+function loadEditingCraft(index) {
+
+    const savedCrafts =
+        localStorage.getItem("creatorCrafts");
+
+
+    if (!savedCrafts) {
+        return;
+    }
+
+
+    let crafts = [];
+
+
+    try {
+
+        crafts =
+            JSON.parse(savedCrafts);
+
+    } catch (error) {
+
+        console.log("Craft data error:", error);
+
+        return;
+    }
+
+
+    if (
+        !Array.isArray(crafts) ||
+        !crafts[index]
+    ) {
+        return;
+    }
+
+
+    const craft =
+        crafts[index];
+
+
+    document.getElementById("craftName").value =
+        craft.name || "";
+
+
+    document.getElementById("craftCategory").value =
+        craft.category || "";
+
+
+    document.getElementById("craftPrice").value =
+        craft.price || "";
+
+
+    document.getElementById("craftStory").value =
+        craft.story || "";
+
+
+    /* Existing image */
+
+    if (craft.image) {
+
+        imagePreview.innerHTML =
+            `<img src="${craft.image}" alt="Craft Preview">`;
+
+        imagePreview.style.display =
+            "block";
+
+        imageData =
+            craft.image;
+
+
+        craftImage.removeAttribute(
+            "required"
+        );
+    }
+
+}
+
+
+/* ============================= */
+/*          BACK BUTTON           */
 /* ============================= */
 
 function goBack() {
+
+    localStorage.removeItem(
+        "editingCraftIndex"
+    );
 
     window.location.href =
         "creator-my-crafts.html";

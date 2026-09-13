@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kalasetu - All Crafts</title>
+
+    <link rel="stylesheet" href="all-categories.css">
+</head>
+
+<body>
+
+<!-- =========================================
+     HEADER
+========================================= -->
+
+<header class="top-header">
+
+    <!-- Same Kalasetu Logo -->
+    <div class="logo-area">
+        <img src="images/kalasetu-logo.png" alt="Kalasetu Logo">
+    </div>
+
+
+    <!-- Search -->
+    <div class="search-area">
+
+        <input
+            type="text"
+            id="categorySearch"
+            placeholder="Search crafts..."
+            autocomplete="off"
+        >
+
+        <button class="search-btn" type="button" aria-label="Search">
+
+            <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="6.5"></circle>
+                <path d="M16 16L21 21"></path>
+            </svg>
+
+        </button>
+
+    </div>
+
+
+    <!-- Header Icons -->
+    <div class="header-icons">
+
+        <!-- Notification -->
+        <button
+            class="icon-btn"
+            onclick="window.location.href='notifications.html'"
+            aria-label="Notifications"
+        >
+
+            <svg viewBox="0 0 24 24">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                <path d="M10 21h4"></path>
+            </svg>
+
+        </button>
+
+
+        <!-- Wishlist -->
+        <button
+            class="icon-btn"
+            onclick="window.location.href='wishlist.html'"
+            aria-label="Wishlist"
+        >
+
+            <svg viewBox="0 0 24 24">
+                <path d="M20.8 8.7c0 5.5-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z"></path>
+            </svg>
+
+        </button>
+
+
+        <!-- Cart -->
+        <button
+            class="icon-btn"
+            onclick="window.location.href='cart.html'"
+            aria-label="Cart"
+        >
+
+            <svg viewBox="0 0 24 24">
+                <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L21 7H6"></path>
+                <circle cx="10" cy="20" r="1"></circle>
+                <circle cx="18" cy="20" r="1"></circle>
+            </svg>
+
+        </button>
+
+
+        <!-- Profile -->
+        <button
+            class="icon-btn"
+            onclick="showMessage('Profile')"
+            aria-label="Profile"
+        >
+
+            <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="3.5"></circle>
+                <path d="M5 21c0-4 3-6 7-6s7 2 7 6"></path>
+            </svg>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================
+     NAVIGATION
+========================================= -->
+
+<nav class="main-nav">
+
+    <a href="customer-home.html">
+        Home
+    </a>
+
+    <a href="all-categories.html" class="active">
+        Categories
+    </a>
+
+    <a href="customer-home.html#offers">
+        Offers
+    </a>
+
+    <a href="chat-with-creator.html">
+        Chat with Creator
+    </a>
+
+</nav>
+
+
+<!-- =========================================
+     MAIN
+========================================= -->
+
+<main class="categories-page">
+
+
+    <!-- Page Heading -->
+
+    <section class="page-title">
+
+        <h1>Explore All Crafts</h1>
+
+        <p>
+            Discover traditional, handmade and creative crafts
+        </p>
+
+    </section>
+
+
+    <!-- Result Bar -->
+
+    <div class="result-bar">
+
+        <span id="resultCount">
+            37 crafts available
+        </span>
+
+        <button
+            type="button"
+            id="clearButton"
+            class="clear-btn"
+        >
+            Clear Search
+        </button>
+
+    </div>
+
+
+    <!-- =====================================
+         CATEGORY GRID
+    ====================================== -->
+
+    <section class="category-grid" id="categoryGrid">
+
+
+        <!-- 1 -->
+        <div class="category-card" onclick="openCategory('Pottery')">
+
+            <div class="category-image">
+                <img src="images/pottery.jpg" alt="Pottery">
+            </div>
+
+            <div class="category-info">
+                <h3>Pottery</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 2 -->
+        <div class="category-card" onclick="openCategory('Textiles')">
+
+            <div class="category-image">
+                <img src="images/textiles.jpg" alt="Textiles">
+            </div>
+
+            <div class="category-info">
+                <h3>Textiles</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 3 -->
+        <div class="category-card" onclick="openCategory('Woodcraft')">
+
+            <div class="category-image">
+                <img src="images/woodcraft.jpg" alt="Woodcraft">
+            </div>
+
+            <div class="category-info">
+                <h3>Woodcraft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 4 -->
+        <div class="category-card" onclick="openCategory('Jewellery')">
+
+            <div class="category-image">
+                <img src="images/jewellery.jpg" alt="Jewellery">
+            </div>
+
+            <div class="category-info">
+                <h3>Jewellery</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 5 -->
+        <div class="category-card" onclick="openCategory('Baskets')">
+
+            <div class="category-image">
+                <img src="images/baskets.jpg" alt="Baskets">
+            </div>
+
+            <div class="category-info">
+                <h3>Baskets</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 6 -->
+        <div class="category-card" onclick="openCategory('Home Decor')">
+
+            <div class="category-image">
+                <img src="images/home-decor.jpg" alt="Home Decor">
+            </div>
+
+            <div class="category-info">
+                <h3>Home Decor</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 7 -->
+        <div class="category-card" onclick="openCategory('Jute Craft')">
+
+            <div class="category-image">
+                <img src="images/jute-craft.jpg" alt="Jute Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Jute Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 8 -->
+        <div class="category-card" onclick="openCategory('Paintings')">
+
+            <div class="category-image">
+                <img src="images/paintings.jpg" alt="Paintings">
+            </div>
+
+            <div class="category-info">
+                <h3>Paintings</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 9 -->
+        <div class="category-card" onclick="openCategory('Sculpting & Clay')">
+
+            <div class="category-image">
+                <img src="images/sculpting-clay.jpg" alt="Sculpting and Clay">
+            </div>
+
+            <div class="category-info">
+                <h3>Sculpting &amp; Clay</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 10 -->
+        <div class="category-card" onclick="openCategory('Resin Art')">
+
+            <div class="category-image">
+                <img src="images/resin-art.jpg" alt="Resin Art">
+            </div>
+
+            <div class="category-info">
+                <h3>Resin Art</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 11 -->
+        <div class="category-card" onclick="openCategory('Paper Craft')">
+
+            <div class="category-image">
+                <img src="images/paper-craft.jpg" alt="Paper Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Paper Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 12 -->
+        <div class="category-card" onclick="openCategory('Macramé')">
+
+            <div class="category-image">
+                <img src="images/macrame.jpg" alt="Macrame">
+            </div>
+
+            <div class="category-info">
+                <h3>Macramé</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 13 -->
+        <div class="category-card" onclick="openCategory('Miniature Making')">
+
+            <div class="category-image">
+                <img src="images/miniature-making.jpg" alt="Miniature Making">
+            </div>
+
+            <div class="category-info">
+                <h3>Miniature Making</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 14 -->
+        <div class="category-card" onclick="openCategory('Candle Making')">
+
+            <div class="category-image">
+                <img src="images/candle-making.jpg" alt="Candle Making">
+            </div>
+
+            <div class="category-info">
+                <h3>Candle Making</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 15 -->
+        <div class="category-card" onclick="openCategory('Soap Making')">
+
+            <div class="category-image">
+                <img src="images/soap-making.jpg" alt="Soap Making">
+            </div>
+
+            <div class="category-info">
+                <h3>Soap Making</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 16 -->
+        <div class="category-card" onclick="openCategory('Mirror Art')">
+
+            <div class="category-image">
+                <img src="images/mirror-art.png" alt="Mirror Art">
+            </div>
+
+            <div class="category-info">
+                <h3>Mirror Art</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 17 -->
+        <div class="category-card" onclick="openCategory('Pebble Art')">
+
+            <div class="category-image">
+                <img src="images/pebble-art.jpg" alt="Pebble Art">
+            </div>
+
+            <div class="category-info">
+                <h3>Pebble Art</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 18 -->
+        <div class="category-card" onclick="openCategory('Fabric Painting')">
+
+            <div class="category-image">
+                <img src="images/fabric-painting.jpg" alt="Fabric Painting">
+            </div>
+
+            <div class="category-info">
+                <h3>Fabric Painting</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 19 -->
+        <div class="category-card" onclick="openCategory('Woolen Craft')">
+
+            <div class="category-image">
+                <img src="images/woolen-craft.jpg" alt="Woolen Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Woolen Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 20 -->
+        <div class="category-card" onclick="openCategory('Embroidery')">
+
+            <div class="category-image">
+                <img src="images/embroidery.jpg" alt="Embroidery">
+            </div>
+
+            <div class="category-info">
+                <h3>Embroidery</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 21 -->
+        <div class="category-card" onclick="openCategory('Stitching')">
+
+            <div class="category-image">
+                <img src="images/stitching.jpg" alt="Stitching">
+            </div>
+
+            <div class="category-info">
+                <h3>Stitching</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 22 -->
+        <div class="category-card" onclick="openCategory('Crochet')">
+
+            <div class="category-image">
+                <img src="images/crochet.jpg" alt="Crochet">
+            </div>
+
+            <div class="category-info">
+                <h3>Crochet</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 23 -->
+        <div class="category-card" onclick="openCategory('Knitting')">
+
+            <div class="category-image">
+                <img src="images/knitting.jpg" alt="Knitting">
+            </div>
+
+            <div class="category-info">
+                <h3>Knitting</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 24 -->
+        <div class="category-card" onclick="openCategory('Origami')">
+
+            <div class="category-image">
+                <img src="images/origami.jpg" alt="Origami">
+            </div>
+
+            <div class="category-info">
+                <h3>Origami</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 25 -->
+        <div class="category-card" onclick="openCategory('Shell Craft')">
+
+            <div class="category-image">
+                <img src="images/shell-craft.jpg" alt="Shell Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Shell Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 26 -->
+        <div class="category-card" onclick="openCategory('Bead Craft')">
+
+            <div class="category-image">
+                <img src="images/bead-craft.jpg" alt="Bead Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Bead Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 27 -->
+        <div class="category-card" onclick="openCategory('Chain Craft')">
+
+            <div class="category-image">
+                <img src="images/chain-craft.jpg" alt="Chain Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Chain Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 28 -->
+        <div class="category-card" onclick="openCategory('Recycled Craft')">
+
+            <div class="category-image">
+                <img src="images/recycled-craft.jpg" alt="Recycled Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Recycled Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 29 -->
+        <div class="category-card" onclick="openCategory('Bottle Craft')">
+
+            <div class="category-image">
+                <img src="images/bottle-craft.jpg" alt="Bottle Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Bottle Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 30 -->
+        <div class="category-card" onclick="openCategory('Coconut Shell Craft')">
+
+            <div class="category-image">
+                <img src="images/coconut-shell-craft.jpg" alt="Coconut Shell Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Coconut Shell Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 31 -->
+        <div class="category-card" onclick="openCategory('Mosaic Art')">
+
+            <div class="category-image">
+                <img src="images/mosaic-art.jpg" alt="Mosaic Art">
+            </div>
+
+            <div class="category-info">
+                <h3>Mosaic Art</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 32 -->
+        <div class="category-card" onclick="openCategory('Metal Craft')">
+
+            <div class="category-image">
+                <img src="images/metal-craft.jpg" alt="Metal Craft">
+            </div>
+
+            <div class="category-info">
+                <h3>Metal Craft</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 33 -->
+        <div class="category-card" onclick="openCategory('Weaving')">
+
+            <div class="category-image">
+                <img src="images/weaving.jpg" alt="Weaving">
+            </div>
+
+            <div class="category-info">
+                <h3>Weaving</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 34 -->
+        <div class="category-card" onclick="openCategory('Quilting')">
+
+            <div class="category-image">
+                <img src="images/quilting.jpg" alt="Quilting">
+            </div>
+
+            <div class="category-info">
+                <h3>Quilting</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 35 -->
+        <div class="category-card" onclick="openCategory('Patchwork')">
+
+            <div class="category-image">
+                <img src="images/patchwork.jpg" alt="Patchwork">
+            </div>
+
+            <div class="category-info">
+                <h3>Patchwork</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 36 -->
+        <div class="category-card" onclick="openCategory('Block Printing')">
+
+            <div class="category-image">
+                <img src="images/block-printing.jpg" alt="Block Printing">
+            </div>
+
+            <div class="category-info">
+                <h3>Block Printing</h3>
+            </div>
+
+        </div>
+
+
+        <!-- 37 -->
+        <div class="category-card" onclick="openCategory('Others')">
+
+            <div class="category-image">
+                <img src="images/others.jpg" alt="Other Crafts">
+            </div>
+
+            <div class="category-info">
+                <h3>Others</h3>
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- No Results -->
+
+    <div class="no-results" id="noResults">
+
+        <h2>No crafts found</h2>
+
+        <p>
+            Try searching with another craft name.
+        </p>
+
+    </div>
+
+</main>
+
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
+<footer>
+
+    <div class="footer-logo">
+
+        <img
+            src="images/kalasetu-logo.png"
+            alt="Kalasetu Logo"
+        >
+
+    </div>
+
+    <p>
+        TRADITION • CRAFT • STORY
+    </p>
+
+    <p>
+        © 2026 Kalasetu. Celebrating handmade craftsmanship.
+    </p>
+
+</footer>
+
+
+<script src="all-categories.js"></script>
+
+</body>
+
+</html>

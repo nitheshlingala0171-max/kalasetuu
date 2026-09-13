@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kalasetu - Creator Profile</title>
+
+    <link rel="stylesheet" href="creator-profile.css">
+</head>
+
+<body>
+
+<div class="profile-container">
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="profile-header">
+
+        <div class="brand">
+
+            <div class="logo">
+                <img src="images/kalasetu-logo.png" alt="Kalasetu">
+            </div>
+
+            <div>
+                <h1>KALASETU</h1>
+                <p>CREATOR • PROFILE</p>
+            </div>
+
+        </div>
+
+        <button class="back-btn" onclick="goDashboard()">
+            ← DASHBOARD
+        </button>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="profile-main">
+
+        <section class="page-heading">
+
+            <p class="small-title">CREATOR SPACE</p>
+
+            <h2>Creator Profile</h2>
+
+            <p>
+                Manage your creator information and let customers know
+                more about the person behind the craft.
+            </p>
+
+        </section>
+
+
+        <!-- ================= PROFILE CARD ================= -->
+
+        <section class="profile-card">
+
+            <div class="profile-top">
+
+                <!-- PROFILE IMAGE -->
+
+                <div class="profile-photo-section">
+
+                    <div class="profile-photo">
+
+                        <img
+                            id="profileImage"
+                            src="images/kalasetu-logo.png"
+                            alt="Creator Profile"
+                        >
+
+                    </div>
+
+                    <label for="profileImageInput" class="change-photo">
+                        Change Photo
+                    </label>
+
+                    <input
+                        type="file"
+                        id="profileImageInput"
+                        accept="image/*"
+                        hidden
+                    >
+
+                </div>
+
+
+                <!-- BASIC INFORMATION -->
+
+                <div class="profile-basic">
+
+                    <span class="profile-label">
+                        CREATOR PROFILE
+                    </span>
+
+                    <h3 id="displayName">
+                        Creator Name
+                    </h3>
+
+                    <p id="displayCategory">
+                        Handmade Artisan
+                    </p>
+
+                    <div class="verification-badge" id="verificationBadge">
+                        ● Under Review
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= FORM ================= -->
+
+            <form id="profileForm">
+
+                <div class="form-grid">
+
+                    <div class="input-group">
+
+                        <label for="creatorName">
+                            Creator Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="creatorName"
+                            placeholder="Enter your name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="creatorPhone">
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="creatorPhone"
+                            placeholder="Enter phone number"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="creatorEmail">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="creatorEmail"
+                            placeholder="Enter email address"
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="creatorLocation">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="creatorLocation"
+                            placeholder="City / District / State"
+                        >
+
+                    </div>
+
+
+                    <div class="input-group full-width">
+
+                        <label for="creatorCategory">
+                            Craft Categories
+                        </label>
+
+                        <input
+                            type="text"
+                            id="creatorCategory"
+                            placeholder="Example: Pottery, Handloom, Woodcraft"
+                        >
+
+                    </div>
+
+
+                    <div class="input-group full-width">
+
+                        <label for="creatorAbout">
+                            About Creator
+                        </label>
+
+                        <textarea
+                            id="creatorAbout"
+                            rows="6"
+                            placeholder="Tell customers about yourself, your craft, your experience and your traditional skills..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= STATUS ================= -->
+
+                <div class="status-box">
+
+                    <div class="status-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <strong>Verification Status</strong>
+
+                        <p id="verificationText">
+                            Your creator profile is currently under review.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= BUTTONS ================= -->
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        onclick="goDashboard()"
+                    >
+                        CANCEL
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="save-btn"
+                    >
+                        SAVE PROFILE →
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+        HANDMADE WITH TRADITION • CONNECTED THROUGH STORIES
+    </footer>
+
+</div>
+
+
+<script src="creator-profile.js"></script>
+
+</body>
+</html>

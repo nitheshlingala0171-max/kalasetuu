@@ -1,0 +1,493 @@
+/* =========================================================
+   KALASETU - CREATOR PROFILE
+   Warm Ivory / Terracotta Theme
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    color: #33231E;
+
+    background:
+        linear-gradient(rgba(246, 235, 221, 0.20), rgba(246, 235, 221, 0.20)),
+        url("images/background.png");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* ================= CONTAINER ================= */
+
+.profile-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ================= HEADER ================= */
+
+.profile-header {
+    width: 100%;
+    min-height: 82px;
+    background: #ffffff;
+    border-bottom: 1px solid #dfcfc0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px 55px;
+}
+
+
+/* ================= BRAND ================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logo {
+    width: 58px;
+    height: 58px;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.brand h1 {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #5a3528;
+}
+
+.brand p {
+    margin-top: 3px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: #7b8060;
+}
+
+
+/* ================= BACK BUTTON ================= */
+
+.back-btn {
+    border: 1px solid #c65d3b;
+    background: transparent;
+    color: #c65d3b;
+
+    padding: 11px 18px;
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.back-btn:hover {
+    background: #c65d3b;
+    color: #ffffff;
+}
+
+
+/* ================= MAIN ================= */
+
+.profile-main {
+    width: min(1050px, 92%);
+    margin: 0 auto;
+    padding: 45px 0 55px;
+    flex: 1;
+}
+
+
+/* ================= HEADING ================= */
+
+.page-heading {
+    margin-bottom: 28px;
+}
+
+.small-title {
+    color: #c65d3b;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 7px;
+}
+
+.page-heading h2 {
+    font-family: Georgia, serif;
+    color: #5a3528;
+    font-size: 34px;
+    margin-bottom: 8px;
+}
+
+.page-heading > p:last-child {
+    color: #7b6b61;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* ================= PROFILE CARD ================= */
+
+.profile-card {
+    background: #ffffff;
+    border: 1px solid #dfcfc0;
+    border-radius: 18px;
+
+    padding: 35px;
+
+    box-shadow: 0 8px 25px rgba(90, 53, 40, 0.08);
+}
+
+
+/* ================= PROFILE TOP ================= */
+
+.profile-top {
+    display: flex;
+    align-items: center;
+
+    gap: 28px;
+
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eaded3;
+
+    margin-bottom: 30px;
+}
+
+
+/* ================= PHOTO ================= */
+
+.profile-photo-section {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.profile-photo {
+    width: 125px;
+    height: 125px;
+
+    border-radius: 50%;
+    overflow: hidden;
+
+    border: 4px solid #f0dfd0;
+    background: #f6ebdd;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.change-photo {
+    display: inline-block;
+
+    margin-top: 10px;
+
+    color: #c65d3b;
+    font-size: 12px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.change-photo:hover {
+    text-decoration: underline;
+}
+
+
+/* ================= BASIC INFO ================= */
+
+.profile-basic {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.profile-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #7b8060;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.profile-basic h3 {
+    font-family: Georgia, serif;
+    font-size: 27px;
+    color: #5a3528;
+    margin-bottom: 6px;
+}
+
+.profile-basic p {
+    font-size: 14px;
+    color: #7b6b61;
+    margin-bottom: 12px;
+}
+
+
+/* ================= VERIFICATION ================= */
+
+.verification-badge {
+    background: #f5eadf;
+    color: #9a654f;
+
+    border-radius: 20px;
+    padding: 7px 13px;
+
+    font-size: 11px;
+    font-weight: bold;
+}
+
+
+/* ================= FORM ================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.input-group label {
+    color: #5a3528;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.input-group input,
+.input-group textarea {
+    width: 100%;
+
+    border: 1px solid #d9c7b8;
+    background: #fffdf9;
+
+    border-radius: 9px;
+
+    padding: 13px 14px;
+
+    font-size: 14px;
+    color: #33231e;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.input-group input {
+    height: 46px;
+}
+
+.input-group textarea {
+    resize: vertical;
+    line-height: 1.6;
+    min-height: 130px;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    border-color: #c65d3b;
+    box-shadow: 0 0 0 3px rgba(198, 93, 59, 0.08);
+}
+
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+    color: #aa9b91;
+}
+
+
+/* ================= STATUS BOX ================= */
+
+.status-box {
+    margin-top: 28px;
+
+    background: #f8f2e9;
+    border: 1px solid #e5d6c7;
+
+    border-radius: 10px;
+
+    padding: 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.status-icon {
+    width: 34px;
+    height: 34px;
+
+    border-radius: 50%;
+
+    background: #7b8060;
+    color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: bold;
+}
+
+.status-box strong {
+    color: #5a3528;
+    font-size: 13px;
+}
+
+.status-box p {
+    margin-top: 4px;
+    color: #7b6b61;
+    font-size: 12px;
+}
+
+
+/* ================= ACTIONS ================= */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    margin-top: 28px;
+}
+
+.cancel-btn,
+.save-btn {
+    min-height: 45px;
+    padding: 0 22px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.6px;
+
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: transparent;
+    border: 1px solid #d4c1b2;
+    color: #6d554a;
+}
+
+.cancel-btn:hover {
+    background: #f6ebdd;
+}
+
+.save-btn {
+    border: none;
+    background: #c65d3b;
+    color: #ffffff;
+}
+
+.save-btn:hover {
+    background: #a94b2f;
+}
+
+
+/* ================= FOOTER ================= */
+
+footer {
+    text-align: center;
+
+    background: #5a3528;
+    color: #f6ebdd;
+
+    padding: 18px;
+
+    font-size: 10px;
+    letter-spacing: 1.5px;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 700px) {
+
+    .profile-header {
+        padding: 10px 20px;
+    }
+
+    .brand h1 {
+        font-size: 18px;
+    }
+
+    .brand p {
+        font-size: 8px;
+    }
+
+    .back-btn {
+        padding: 9px 12px;
+        font-size: 10px;
+    }
+
+    .profile-main {
+        padding-top: 30px;
+    }
+
+    .page-heading h2 {
+        font-size: 28px;
+    }
+
+    .profile-card {
+        padding: 22px;
+    }
+
+    .profile-top {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-basic {
+        align-items: center;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: auto;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .cancel-btn,
+    .save-btn {
+        width: 100%;
+    }
+}

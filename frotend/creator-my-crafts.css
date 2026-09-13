@@ -20,7 +20,7 @@ body {
     content: "";
     position: fixed;
     inset: 0;
-    background: rgba(246, 235, 221, 0.68);
+    background: rgba(246, 235, 221, 0.20);
     z-index: 0;
 }
 

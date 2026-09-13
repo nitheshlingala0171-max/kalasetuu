@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kalasetu - Creator Orders</title>
+
+    <link rel="stylesheet" href="creator-orders.css">
+</head>
+
+<body>
+
+<div class="orders-container">
+
+    <!-- HEADER -->
+    <header class="orders-header">
+
+        <div class="brand">
+
+            <div class="logo">
+                <img src="images/kalasetu-logo.png" alt="Kalasetu">
+            </div>
+
+            <div>
+                <h1>KALASETU</h1>
+                <p>CREATOR • ORDERS</p>
+            </div>
+
+        </div>
+
+        <button class="back-btn" onclick="goDashboard()">
+            ← DASHBOARD
+        </button>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="orders-main">
+
+        <section class="page-heading">
+
+            <div>
+                <p class="small-title">CREATOR SPACE</p>
+
+                <h2>Customer Orders</h2>
+
+                <p>
+                    View the orders placed for your handmade crafts.
+                </p>
+            </div>
+
+        </section>
+
+
+        <!-- ORDER SUMMARY -->
+        <section class="order-summary">
+
+            <div class="summary-card">
+                <span>Total Orders</span>
+                <strong id="totalOrders">0</strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Pending</span>
+                <strong id="pendingOrders">0</strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Delivered</span>
+                <strong id="deliveredOrders">0</strong>
+            </div>
+
+        </section>
+
+
+        <!-- ORDERS -->
+        <section class="orders-section">
+
+            <div class="section-title">
+                <h3>Your Orders</h3>
+                <span id="orderCount">0 Orders</span>
+            </div>
+
+            <div id="ordersList" class="orders-grid"></div>
+
+
+            <!-- EMPTY -->
+            <div id="emptyState" class="empty-state">
+
+                <div class="empty-icon">◇</div>
+
+                <h3>No Orders Yet</h3>
+
+                <p>
+                    When customers order your crafts,
+                    their orders will appear here.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        HANDMADE WITH TRADITION • CONNECTED THROUGH STORIES
+    </footer>
+
+</div>
+
+
+<script src="creator-orders.js"></script>
+
+</body>
+</html>

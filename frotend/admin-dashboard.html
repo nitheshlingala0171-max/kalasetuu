@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalasetu - Admin Dashboard</title>
+    <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <!-- HEADER -->
+    <header class="admin-header">
+
+        <div class="brand">
+            <div class="logo">
+                <img src="images/kalasetu-logo.png" alt="Kalasetu">
+            </div>
+
+            <div>
+                <h1>KALASETU</h1>
+                <p>ADMIN • DASHBOARD</p>
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="logoutAdmin()">
+            LOGOUT
+        </button>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+        <section class="page-heading">
+
+            <div>
+                <p class="small-title">ADMINISTRATOR</p>
+
+                <h2>Admin Dashboard</h2>
+
+                <p>
+                    Manage creators, customers, crafts and orders
+                    from one place.
+                </p>
+            </div>
+
+        </section>
+
+
+        <!-- SUMMARY CARDS -->
+        <section class="summary-grid">
+
+            <div class="summary-card">
+                <div class="summary-icon">♙</div>
+
+                <div>
+                    <span>Customers</span>
+                    <strong id="customerCount">0</strong>
+                </div>
+            </div>
+
+
+            <div class="summary-card">
+                <div class="summary-icon">♧</div>
+
+                <div>
+                    <span>Creators</span>
+                    <strong id="creatorCount">0</strong>
+                </div>
+            </div>
+
+
+            <div class="summary-card">
+                <div class="summary-icon">◇</div>
+
+                <div>
+                    <span>Crafts</span>
+                    <strong id="craftCount">0</strong>
+                </div>
+            </div>
+
+
+            <div class="summary-card">
+                <div class="summary-icon">▣</div>
+
+                <div>
+                    <span>Orders</span>
+                    <strong id="orderCount">0</strong>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- MANAGEMENT -->
+        <section class="management-section">
+
+            <div class="section-title">
+
+                <div>
+                    <p class="small-title">PLATFORM MANAGEMENT</p>
+                    <h3>Manage Kalasetu</h3>
+                </div>
+
+            </div>
+
+
+            <div class="management-grid">
+
+                <!-- CREATOR VERIFICATION -->
+                <button
+                    class="management-card"
+                    onclick="openPage('admin-creators.html')"
+                >
+
+                    <div class="card-icon">✓</div>
+
+                    <div class="card-content">
+                        <h4>Creator Verification</h4>
+
+                        <p>
+                            Review and approve creator
+                            verification requests.
+                        </p>
+                    </div>
+
+                    <span class="arrow">→</span>
+
+                </button>
+
+
+                <!-- CUSTOMERS -->
+                <button
+                    class="management-card"
+                    onclick="openPage('admin-users.html')"
+                >
+
+                    <div class="card-icon">♙</div>
+
+                    <div class="card-content">
+                        <h4>Manage Customers</h4>
+
+                        <p>
+                            View and manage registered
+                            customers.
+                        </p>
+                    </div>
+
+                    <span class="arrow">→</span>
+
+                </button>
+
+
+                <!-- CREATORS -->
+                <button
+                    class="management-card"
+                    onclick="openPage('admin-creators.html')"
+                >
+
+                    <div class="card-icon">♧</div>
+
+                    <div class="card-content">
+                        <h4>Manage Creators</h4>
+
+                        <p>
+                            View creator profiles and
+                            verification status.
+                        </p>
+                    </div>
+
+                    <span class="arrow">→</span>
+
+                </button>
+
+
+                <!-- CRAFTS -->
+                <button
+                    class="management-card"
+                    onclick="openPage('admin-crafts.html')"
+                >
+
+                    <div class="card-icon">◇</div>
+
+                    <div class="card-content">
+                        <h4>Manage Crafts</h4>
+
+                        <p>
+                            Review crafts added by
+                            creators.
+                        </p>
+                    </div>
+
+                    <span class="arrow">→</span>
+
+                </button>
+
+
+                <!-- ORDERS -->
+                <button
+                    class="management-card"
+                    onclick="openPage('admin-orders.html')"
+                >
+
+                    <div class="card-icon">▣</div>
+
+                    <div class="card-content">
+                        <h4>Orders Management</h4>
+
+                        <p>
+                            Monitor customer orders and
+                            order status.
+                        </p>
+                    </div>
+
+                    <span class="arrow">→</span>
+
+                </button>
+
+
+                <!-- REPORTS -->
+                <button
+                    class="management-card"
+                    onclick="openPage('admin-reports.html')"
+                >
+
+                    <div class="card-icon">▤</div>
+
+                    <div class="card-content">
+                        <h4>Reports & Overview</h4>
+
+                        <p>
+                            View platform activity and
+                            basic reports.
+                        </p>
+                    </div>
+
+                    <span class="arrow">→</span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ADMIN INFO -->
+        <section class="admin-info">
+
+            <div>
+                <span>Logged in as</span>
+                <strong id="adminEmail">Admin</strong>
+            </div>
+
+            <div>
+                <span>Platform</span>
+                <strong>Kalasetu</strong>
+            </div>
+
+            <div>
+                <span>Access</span>
+                <strong>Administrator</strong>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        HANDMADE WITH TRADITION • CONNECTED THROUGH STORIES
+    </footer>
+
+</div>
+
+<script src="admin-dashboard.js"></script>
+
+</body>
+</html>
