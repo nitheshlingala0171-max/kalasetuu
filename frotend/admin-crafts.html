@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kalasetu - Craft Management</title>
+
+    <link rel="stylesheet" href="admin-crafts.css">
+</head>
+
+<body>
+
+<div class="admin-page">
+
+    <!-- HEADER -->
+    <header class="admin-header">
+
+        <div class="brand">
+            <img src="images/kalasetu-logo.png" alt="Kalasetu">
+
+            <div>
+                <h1>KALASETU</h1>
+                <p>ADMIN • CRAFT MANAGEMENT</p>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="goDashboard()">
+            ← Dashboard
+        </button>
+
+    </header>
+
+
+    <!-- PAGE CONTENT -->
+    <main class="content">
+
+        <div class="page-heading">
+
+            <div>
+                <p class="eyebrow">CRAFT MANAGEMENT</p>
+
+                <h2>Creator Crafts</h2>
+
+                <p>
+                    Review crafts submitted by creators and manage
+                    their publishing status.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+        <section class="summary-grid">
+
+            <div class="summary-card">
+                <span>Total Crafts</span>
+                <strong id="totalCrafts">0</strong>
+            </div>
+
+
+            <div class="summary-card pending">
+                <span>Under Review</span>
+                <strong id="pendingCrafts">0</strong>
+            </div>
+
+
+            <div class="summary-card approved">
+                <span>Approved</span>
+                <strong id="approvedCrafts">0</strong>
+            </div>
+
+
+            <div class="summary-card rejected">
+                <span>Rejected</span>
+                <strong id="rejectedCrafts">0</strong>
+            </div>
+
+        </section>
+
+
+        <!-- FILTER -->
+        <section class="filter-section">
+
+            <button
+                class="filter-btn active"
+                onclick="filterCrafts('All', this)">
+                All
+            </button>
+
+            <button
+                class="filter-btn"
+                onclick="filterCrafts('Under Review', this)">
+                Under Review
+            </button>
+
+            <button
+                class="filter-btn"
+                onclick="filterCrafts('Approved', this)">
+                Approved
+            </button>
+
+            <button
+                class="filter-btn"
+                onclick="filterCrafts('Rejected', this)">
+                Rejected
+            </button>
+
+        </section>
+
+
+        <!-- CRAFT LIST -->
+        <section>
+
+            <div id="craftsList" class="crafts-grid"></div>
+
+
+            <!-- EMPTY STATE -->
+            <div id="emptyState" class="empty-state">
+
+                <div class="empty-icon">◇</div>
+
+                <h3>No Crafts Found</h3>
+
+                <p>
+                    Creator submitted crafts will appear here
+                    for admin review.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <p>
+            © 2026 Kalasetu • Admin Panel
+        </p>
+
+    </footer>
+
+</div>
+
+
+<script src="admin-crafts.js"></script>
+
+</body>
+</html>

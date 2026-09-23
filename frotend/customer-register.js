@@ -1,61 +1,79 @@
- console.log("REGISTER JS LOADED");
- document
-    .getElementById("registerForm")
-    .addEventListener("submit", function(event) {
+console.log("REGISTER JS LOADED");
 
-        event.preventDefault();
+document.getElementById("registerForm").addEventListener("submit", async function(event) {
 
-        const name = document.getElementById("name").value.trim();
-        const contact = document.getElementById("contact").value.trim();
-        const password = document.getElementById("password").value;
-        const confirmPassword =
-            document.getElementById("confirmPassword").value;
+    event.preventDefault();
 
-        if (
-            name === "" ||
-            contact === "" ||
-            password === "" ||
-            confirmPassword === ""
-        ) {
-            alert("Please fill all fields.");
+    const name = document.getElementById("name").value.trim();
+    const contact = document.getElementById("contact").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (name === "" || contact === "" || password === "" || confirmPassword === "") {
+        alert("Please fill all fields.");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch("http://localhost:5000/api/customers/register", {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                name: name,
+                contact: contact,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        console.log("SERVER RESPONSE:", data);
+
+        if (!response.ok) {
+            alert(data.message || "Registration failed.");
             return;
         }
 
-        if (password !== confirmPassword) {
-            alert("Passwords do not match.");
-            return;
-        }
-
-        const customer = {
-            name: name,
-            contact: contact,
-            password: password
-        };
-        console.log("ABOUT TO SAVE", customer);
-
-localStorage.setItem(
-    "customerAccount",
-    JSON.stringify(customer)
-);
-
-console.log("SAVED DATA", localStorage.getItem("customerAccount"));
-
+        /*
+         * Save only the customer information needed
+         * by the current frontend.
+         *
+         * Password is NOT stored here.
+         */
         localStorage.setItem(
             "customerAccount",
-            JSON.stringify(customer)
+            JSON.stringify(data.customer)
         );
 
         alert("Account created successfully.");
 
         window.location.href = "customer-auth.html";
-    });
 
+    } catch (error) {
 
-/* Login */
+        console.error("Registration error:", error);
+
+        alert(
+            "Unable to connect to server. Please make sure the backend is running."
+        );
+    }
+});
+
 
 const loginLink = document.getElementById("loginLink");
 
 if (loginLink) {
+
     loginLink.addEventListener("click", function(event) {
 
         event.preventDefault();
@@ -63,4 +81,5 @@ if (loginLink) {
         window.location.href = "customer-auth.html";
 
     });
+
 }

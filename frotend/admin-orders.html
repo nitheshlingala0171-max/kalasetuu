@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kalasetu - Order Management</title>
+
+    <link rel="stylesheet" href="admin-orders.css">
+</head>
+
+<body>
+
+<div class="admin-page">
+
+    <!-- HEADER -->
+    <header class="admin-header">
+
+        <div class="brand">
+
+            <img
+                src="images/kalasetu-logo.png"
+                alt="Kalasetu"
+            >
+
+            <div>
+                <h1>KALASETU</h1>
+                <p>ADMIN • ORDER MANAGEMENT</p>
+            </div>
+
+        </div>
+
+
+        <button
+            class="back-btn"
+            onclick="goDashboard()"
+        >
+            ← Dashboard
+        </button>
+
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+
+        <!-- PAGE HEADING -->
+        <div class="page-heading">
+
+            <p class="eyebrow">
+                ORDER MANAGEMENT
+            </p>
+
+            <h2>
+                Customer Orders
+            </h2>
+
+            <p>
+                View and manage orders placed by customers.
+            </p>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <span>
+                    Total Orders
+                </span>
+
+                <strong id="totalOrders">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card pending">
+
+                <span>
+                    Pending
+                </span>
+
+                <strong id="pendingOrders">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card confirmed">
+
+                <span>
+                    Confirmed
+                </span>
+
+                <strong id="confirmedOrders">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card delivered">
+
+                <span>
+                    Delivered
+                </span>
+
+                <strong id="deliveredOrders">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- FILTER -->
+        <section class="filter-section">
+
+            <button
+                class="filter-btn active"
+                onclick="filterOrders('All', this)"
+            >
+                All
+            </button>
+
+
+            <button
+                class="filter-btn"
+                onclick="filterOrders('Pending', this)"
+            >
+                Pending
+            </button>
+
+
+            <button
+                class="filter-btn"
+                onclick="filterOrders('Confirmed', this)"
+            >
+                Confirmed
+            </button>
+
+
+            <button
+                class="filter-btn"
+                onclick="filterOrders('Shipped', this)"
+            >
+                Shipped
+            </button>
+
+
+            <button
+                class="filter-btn"
+                onclick="filterOrders('Delivered', this)"
+            >
+                Delivered
+            </button>
+
+
+            <button
+                class="filter-btn"
+                onclick="filterOrders('Cancelled', this)"
+            >
+                Cancelled
+            </button>
+
+        </section>
+
+
+        <!-- ORDERS -->
+        <section>
+
+            <div
+                id="ordersList"
+                class="orders-list"
+            ></div>
+
+
+            <!-- EMPTY STATE -->
+            <div
+                id="emptyState"
+                class="empty-state"
+            >
+
+                <div class="empty-icon">
+                    ◇
+                </div>
+
+                <h3>
+                    No Orders Found
+                </h3>
+
+                <p>
+                    Customer orders will appear here.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <p>
+            © 2026 Kalasetu • Admin Panel
+        </p>
+
+    </footer>
+
+</div>
+
+
+<script src="admin-orders.js"></script>
+
+</body>
+</html>

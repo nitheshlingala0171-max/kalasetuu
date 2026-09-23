@@ -7,74 +7,125 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function loadOrders() {
 
-    const ordersList = document.getElementById("ordersList");
-    const emptyState = document.getElementById("emptyState");
+    const ordersList =
+        document.getElementById("ordersList");
 
-    const totalOrders = document.getElementById("totalOrders");
-    const pendingOrders = document.getElementById("pendingOrders");
-    const deliveredOrders = document.getElementById("deliveredOrders");
-    const orderCount = document.getElementById("orderCount");
+    const emptyState =
+        document.getElementById("emptyState");
+
+    const totalOrders =
+        document.getElementById("totalOrders");
+
+    const pendingOrders =
+        document.getElementById("pendingOrders");
+
+    const deliveredOrders =
+        document.getElementById("deliveredOrders");
+
+    const orderCount =
+        document.getElementById("orderCount");
+
+
+    // Get orders
+    let orders = [];
+
+    try {
+        orders =
+            JSON.parse(
+                localStorage.getItem("orders")
+            ) || [];
+    } catch (error) {
+        console.log("Orders loading error:", error);
+        orders = [];
+    }
+
+
+    // Get creator crafts
+    let creatorCrafts = [];
+
+    try {
+        creatorCrafts =
+            JSON.parse(
+                localStorage.getItem("creatorCrafts")
+            ) || [];
+    } catch (error) {
+        console.log(
+            "Creator crafts loading error:",
+            error
+        );
+
+        creatorCrafts = [];
+    }
 
 
     /*
-        Customer side nunchi orders
-        localStorage lo "orders" ane key tho save avuthayi.
+        Find orders belonging to creator crafts
     */
 
-    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    const creatorOrders =
+        orders.filter(function (order) {
 
+            if (!order.productName) {
+                return false;
+            }
 
-    /*
-        Current creator crafts
-    */
+            return creatorCrafts.some(function (craft) {
 
-    let creatorCrafts =
-        JSON.parse(localStorage.getItem("creatorCrafts")) || [];
+                return (
+                    String(craft.name).trim().toLowerCase() ===
+                    String(order.productName).trim().toLowerCase()
+                );
 
-
-    /*
-        Creator ki sambandhinchina orders
-        matrame filter cheyyadam
-    */
-
-    let creatorOrders = orders.filter(function (order) {
-
-        if (!order.productName) {
-            return false;
-        }
-
-        return creatorCrafts.some(function (craft) {
-
-            return craft.name === order.productName;
+            });
 
         });
 
-    });
-
 
     /*
-        Counts
+        SUMMARY COUNTS
     */
 
-    totalOrders.textContent = creatorOrders.length;
+    totalOrders.textContent =
+        creatorOrders.length;
+
 
     pendingOrders.textContent =
         creatorOrders.filter(function (order) {
-            return getStatus(order) === "Pending";
+
+            const status =
+                getStatus(order).toLowerCase();
+
+            return (
+                status === "pending" ||
+                status === "confirmed" ||
+                status === "shipped"
+            );
+
         }).length;
+
 
     deliveredOrders.textContent =
         creatorOrders.filter(function (order) {
-            return getStatus(order) === "Delivered";
+
+            return (
+                getStatus(order).toLowerCase() ===
+                "delivered"
+            );
+
         }).length;
+
 
     orderCount.textContent =
         creatorOrders.length +
-        (creatorOrders.length === 1 ? " Order" : " Orders");
+        (
+            creatorOrders.length === 1
+                ? " Order"
+                : " Orders"
+        );
 
 
     /*
-        Empty state
+        EMPTY STATE
     */
 
     if (creatorOrders.length === 0) {
@@ -91,153 +142,255 @@ function loadOrders() {
 
 
     /*
-        Display orders
+        DISPLAY ORDERS
     */
 
-    ordersList.innerHTML = creatorOrders.map(function (order) {
+    ordersList.innerHTML =
+        creatorOrders.map(function (order) {
 
-        const status = getStatus(order);
-
-        const image =
-            order.productImage ||
-            order.image ||
-            "images/kalasetu-logo.png";
-
-        const productName =
-            order.productName ||
-            order.name ||
-            "Craft Product";
-
-        const customerName =
-            order.customerName ||
-            order.customer ||
-            "Customer";
-
-        const quantity =
-            order.quantity ||
-            1;
-
-        const price =
-            order.totalPrice ||
-            order.price ||
-            0;
-
-        const date =
-            order.orderDate ||
-            order.createdAt ||
-            "Recently";
+            const status =
+                getStatus(order);
 
 
-        return `
+            const image =
+                order.productImage ||
+                order.image ||
+                findCraftImage(
+                    order.productName,
+                    creatorCrafts
+                ) ||
+                "images/kalasetu-logo.png";
 
-            <div class="order-card">
 
-                <div class="order-top">
+            const productName =
+                order.productName ||
+                order.name ||
+                "Craft Product";
 
-                    <div class="product-image">
-                        <img
-                            src="${image}"
-                            alt="${productName}"
-                        >
+
+            const customerName =
+                order.customerName ||
+                order.customer ||
+                "Customer";
+
+
+            const quantity =
+                order.quantity ||
+                1;
+
+
+            const price =
+                order.totalPrice ||
+                order.price ||
+                0;
+
+
+            const date =
+                order.orderDate ||
+                order.createdAt ||
+                "Recently";
+
+
+            const orderId =
+                order.id ||
+                "N/A";
+
+
+            return `
+
+                <div class="order-card">
+
+                    <div class="order-top">
+
+                        <div class="product-image">
+
+                            <img
+                                src="${image}"
+                                alt="${productName}"
+                                onerror="this.src='images/kalasetu-logo.png'"
+                            >
+
+                        </div>
+
+
+                        <div class="product-info">
+
+                            <h3>
+                                ${productName}
+                            </h3>
+
+
+                            <p class="customer-name">
+
+                                Customer:
+                                <strong>
+                                    ${customerName}
+                                </strong>
+
+                            </p>
+
+
+                            <div class="order-detail">
+
+                                <span>
+                                    Quantity
+                                </span>
+
+                                <span>
+                                    ${quantity}
+                                </span>
+
+                            </div>
+
+
+                            <div class="order-detail">
+
+                                <span>
+                                    Order Date
+                                </span>
+
+                                <span>
+                                    ${formatDate(date)}
+                                </span>
+
+                            </div>
+
+
+                            <div class="order-detail">
+
+                                <span>
+                                    Order ID
+                                </span>
+
+                                <span>
+                                    ${orderId}
+                                </span>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
 
-                    <div class="product-info">
+                    <div class="order-bottom">
 
-                        <h3>${productName}</h3>
+                        <div>
 
-                        <p class="customer-name">
-                            Customer:
-                            <strong>${customerName}</strong>
-                        </p>
+                            <div class="price">
+
+                                ₹${Number(price)
+                                    .toLocaleString("en-IN")}
+
+                            </div>
 
 
-                        <div class="order-detail">
-                            <span>Quantity</span>
-                            <span>${quantity}</span>
+                            <button
+                                class="details-btn"
+                                onclick="viewOrder('${orderId}')"
+                            >
+                                VIEW ORDER DETAILS
+                            </button>
+
                         </div>
 
 
-                        <div class="order-detail">
-                            <span>Order Date</span>
-                            <span>${formatDate(date)}</span>
-                        </div>
-
-
-                        <div class="order-detail">
-                            <span>Order ID</span>
-                            <span>${order.id || "N/A"}</span>
-                        </div>
+                        <span
+                            class="status ${status.toLowerCase()}"
+                        >
+                            ${status}
+                        </span>
 
                     </div>
 
                 </div>
 
+            `;
 
-                <div class="order-bottom">
-
-                    <div>
-
-                        <div class="price">
-                            ₹${Number(price).toLocaleString("en-IN")}
-                        </div>
-
-                        <button
-                            class="details-btn"
-                            onclick="viewOrder('${order.id || ""}')"
-                        >
-                            VIEW ORDER DETAILS
-                        </button>
-
-                    </div>
-
-
-                    <span class="status ${status.toLowerCase()}">
-                        ${status}
-                    </span>
-
-                </div>
-
-            </div>
-
-        `;
-
-    }).join("");
+        }).join("");
 
 }
 
 
 /*
-    Order status
+    FIND CRAFT IMAGE
+*/
+
+function findCraftImage(
+    productName,
+    creatorCrafts
+) {
+
+    if (!productName) {
+        return "";
+    }
+
+
+    const craft =
+        creatorCrafts.find(function (item) {
+
+            return (
+                String(item.name).trim().toLowerCase() ===
+                String(productName).trim().toLowerCase()
+            );
+
+        });
+
+
+    if (craft && craft.image) {
+        return craft.image;
+    }
+
+
+    return "";
+
+}
+
+
+/*
+    ORDER STATUS
 */
 
 function getStatus(order) {
 
-    if (!order.status) {
+    if (!order || !order.status) {
         return "Pending";
     }
 
+
     const status =
-        order.status.toLowerCase();
+        String(order.status)
+            .trim()
+            .toLowerCase();
+
 
     if (status === "confirmed") {
         return "Confirmed";
     }
 
+
     if (status === "shipped") {
         return "Shipped";
     }
+
 
     if (status === "delivered") {
         return "Delivered";
     }
 
+
+    if (status === "cancelled") {
+        return "Cancelled";
+    }
+
+
     return "Pending";
+
 }
 
 
 /*
-    Date format
+    DATE FORMAT
 */
 
 function formatDate(date) {
@@ -246,44 +399,86 @@ function formatDate(date) {
         return "Recently";
     }
 
-    const parsedDate = new Date(date);
+
+    const parsedDate =
+        new Date(date);
+
 
     if (isNaN(parsedDate.getTime())) {
         return date;
     }
 
-    return parsedDate.toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-    });
+
+    return parsedDate.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
 
 }
 
 
 /*
-    View order
+    VIEW ORDER DETAILS
 */
 
 function viewOrder(orderId) {
 
     const orders =
-        JSON.parse(localStorage.getItem("orders")) || [];
+        JSON.parse(
+            localStorage.getItem("orders")
+        ) || [];
+
 
     const order =
         orders.find(function (item) {
 
-            return String(item.id) === String(orderId);
+            return (
+                String(item.id) ===
+                String(orderId)
+            );
 
         });
 
 
     if (!order) {
 
-        alert("Order details not found.");
+        alert(
+            "Order details not found."
+        );
 
         return;
     }
+
+
+    const customerName =
+        order.customerName ||
+        order.customer ||
+        "Customer";
+
+
+    const productName =
+        order.productName ||
+        order.name ||
+        "Craft Product";
+
+
+    const quantity =
+        order.quantity ||
+        1;
+
+
+    const price =
+        order.totalPrice ||
+        order.price ||
+        0;
+
+
+    const status =
+        getStatus(order);
 
 
     alert(
@@ -291,19 +486,19 @@ function viewOrder(orderId) {
         "ORDER DETAILS\n\n" +
 
         "Customer: " +
-        (order.customerName || order.customer || "Customer") +
+        customerName +
 
         "\nProduct: " +
-        (order.productName || order.name || "Craft Product") +
+        productName +
 
         "\nQuantity: " +
-        (order.quantity || 1) +
+        quantity +
 
         "\nPrice: ₹" +
-        (order.totalPrice || order.price || 0) +
+        Number(price).toLocaleString("en-IN") +
 
         "\nStatus: " +
-        getStatus(order)
+        status
 
     );
 
@@ -311,7 +506,7 @@ function viewOrder(orderId) {
 
 
 /*
-    Dashboard
+    GO TO DASHBOARD
 */
 
 function goDashboard() {

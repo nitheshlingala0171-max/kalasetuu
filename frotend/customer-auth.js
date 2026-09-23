@@ -1,71 +1,93 @@
 const customerForm = document.getElementById("customerForm");
 
-customerForm.addEventListener("submit", function (event) {
+customerForm.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+    const contact = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-    if (email === "" || password === "") {
+    if (contact === "" || password === "") {
         alert("Please enter your login details.");
         return;
     }
 
-    alert("Customer login successful!");
+    try {
 
-    // Later we will connect this to the backend.
-    // For now, it will go to the Customer Home page.
+        const response = await fetch(
+            "http://localhost:5000/api/customers/login",
+            {
+                method: "POST",
 
-    window.location.href = "customer-home.html";
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    contact: contact,
+                    password: password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        console.log("LOGIN RESPONSE:", data);
+
+        if (!response.ok) {
+            alert(data.message || "Login failed.");
+            return;
+        }
+
+        /*
+         * Save only customer information needed
+         * by the current frontend.
+         *
+         * Password is NOT stored.
+         */
+        localStorage.setItem(
+            "customerAccount",
+            JSON.stringify(data.customer)
+        );
+
+        alert("Customer login successful!");
+
+        window.location.href = "customer-home.html";
+
+    } catch (error) {
+
+        console.error("Customer login error:", error);
+
+        alert(
+            "Unable to connect to server. Please make sure the backend is running."
+        );
+    }
 });
 
 
-document.getElementById("forgotPassword").addEventListener("click", function (event) {
-    event.preventDefault();
+/* Forgot Password */
 
-    const customerData = localStorage.getItem("customerAccount");
+document.getElementById("forgotPassword").addEventListener(
+    "click",
+    function (event) {
 
-    if (!customerData) {
-        alert("No registered account found. Please create an account first.");
-        return;
+        event.preventDefault();
+
+        alert(
+            "Password reset will be connected to the backend soon."
+        );
     }
-
-    const customer = JSON.parse(customerData);
-
-    const contact = prompt("Enter your registered email or mobile number:");
-
-    if (contact === null) {
-        return;
-    }
-
-    if (contact.trim() !== customer.contact) {
-        alert("Email or mobile number does not match.");
-        return;
-    }
-
-    const newPassword = prompt("Enter your new password:");
-
-    if (newPassword === null || newPassword.trim() === "") {
-        alert("Please enter a new password.");
-        return;
-    }
-
-    customer.password = newPassword.trim();
-
-    localStorage.setItem(
-        "customerAccount",
-        JSON.stringify(customer)
-    );
-
-    alert("Password changed successfully. Please login again.");
-});
+);
 
 
 /* Create Account */
 
-document.getElementById("registerLink").addEventListener("click", function () {
+document.getElementById("registerLink").addEventListener(
+    "click",
+    function (event) {
 
-    window.location.href = "customer-register.html";
+        event.preventDefault();
 
-});
+        window.location.href = "customer-register.html";
+    }
+);

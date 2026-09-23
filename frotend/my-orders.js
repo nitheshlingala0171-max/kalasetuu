@@ -1,37 +1,143 @@
- /* =========================================================
+/* =========================================================
    KALASETU - MY ORDERS
    ========================================================= */
 
-const ordersList = document.getElementById("ordersList");
+const ordersList =
+    document.getElementById("ordersList");
 
-let orders =
-    JSON.parse(localStorage.getItem("orders")) || [];
+let orders = [];
 
 
-/* ================= CANCEL ORDER ================= */
+/* ================= LOAD ORDERS ================= */
 
-function cancelOrder(orderId) {
+async function loadOrders() {
 
-    const confirmCancel =
-        confirm("Are you sure you want to cancel this order?");
+    const customerData =
+        localStorage.getItem("customerAccount");
 
-    if (!confirmCancel) {
+    if (!customerData) {
+
+        alert("Please login first.");
+
+        window.location.href =
+            "customer-auth.html";
+
         return;
     }
 
-    /* Remove the selected order */
-    orders = orders.filter(function(order) {
-        return order.id !== orderId;
-    });
+    try {
 
-    /* Save updated orders */
-    localStorage.setItem(
-        "orders",
-        JSON.stringify(orders)
-    );
+        const customer =
+            JSON.parse(customerData);
 
-    /* Refresh My Orders page */
-    displayOrders();
+        if (!customer.id) {
+
+            alert("Customer information not found.");
+
+            return;
+        }
+
+
+        const response = await fetch(
+            `http://localhost:5000/api/customers/orders/${customer.id}`
+        );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "MY ORDERS RESPONSE:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            alert(
+                data.message ||
+                "Unable to load orders."
+            );
+
+            return;
+        }
+
+
+        orders =
+            Array.isArray(data.orders)
+                ? data.orders
+                : [];
+
+
+        displayOrders();
+
+
+    } catch (error) {
+
+        console.error(
+            "Orders loading error:",
+            error
+        );
+
+        orders = [];
+
+        ordersList.innerHTML = `
+            <div class="empty-orders">
+
+                <div class="empty-icon">
+                    ✦
+                </div>
+
+                <h3>
+                    Unable to Load Orders
+                </h3>
+
+                <p>
+                    Please make sure the backend is running
+                    and try again.
+                </p>
+
+            </div>
+        `;
+    }
+}
+
+
+/* ================= GET STATUS ================= */
+
+function getOrderStatus(status) {
+
+    const currentStatus =
+        String(status || "Pending")
+            .trim()
+            .toLowerCase();
+
+
+    if (currentStatus === "confirmed") {
+        return "Confirmed";
+    }
+
+
+    if (currentStatus === "shipped") {
+        return "Shipped";
+    }
+
+
+    if (currentStatus === "delivered") {
+        return "Delivered";
+    }
+
+
+    if (
+        currentStatus === "cancelled" ||
+        currentStatus === "canceled"
+    ) {
+        return "Cancelled";
+    }
+
+
+    return "Pending";
 }
 
 
@@ -39,7 +145,6 @@ function cancelOrder(orderId) {
 
 function displayOrders() {
 
-    /* No orders */
     if (orders.length === 0) {
 
         ordersList.innerHTML = `
@@ -73,8 +178,7 @@ function displayOrders() {
     ordersList.innerHTML = "";
 
 
-    /* Display latest order first */
-    orders.slice().reverse().forEach(function(order) {
+    orders.forEach(function(order) {
 
         const orderCard =
             document.createElement("div");
@@ -86,8 +190,13 @@ function displayOrders() {
         let itemsHTML = "";
 
 
-        /* Display products inside order */
-        order.items.forEach(function(item) {
+        const orderItems =
+            Array.isArray(order.items)
+                ? order.items
+                : [];
+
+
+        orderItems.forEach(function(item) {
 
             const quantity =
                 Number(item.quantity) || 1;
@@ -95,26 +204,41 @@ function displayOrders() {
             const price =
                 Number(item.price) || 0;
 
+            const productName =
+                item.name ||
+                "Craft Product";
+
+            const productImage =
+                item.image ||
+                "images/kalasetu-logo.png";
+
+            const category =
+                item.category ||
+                "Handmade Craft";
+
+
             itemsHTML += `
                 <div class="order-product">
 
                     <div class="order-product-image">
 
                         <img
-                            src="${item.image}"
-                            alt="${item.name}"
+                            src="${productImage}"
+                            alt="${escapeHTML(productName)}"
+                            onerror="this.src='images/kalasetu-logo.png'"
                         >
 
                     </div>
 
+
                     <div class="order-product-info">
 
                         <h4>
-                            ${item.name}
+                            ${escapeHTML(productName)}
                         </h4>
 
                         <p>
-                            ${item.category}
+                            ${escapeHTML(category)}
                         </p>
 
                         <p>
@@ -123,8 +247,10 @@ function displayOrders() {
 
                     </div>
 
+
                     <strong>
-                        ₹${(price * quantity).toLocaleString("en-IN")}
+                        ₹${(price * quantity)
+                            .toLocaleString("en-IN")}
                     </strong>
 
                 </div>
@@ -132,7 +258,49 @@ function displayOrders() {
         });
 
 
-        /* Order card */
+        const status =
+            getOrderStatus(order.status);
+
+
+        const totalAmount =
+            Number(order.totalPrice) || 0;
+
+
+        const orderDate =
+            order.orderDate ||
+            "Recently";
+
+
+        const customerName =
+            order.customerName ||
+            "Customer";
+
+
+        const phone =
+            order.phone ||
+            "Not provided";
+
+
+        const address =
+            order.address ||
+            "Not provided";
+
+
+        const city =
+            order.city ||
+            "";
+
+
+        const state =
+            order.state ||
+            "";
+
+
+        const pincode =
+            order.pincode ||
+            "";
+
+
         orderCard.innerHTML = `
 
             <div class="order-header">
@@ -140,17 +308,26 @@ function displayOrders() {
                 <div>
 
                     <h3>
-                        Order #${order.id}
+                        Order #${escapeHTML(
+                            String(order.id)
+                        )}
                     </h3>
 
                     <p>
-                        ${order.orderDate}
+                        ${escapeHTML(
+                            String(orderDate)
+                        )}
                     </p>
 
                 </div>
 
-                <span class="order-status">
-                    ${order.status}
+
+                <span
+                    class="order-status status-${status
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}"
+                >
+                    ${status}
                 </span>
 
             </div>
@@ -171,22 +348,23 @@ function displayOrders() {
 
                 <p>
                     <strong>Name:</strong>
-                    ${order.customerName}
+                    ${escapeHTML(customerName)}
                 </p>
 
                 <p>
                     <strong>Phone:</strong>
-                    ${order.phone}
+                    ${escapeHTML(phone)}
                 </p>
 
                 <p>
                     <strong>Address:</strong>
-                    ${order.address}
+                    ${escapeHTML(address)}
                 </p>
 
                 <p>
-                    ${order.city}, ${order.state}
-                    - ${order.pincode}
+                    ${escapeHTML(city)},
+                    ${escapeHTML(state)}
+                    - ${escapeHTML(String(pincode))}
                 </p>
 
             </div>
@@ -199,18 +377,25 @@ function displayOrders() {
                 </span>
 
                 <strong>
-                    ₹${Number(order.total).toLocaleString("en-IN")}
+                    ₹${totalAmount.toLocaleString("en-IN")}
                 </strong>
 
             </div>
 
 
-            <button
-                class="cancel-order-btn"
-                onclick="cancelOrder(${order.id})"
-            >
-                Cancel Order
-            </button>
+            ${
+                status === "Pending" ||
+                status === "Confirmed"
+                    ? `
+                        <button
+                            class="cancel-order-btn"
+                            onclick="cancelOrder('${String(order.id)}')"
+                        >
+                            Cancel Order
+                        </button>
+                    `
+                    : ""
+            }
 
         `;
 
@@ -221,6 +406,86 @@ function displayOrders() {
 }
 
 
+/* ================= CANCEL ORDER ================= */
+
+async function cancelOrder(orderId) {
+
+    const confirmCancel =
+        confirm(
+            "Are you sure you want to cancel this order?"
+        );
+
+
+    if (!confirmCancel) {
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            `http://localhost:5000/api/customers/orders/${orderId}/cancel`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.message ||
+                "Unable to cancel order."
+            );
+
+            return;
+        }
+
+
+        alert("Order cancelled successfully.");
+
+        await loadOrders();
+
+
+    } catch (error) {
+
+        console.error(
+            "Cancel order error:",
+            error
+        );
+
+        alert(
+            "Unable to connect to server."
+        );
+    }
+}
+
+
+/* ================= HTML SAFETY ================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+}
+
+
 /* ================= START ================= */
 
-displayOrders();
+loadOrders();

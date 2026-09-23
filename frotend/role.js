@@ -5,7 +5,7 @@ function continueAs(role) {
     }
 
     else if (role === "creator") {
-        alert("Creator page will be created next.");
+       window.location.href = "creator-auth.html";
     }
 
 }

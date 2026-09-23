@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Kalasetu - Manage Customers</title>
+
+    <link
+        rel="stylesheet"
+        href="admin-customers.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="admin-page">
+
+
+    <!-- HEADER -->
+
+    <header class="admin-header">
+
+        <div class="brand">
+
+            <img
+                src="images/kalasetu-logo.png"
+                alt="Kalasetu"
+            >
+
+            <div>
+
+                <h1>KALASETU</h1>
+
+                <p>
+                    ADMIN • CUSTOMER MANAGEMENT
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="back-btn"
+            onclick="goDashboard()"
+        >
+            ← Dashboard
+        </button>
+
+    </header>
+
+
+
+    <!-- MAIN -->
+
+    <main class="content">
+
+
+        <!-- PAGE HEADING -->
+
+        <div class="page-heading">
+
+            <p class="eyebrow">
+                CUSTOMER MANAGEMENT
+            </p>
+
+            <h2>
+                Manage Customers
+            </h2>
+
+            <p>
+                View and manage customers registered on Kalasetu.
+            </p>
+
+        </div>
+
+
+
+        <!-- SUMMARY -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <span>
+                    Total Customers
+                </span>
+
+                <strong id="totalCustomers">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Active Customers
+                </span>
+
+                <strong id="activeCustomers">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    New Customers
+                </span>
+
+                <strong id="newCustomers">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- SEARCH -->
+
+        <div class="search-section">
+
+            <input
+                type="text"
+                id="customerSearch"
+                placeholder="Search customers..."
+                oninput="searchCustomers()"
+            >
+
+        </div>
+
+
+
+        <!-- CUSTOMER LIST -->
+
+        <section>
+
+            <div
+                id="customersList"
+                class="customers-list"
+            ></div>
+
+
+            <!-- EMPTY STATE -->
+
+            <div
+                id="emptyState"
+                class="empty-state"
+            >
+
+                <div class="empty-icon">
+                    ◇
+                </div>
+
+                <h3>
+                    No Customers Found
+                </h3>
+
+                <p>
+                    Registered customers will appear here.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            © 2026 Kalasetu • Admin Panel
+        </p>
+
+    </footer>
+
+
+</div>
+
+
+<script src="admin-customers.js"></script>
+
+</body>
+
+</html>

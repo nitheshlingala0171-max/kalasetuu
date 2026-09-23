@@ -1,148 +1,411 @@
- document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-    /* Creator Account */
+    /* =====================================================
+       CREATOR ACCOUNT
+    ===================================================== */
 
-    const creatorData = localStorage.getItem("creatorAccount");
+    const creatorData =
+        localStorage.getItem("creatorAccount");
 
-    const creatorName = document.getElementById("creatorName");
+    const creatorNameElement =
+        document.getElementById("creatorName");
+
+    let creator = {};
 
     if (creatorData) {
-        try {
-            const creator = JSON.parse(creatorData);
 
-            if (creatorName) {
-                creatorName.textContent = creator.name || "Creator";
-            }
+        try {
+
+            creator = JSON.parse(creatorData);
 
         } catch (error) {
-            console.log("Creator account data error:", error);
 
-            if (creatorName) {
-                creatorName.textContent = "Creator";
-            }
+            console.log(
+                "Creator account data error:",
+                error
+            );
+
         }
 
-    } else {
-
-        if (creatorName) {
-            creatorName.textContent = "Creator";
-        }
-
-        console.log("creatorAccount data not found in localStorage.");
     }
 
 
-    /* Verification Data */
+    if (creatorNameElement) {
 
-    const verificationData =
-        localStorage.getItem("creatorVerification");
+        creatorNameElement.textContent =
+            creator.name || "Creator";
 
-    if (verificationData) {
+    }
+
+
+
+    /* =====================================================
+       GET ALL VERIFICATION RECORDS
+    ===================================================== */
+
+    let verifications = [];
+
+    try {
+
+        verifications =
+            JSON.parse(
+                localStorage.getItem(
+                    "creatorVerifications"
+                )
+            ) || [];
+
+    } catch (error) {
+
+        console.log(
+            "Verification records error:",
+            error
+        );
+
+        verifications = [];
+
+    }
+
+
+
+    /* =====================================================
+       FIND CURRENT CREATOR
+    ===================================================== */
+
+    let matchingRecords = [];
+
+
+    if (Array.isArray(verifications)) {
+
+        matchingRecords =
+            verifications.filter(function (item) {
+
+                const sameContact =
+                    creator.contact &&
+                    item.contact &&
+                    String(item.contact).trim() ===
+                    String(creator.contact).trim();
+
+
+                const sameName =
+                    creator.name &&
+                    item.name &&
+                    String(item.name).trim().toLowerCase() ===
+                    String(creator.name).trim().toLowerCase();
+
+
+                return sameContact || sameName;
+
+            });
+
+    }
+
+
+
+    /* =====================================================
+       SELECT CORRECT VERIFICATION
+    ===================================================== */
+
+    let verification = null;
+
+
+    /*
+       First priority:
+       Approved record for this creator
+    */
+
+    const approvedRecord =
+        matchingRecords.find(function (item) {
+
+            return item.status === "Approved";
+
+        });
+
+
+    if (approvedRecord) {
+
+        verification =
+            approvedRecord;
+
+    }
+
+
+    /*
+       Second priority:
+       Pending record
+    */
+
+    if (!verification) {
+
+        const pendingRecord =
+            matchingRecords.find(function (item) {
+
+                return item.status === "Pending";
+
+            });
+
+
+        if (pendingRecord) {
+
+            verification =
+                pendingRecord;
+
+        }
+
+    }
+
+
+    /*
+       Third priority:
+       Rejected record
+    */
+
+    if (!verification) {
+
+        const rejectedRecord =
+            matchingRecords.find(function (item) {
+
+                return item.status === "Rejected";
+
+            });
+
+
+        if (rejectedRecord) {
+
+            verification =
+                rejectedRecord;
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       FALLBACK TO SINGLE VERIFICATION
+    ===================================================== */
+
+    if (!verification) {
 
         try {
 
-            const verification =
-                JSON.parse(verificationData);
-
-            const craft =
-                document.getElementById("creatorCraft");
-
-            const location =
-                document.getElementById("creatorLocation");
-
-            const experience =
-                document.getElementById("creatorExperience");
-
-            const status =
-                document.getElementById("verificationStatus");
+            const singleData =
+                localStorage.getItem(
+                    "creatorVerification"
+                );
 
 
-            if (craft) {
-                craft.textContent =
-                    verification.craft || "Not available";
-            }
+            if (singleData) {
 
-            if (location) {
-                location.textContent =
-                    verification.location || "Not available";
-            }
+                verification =
+                    JSON.parse(
+                        singleData
+                    );
 
-            if (experience) {
-                experience.textContent =
-                    verification.experience
-                        ? verification.experience + " years"
-                        : "Not available";
-            }
-
-            if (status) {
-
-                status.textContent =
-                    verification.status || "Under Review";
-
-
-                if (verification.status === "Approved") {
-
-                    status.style.background = "#dfead9";
-                    status.style.color = "#557047";
-
-                } else if (verification.status === "Rejected") {
-
-                    status.style.background = "#f2d9d4";
-                    status.style.color = "#9b4034";
-
-                }
             }
 
         } catch (error) {
 
             console.log(
-                "Creator verification data error:",
+                "Single verification error:",
                 error
             );
 
         }
+
+    }
+
+
+
+    /* =====================================================
+       DISPLAY VERIFICATION INFORMATION
+    ===================================================== */
+
+    if (verification) {
+
+        const craft =
+            document.getElementById(
+                "creatorCraft"
+            );
+
+        const location =
+            document.getElementById(
+                "creatorLocation"
+            );
+
+        const experience =
+            document.getElementById(
+                "creatorExperience"
+            );
+
+        const status =
+            document.getElementById(
+                "verificationStatus"
+            );
+
+
+
+        /* Craft */
+
+        if (craft) {
+
+            craft.textContent =
+                verification.craftType ||
+                verification.craft ||
+                "Not available";
+
+        }
+
+
+
+        /* Location */
+
+        if (location) {
+
+            location.textContent =
+                verification.location ||
+                "Not available";
+
+        }
+
+
+
+        /* Experience */
+
+        if (experience) {
+
+            experience.textContent =
+                verification.experience
+                    ? verification.experience + " years"
+                    : "Not available";
+
+        }
+
+
+
+        /* Verification Status */
+
+        if (status) {
+
+            const currentStatus =
+                verification.status ||
+                "Under Review";
+
+
+            status.textContent =
+                currentStatus;
+
+
+            if (
+                currentStatus ===
+                "Approved"
+            ) {
+
+                status.style.background =
+                    "#dfead9";
+
+                status.style.color =
+                    "#557047";
+
+
+            } else if (
+                currentStatus ===
+                "Rejected"
+            ) {
+
+                status.style.background =
+                    "#f2d9d4";
+
+                status.style.color =
+                    "#9b4034";
+
+
+            } else {
+
+                status.style.background =
+                    "";
+
+                status.style.color =
+                    "";
+
+            }
+
+        }
+
     }
 
 });
 
 
-/* My Crafts */
+
+/* =====================================================
+   MY CRAFTS
+===================================================== */
 
 function openMyCrafts() {
-    window.location.href = "creator-my-crafts.html";
+
+    window.location.href =
+        "creator-my-crafts.html";
+
 }
 
 
-/* Add New Craft */
+
+/* =====================================================
+   ADD NEW CRAFT
+===================================================== */
 
 function addNewCraft() {
-    window.location.href = "creator-add-craft.html";
+
+    window.location.href =
+        "creator-add-craft.html";
+
 }
 
 
-/* Orders */
+
+/* =====================================================
+   ORDERS
+===================================================== */
 
 function openOrders() {
-    window.location.href = "creator-orders.html";
+
+    window.location.href =
+        "creator-orders.html";
+
 }
 
 
-/* Creator Profile */
+
+/* =====================================================
+   CREATOR PROFILE
+===================================================== */
 
 function openProfile() {
-    window.location.href = "creator-profile.html";
+
+    window.location.href =
+        "creator-profile.html";
+
 }
 
 
-/* Logout */
+
+/* =====================================================
+   LOGOUT
+===================================================== */
 
 function logout() {
 
     const confirmLogout =
-        confirm("Are you sure you want to logout?");
+        confirm(
+            "Are you sure you want to logout?"
+        );
+
 
     if (confirmLogout) {
-        window.location.href = "creator-auth.html";
+
+        window.location.href =
+            "creator-auth.html";
+
     }
 
 }

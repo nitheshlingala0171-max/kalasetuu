@@ -1,0 +1,410 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+
+    background-image:
+        linear-gradient(
+            rgba(246, 235, 221, 0.68),
+            rgba(246, 235, 221, 0.68)
+        ),
+        url("images/background.png");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+
+    color: #33231E;
+}
+
+
+/* ================= PAGE ================= */
+
+.admin-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ================= HEADER ================= */
+
+.admin-header {
+    width: 100%;
+    padding: 18px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid rgba(51, 35, 30, 0.12);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand img {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.brand h1 {
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #33231E;
+}
+
+.brand p {
+    margin-top: 4px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #7B8060;
+}
+
+
+/* ================= BACK BUTTON ================= */
+
+.back-btn {
+    border: none;
+    background: #33231E;
+    color: #FFFFFF;
+
+    padding: 11px 18px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    transition: 0.2s ease;
+}
+
+.back-btn:hover {
+    opacity: 0.88;
+}
+
+
+/* ================= MAIN ================= */
+
+.content {
+    width: 90%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+    padding: 45px 0 60px;
+
+    flex: 1;
+}
+
+
+/* ================= PAGE HEADING ================= */
+
+.page-heading {
+    margin-bottom: 30px;
+}
+
+.eyebrow {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #7B8060;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.page-heading h2 {
+    font-size: 34px;
+    margin-bottom: 8px;
+}
+
+.page-heading > p:last-child {
+    color: #6D625C;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+
+/* ================= SUMMARY ================= */
+
+.summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 35px;
+}
+
+.summary-card {
+    background: rgba(255, 255, 255, 0.94);
+
+    border: 1px solid rgba(51, 35, 30, 0.10);
+
+    border-radius: 14px;
+
+    padding: 24px;
+
+    box-shadow:
+        0 8px 25px rgba(51, 35, 30, 0.08);
+
+    transition: transform 0.2s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+}
+
+.summary-card span {
+    display: block;
+
+    font-size: 13px;
+
+    color: #7B8060;
+
+    margin-bottom: 10px;
+}
+
+.summary-card strong {
+    display: block;
+
+    font-size: 34px;
+
+    color: #33231E;
+}
+
+
+/* ================= REPORT SECTION ================= */
+
+.report-section {
+    background: rgba(255, 255, 255, 0.92);
+
+    border-radius: 16px;
+
+    padding: 28px;
+
+    margin-bottom: 28px;
+
+    border: 1px solid rgba(51, 35, 30, 0.10);
+
+    box-shadow:
+        0 8px 25px rgba(51, 35, 30, 0.07);
+}
+
+.section-heading {
+    margin-bottom: 22px;
+}
+
+.section-heading h3 {
+    font-size: 22px;
+}
+
+
+/* ================= ORDER STATUS ================= */
+
+.status-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 14px;
+}
+
+.status-card {
+    padding: 20px;
+
+    border-radius: 12px;
+
+    background: #F6EBDD;
+
+    border: 1px solid rgba(51, 35, 30, 0.08);
+}
+
+.status-card span {
+    display: block;
+
+    font-size: 13px;
+
+    color: #6D625C;
+
+    margin-bottom: 8px;
+}
+
+.status-card strong {
+    font-size: 28px;
+
+    color: #33231E;
+}
+
+
+/* ================= ACTIVITY ================= */
+
+.activity-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 16px;
+}
+
+.activity-card {
+    padding: 22px;
+
+    border-radius: 12px;
+
+    background: #F6EBDD;
+
+    border: 1px solid rgba(51, 35, 30, 0.08);
+}
+
+.activity-card span {
+    display: block;
+
+    font-size: 13px;
+
+    color: #6D625C;
+
+    margin-bottom: 10px;
+
+    line-height: 1.4;
+}
+
+.activity-card strong {
+    font-size: 30px;
+
+    color: #33231E;
+}
+
+
+/* ================= OVERVIEW BOX ================= */
+
+.overview-box {
+    background: rgba(255, 255, 255, 0.92);
+
+    border-left: 5px solid #7B8060;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 8px 25px rgba(51, 35, 30, 0.06);
+}
+
+.overview-box h3 {
+    font-size: 21px;
+
+    margin-bottom: 12px;
+}
+
+.overview-box p {
+    color: #6D625C;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    margin-bottom: 8px;
+}
+
+
+/* ================= FOOTER ================= */
+
+footer {
+    text-align: center;
+
+    padding: 20px;
+
+    background: rgba(255, 255, 255, 0.90);
+
+    border-top: 1px solid rgba(51, 35, 30, 0.10);
+
+    color: #6D625C;
+
+    font-size: 13px;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .status-grid {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .activity-grid {
+        grid-template-columns:
+            1fr;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .admin-header {
+        padding: 15px 4%;
+    }
+
+    .brand img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .brand h1 {
+        font-size: 18px;
+    }
+
+    .brand p {
+        font-size: 9px;
+    }
+
+    .back-btn {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    .content {
+        width: 92%;
+        padding-top: 30px;
+    }
+
+    .page-heading h2 {
+        font-size: 27px;
+    }
+
+    .summary-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .status-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .report-section {
+        padding: 20px;
+    }
+}

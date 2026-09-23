@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kalasetu - Reports & Overview</title>
+
+    <link rel="stylesheet" href="admin-reports.css">
+</head>
+
+<body>
+
+<div class="admin-page">
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="admin-header">
+
+        <div class="brand">
+
+            <img
+                src="images/kalasetu-logo.png"
+                alt="Kalasetu"
+            >
+
+            <div>
+                <h1>KALASETU</h1>
+                <p>ADMIN • REPORTS & OVERVIEW</p>
+            </div>
+
+        </div>
+
+        <button
+            class="back-btn"
+            onclick="goDashboard()"
+        >
+            ← Dashboard
+        </button>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="content">
+
+        <div class="page-heading">
+
+            <p class="eyebrow">
+                PLATFORM OVERVIEW
+            </p>
+
+            <h2>
+                Reports & Overview
+            </h2>
+
+            <p>
+                View the overall activity and performance of the Kalasetu platform.
+            </p>
+
+        </div>
+
+
+        <!-- ================= SUMMARY ================= -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <span>
+                    Total Customers
+                </span>
+
+                <strong id="totalCustomers">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Total Creators
+                </span>
+
+                <strong id="totalCreators">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Total Crafts
+                </span>
+
+                <strong id="totalCrafts">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Total Orders
+                </span>
+
+                <strong id="totalOrders">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= ORDER OVERVIEW ================= -->
+
+        <section class="report-section">
+
+            <div class="section-heading">
+
+                <p class="eyebrow">
+                    ORDER OVERVIEW
+                </p>
+
+                <h3>
+                    Order Status
+                </h3>
+
+            </div>
+
+
+            <div class="status-grid">
+
+                <div class="status-card">
+
+                    <span>
+                        Pending
+                    </span>
+
+                    <strong id="pendingOrders">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <span>
+                        Confirmed
+                    </span>
+
+                    <strong id="confirmedOrders">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <span>
+                        Shipped
+                    </span>
+
+                    <strong id="shippedOrders">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <span>
+                        Delivered
+                    </span>
+
+                    <strong id="deliveredOrders">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="status-card">
+
+                    <span>
+                        Cancelled
+                    </span>
+
+                    <strong id="cancelledOrders">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PLATFORM ACTIVITY ================= -->
+
+        <section class="report-section">
+
+            <div class="section-heading">
+
+                <p class="eyebrow">
+                    PLATFORM ACTIVITY
+                </p>
+
+                <h3>
+                    Current Activity
+                </h3>
+
+            </div>
+
+
+            <div class="activity-grid">
+
+                <div class="activity-card">
+
+                    <span>
+                        Approved Creators
+                    </span>
+
+                    <strong id="approvedCreators">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="activity-card">
+
+                    <span>
+                        Pending Creator Verification
+                    </span>
+
+                    <strong id="pendingCreators">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="activity-card">
+
+                    <span>
+                        Crafts Under Review
+                    </span>
+
+                    <strong id="reviewCrafts">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= REPORT NOTE ================= -->
+
+        <section class="overview-box">
+
+            <h3>
+                Platform Overview
+            </h3>
+
+            <p>
+                This section gives the administrator a quick view of
+                customers, creators, crafts and orders currently recorded
+                in the Kalasetu platform.
+            </p>
+
+            <p>
+                The numbers are automatically collected from the platform
+                data and updated whenever this page is opened.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            © 2026 Kalasetu • Admin Panel
+        </p>
+
+    </footer>
+
+</div>
+
+
+<script src="admin-reports.js"></script>
+
+</body>
+</html>

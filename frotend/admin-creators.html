@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kalasetu - Creator Verification</title>
+
+    <link rel="stylesheet" href="admin-creators.css">
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <!-- HEADER -->
+    <header class="admin-header">
+
+        <div class="brand">
+
+            <div class="logo">
+                <img src="images/kalasetu-logo.png" alt="Kalasetu">
+            </div>
+
+            <div>
+                <h1>KALASETU</h1>
+                <p>ADMIN • CREATOR VERIFICATION</p>
+            </div>
+
+        </div>
+
+        <button class="back-btn" onclick="goBack()">
+            ← DASHBOARD
+        </button>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+        <!-- PAGE HEADING -->
+        <section class="page-heading">
+
+            <p class="small-title">
+                PLATFORM MANAGEMENT
+            </p>
+
+            <h2>
+                Creator Verification
+            </h2>
+
+            <p>
+                Review creator applications and verify
+                their handmade craft profiles.
+            </p>
+
+        </section>
+
+
+        <!-- STATUS SUMMARY -->
+        <section class="status-grid">
+
+            <div class="status-card">
+
+                <span class="status-label">
+                    Pending Requests
+                </span>
+
+                <strong id="pendingCount">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="status-card">
+
+                <span class="status-label">
+                    Approved Creators
+                </span>
+
+                <strong id="approvedCount">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="status-card">
+
+                <span class="status-label">
+                    Rejected Requests
+                </span>
+
+                <strong id="rejectedCount">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- PENDING REQUESTS -->
+        <section class="requests-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="small-title">
+                        VERIFICATION REQUESTS
+                    </p>
+
+                    <h3>
+                        Pending Creator Applications
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <!-- REQUEST LIST -->
+            <div id="creatorRequests" class="creator-requests">
+
+                <!-- JavaScript will load creator requests here -->
+
+            </div>
+
+
+            <!-- EMPTY MESSAGE -->
+            <div
+                id="emptyMessage"
+                class="empty-message"
+                style="display: none;"
+            >
+
+                <div class="empty-icon">
+                    ✓
+                </div>
+
+                <h3>
+                    No Pending Requests
+                </h3>
+
+                <p>
+                    There are currently no creator verification
+                    requests waiting for review.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- APPROVED CREATORS -->
+        <section class="approved-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="small-title">
+                        VERIFIED CREATORS
+                    </p>
+
+                    <h3>
+                        Approved Creators
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <div id="approvedCreators" class="approved-creators">
+
+                <!-- JavaScript will load approved creators here -->
+
+            </div>
+
+        </section>
+
+
+        <!-- ADMIN INFORMATION -->
+        <section class="admin-info">
+
+            <div>
+
+                <span>
+                    Logged in as
+                </span>
+
+                <strong id="adminEmail">
+                    Admin
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Platform
+                </span>
+
+                <strong>
+                    Kalasetu
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Section
+                </span>
+
+                <strong>
+                    Creator Verification
+                </strong>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        HANDMADE WITH TRADITION • CONNECTED THROUGH STORIES
+    </footer>
+
+</div>
+
+
+<script src="admin-creators.js"></script>
+
+</body>
+</html>

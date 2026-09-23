@@ -261,5 +261,5 @@ function buyNow() {
         JSON.stringify(order)
     );
 
-    window.location.href = "my-orders.html";
+    window.location.href = "checkout.html";
 }
