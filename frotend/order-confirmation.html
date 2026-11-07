@@ -1,45 +1,31 @@
- <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Order Confirmation | Kalasetu</title>
-
     <link rel="stylesheet" href="order-confirmation.css">
 </head>
 
 <body>
 
-    <!-- ================= BLAST CONTAINER ================= -->
     <div id="confetti-container"></div>
 
-
-    <!-- ================= HEADER ================= -->
-
     <header class="confirmation-header">
-
         <div class="logo-area">
             <img src="images/kalasetu-logo.png" alt="Kalasetu">
         </div>
-
         <div class="brand-name">
             <h1>Kalasetu</h1>
             <p>TRADITION • CRAFT • STORY</p>
         </div>
-
     </header>
 
-
-    <!-- ================= MAIN ================= -->
-
     <main class="confirmation-container">
-
         <div class="confirmation-card">
 
-            <div class="success-icon">
-                ✓
-            </div>
+            <div class="success-icon">✓</div>
 
             <h2>Order Successful!</h2>
 
@@ -47,9 +33,6 @@
                 Thank you for supporting handmade craftsmanship.
                 Your order has been successfully placed.
             </p>
-
-
-            <!-- ================= ORDER DETAILS ================= -->
 
             <div class="order-details">
 
@@ -68,6 +51,13 @@
                     <strong id="paymentMethod">--</strong>
                 </div>
 
+                <div class="detail-row">
+                    <span>Delivery Address</span>
+                    <strong id="deliveryAddress">--</strong>
+                </div>
+
+                <div id="confirmedItems"></div>
+
                 <div class="detail-row total-row">
                     <span>Total Amount</span>
                     <strong id="orderTotal">₹0</strong>
@@ -75,251 +65,248 @@
 
             </div>
 
-
-            <!-- ================= BUTTONS ================= -->
-
             <div class="confirmation-actions">
 
-                <button
-                    type="button"
-                    class="track-btn"
-                    onclick="trackOrder()"
-                >
+                <button type="button" class="track-btn" onclick="trackOrder()">
                     Track Order
                 </button>
 
-                <button
-                    type="button"
-                    class="home-btn"
-                    onclick="window.location.href='customer-home.html'"
-                >
+                <button type="button" class="home-btn"
+                    onclick="window.location.href='customer-home.html'">
                     Continue Shopping
                 </button>
 
             </div>
 
         </div>
-
     </main>
 
-
-    <!-- ================= JAVASCRIPT ================= -->
-
     <script>
+        function formatMoney(value) {
+            return "₹" + Number(value || 0).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
 
-        /* ================= LOAD LATEST ORDER ================= */
+        function addText(parent, tag, text, className) {
+            const element = document.createElement(tag);
+            element.textContent = text;
+            if (className) element.className = className;
+            parent.appendChild(element);
+            return element;
+        }
 
-        const orders =
-            JSON.parse(localStorage.getItem("orders")) || [];
+        function getBreakdown(item) {
+            const saved = item.priceBreakdown || {};
 
-        if (orders.length > 0) {
+            const creator = Number(
+                saved.creatorPrice ?? item.creatorPrice ?? 0
+            );
+            const materials = Number(
+                saved.materials ?? item.materials ?? 0
+            );
+            const packaging = Number(
+                saved.packaging ?? item.packaging ?? 0
+            );
+            const platform = Number(
+                saved.platformServices ?? item.platformServices ?? 0
+            );
 
-            const latestOrder =
-                orders[orders.length - 1];
+            const savedTotal = Number(
+                saved.total ?? item.price ?? item.totalPrice ?? 0
+            );
+
+            const hasBreakdown =
+                saved.creatorPrice !== undefined ||
+                item.creatorPrice !== undefined;
+
+            if (hasBreakdown) {
+                return {
+                    creator,
+                    materials,
+                    packaging,
+                    platform,
+                    total: savedTotal || creator + materials + packaging + platform
+                };
+            }
+
+            const total = Number(item.price || item.totalPrice || 0);
+
+            return {
+                creator: total * 0.60,
+                materials: total * 0.20,
+                packaging: total * 0.10,
+                platform: total * 0.10,
+                total
+            };
+        }
+
+        function displayOrder() {
+            const currentOrder = JSON.parse(
+                localStorage.getItem("currentOrder") || "null"
+            );
+
+            const oldOrders = JSON.parse(
+                localStorage.getItem("orders") || "[]"
+            );
+
+            const order = currentOrder ||
+                (oldOrders.length ? oldOrders[oldOrders.length - 1] : null);
+
+            if (!order) {
+                document.getElementById("orderId").textContent =
+                    "Order details unavailable";
+                return;
+            }
 
             document.getElementById("orderId").textContent =
-                "#" + latestOrder.id;
+                "#" + (order.id || order.orderId || "--");
 
-            document.getElementById("orderDate").textContent =
-                latestOrder.orderDate || "--";
+            const date = order.orderDate || order.createdAt || order.date;
+
+            document.getElementById("orderDate").textContent = date
+                ? new Date(date).toLocaleString("en-IN")
+                : new Date().toLocaleString("en-IN");
 
             document.getElementById("paymentMethod").textContent =
-                latestOrder.paymentMethod || "Cash on Delivery";
+                order.paymentMethod || "Cash on Delivery";
+
+            const address = [
+                order.address,
+                order.city,
+                order.state,
+                order.pincode
+            ].filter(Boolean).join(", ");
+
+            document.getElementById("deliveryAddress").textContent =
+                address || "--";
+
+            const items = order.items || [];
+            const container = document.getElementById("confirmedItems");
+
+            items.forEach(item => {
+                const breakdown = getBreakdown(item);
+                const quantity = Number(item.quantity || 1);
+
+                const itemBox = document.createElement("div");
+                itemBox.className = "confirmed-item";
+
+                addText(
+                    itemBox,
+                    "h3",
+                    (item.name || "Craft Item") + " × " + quantity
+                );
+
+                const rows = [
+                    ["Creator Price", breakdown.creator],
+                    ["Materials", breakdown.materials],
+                    ["Packaging", breakdown.packaging],
+                    ["Platform & Services", breakdown.platform]
+                ];
+
+                rows.forEach(([label, value]) => {
+                    const row = document.createElement("div");
+                    row.className = "detail-row";
+
+                    addText(row, "span", label);
+                    addText(row, "strong", formatMoney(value * quantity));
+
+                    itemBox.appendChild(row);
+                });
+
+                const totalRow = document.createElement("div");
+                totalRow.className = "detail-row";
+
+                addText(totalRow, "span", "Item Total");
+                addText(
+                    totalRow,
+                    "strong",
+                    formatMoney(breakdown.total * quantity)
+                );
+
+                itemBox.appendChild(totalRow);
+                container.appendChild(itemBox);
+            });
+
+            const total = Number(
+                order.totalPrice ?? order.total ?? 0
+            );
 
             document.getElementById("orderTotal").textContent =
-                "₹" +
-                Number(latestOrder.total || 0)
-                    .toLocaleString("en-IN");
+                formatMoney(total);
         }
-
-
-        /* ================= TRACK ORDER ================= */
 
         function trackOrder() {
-
-            window.location.href =
-                "order-tracking.html";
-
+            window.location.href = "order-tracking.html";
         }
 
-
-        /* ================= ORDER SUCCESS BLAST ================= */
-
         window.addEventListener("load", function () {
+            displayOrder();
 
             const container =
                 document.getElementById("confetti-container");
 
-            if (!container) {
-                return;
-            }
+            if (!container) return;
 
             container.innerHTML = "";
 
-
-            /* ================= PARTICLE COLORS ================= */
-
             const colors = [
-                "#6f593f",
-                "#8b6f47",
-                "#c89f6a",
-                "#d8b48a",
-                "#7f9b67",
-                "#b98b5f",
-                "#a66a45"
+                "#6f593f", "#8b6f47", "#c89f6a",
+                "#d8b48a", "#7f9b67", "#b98b5f", "#a66a45"
             ];
 
-
-            /* ================= SCREEN CENTER ================= */
-
-            const centerX =
-                window.innerWidth / 2;
-
-            const centerY =
-                window.innerHeight / 2;
-
-
-            /* ================= CREATE PARTICLES ================= */
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
 
             for (let i = 0; i < 100; i++) {
-
-                const particle =
-                    document.createElement("div");
-
-
-                /* Position */
+                const particle = document.createElement("div");
 
                 particle.style.position = "fixed";
-
-                particle.style.left =
-                    centerX + "px";
-
-                particle.style.top =
-                    centerY + "px";
-
-
-                /* Size */
-
-                particle.style.width =
-                    (5 + Math.random() * 8) + "px";
-
-                particle.style.height =
-                    (8 + Math.random() * 14) + "px";
-
-
-                /* Color */
-
+                particle.style.left = centerX + "px";
+                particle.style.top = centerY + "px";
+                particle.style.width = (5 + Math.random() * 8) + "px";
+                particle.style.height = (8 + Math.random() * 14) + "px";
                 particle.style.backgroundColor =
-                    colors[
-                        Math.floor(
-                            Math.random() * colors.length
-                        )
-                    ];
+                    colors[Math.floor(Math.random() * colors.length)];
+                particle.style.borderRadius = "2px";
+                particle.style.zIndex = "99999";
+                particle.style.pointerEvents = "none";
 
-
-                /* Shape */
-
-                particle.style.borderRadius =
-                    "2px";
-
-
-                /* Layer */
-
-                particle.style.zIndex =
-                    "99999";
-
-                particle.style.pointerEvents =
-                    "none";
-
-
-                /* ================= RANDOM DIRECTION ================= */
-
-                const angle =
-                    Math.random() * Math.PI * 2;
-
-
-                const distance =
-                    250 + Math.random() * 550;
-
-
-                const endX =
-                    Math.cos(angle) * distance;
-
-
-                const endY =
-                    Math.sin(angle) * distance;
-
-
-                /* Random rotation */
-
-                const rotate =
-                    Math.random() * 1440;
-
-
-                /* Random speed */
-
-                const duration =
-                    900 + Math.random() * 900;
-
-
-                /* ================= ANIMATION ================= */
-
-                particle.animate(
-
-                    [
-                        {
-                            transform:
-                                "translate(-50%, -50%) scale(0.2) rotate(0deg)",
-
-                            opacity: 1
-                        },
-
-                        {
-                            transform:
-                                "translate(" +
-                                endX +
-                                "px, " +
-                                endY +
-                                "px) scale(1) rotate(" +
-                                rotate +
-                                "deg)",
-
-                            opacity: 0
-                        }
-                    ],
-
-                    {
-                        duration: duration,
-
-                        delay:
-                            Math.random() * 120,
-
-                        easing:
-                            "cubic-bezier(.15,.75,.25,1)",
-
-                        fill: "forwards"
-                    }
-
-                );
-
-
-                /* Add particle */
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 250 + Math.random() * 550;
+                const endX = Math.cos(angle) * distance;
+                const endY = Math.sin(angle) * distance;
+                const rotate = Math.random() * 1440;
+                const duration = 900 + Math.random() * 900;
 
                 container.appendChild(particle);
 
+                particle.animate(
+                    [
+                        {
+                            transform: "translate(-50%, -50%) scale(0.2)",
+                            opacity: 1
+                        },
+                        {
+                            transform:
+                                `translate(${endX}px, ${endY}px) scale(1) rotate(${rotate}deg)`,
+                            opacity: 0
+                        }
+                    ],
+                    {
+                        duration,
+                        delay: Math.random() * 120,
+                        easing: "cubic-bezier(.15,.75,.25,1)",
+                        fill: "forwards"
+                    }
+                );
             }
 
-
-            /* ================= REMOVE PARTICLES ================= */
-
-            setTimeout(function () {
-
+            setTimeout(() => {
                 container.innerHTML = "";
-
             }, 2200);
-
         });
-
     </script>
 
 </body>

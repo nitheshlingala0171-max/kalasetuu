@@ -404,3 +404,26 @@ body {
     }
 
 }
+/* ================= TRACKING ERROR / CANCELLED ================= */
+
+.tracking-error,
+.cancelled-tracking-message {
+    margin-top: 20px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tracking-error {
+    background: #f5dede;
+    border: 1px solid #e8c2bd;
+    color: #a13c35;
+}
+
+.cancelled-tracking-message {
+    background: #f5dede;
+    border: 1px solid #e8c2bd;
+    color: #a13c35;
+}

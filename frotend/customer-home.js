@@ -101,7 +101,54 @@ function openProduct(productName) {
         encodeURIComponent(productName);
 
 }
+/* ================= CUSTOMER STOCK STATUS ================= */
 
+function updateCustomerStockStatus() {
+
+    const crafts = JSON.parse(
+        localStorage.getItem("creatorCrafts") || "[]"
+    );
+
+    document.querySelectorAll(".product-card").forEach(card => {
+
+        const title = card.querySelector("h3");
+
+        if (!title) return;
+
+        const productName = title.innerText.trim();
+
+        const creatorCraft = crafts.find(item =>
+            String(item.name || "").trim().toLowerCase() ===
+            productName.toLowerCase()
+        );
+
+        if (!creatorCraft) return;
+
+        let stockLabel = card.querySelector(".customer-stock-status");
+
+        if (!stockLabel) {
+            stockLabel = document.createElement("span");
+            stockLabel.className = "customer-stock-status";
+            card.appendChild(stockLabel);
+        }
+
+        const status = creatorCraft.stockStatus || "In Stock";
+
+        stockLabel.textContent = status;
+
+        stockLabel.classList.toggle(
+            "out-of-stock",
+            status === "Out of Stock"
+        );
+
+        stockLabel.classList.toggle(
+            "in-stock",
+            status !== "Out of Stock"
+        );
+    });
+}
+
+updateCustomerStockStatus();
 
 
 /* ================= HEADER ICONS ================= */
@@ -294,6 +341,124 @@ if (searchInput) {
     window.searchProducts = searchProducts;
 }
 
+/* ================= CUSTOMER STOCK STATUS ================= */
+
+function getCreatorCraftStock(productName) {
+    const crafts = JSON.parse(
+        localStorage.getItem("creatorCrafts") || "[]"
+    );
+
+    const craft = crafts.find(item =>
+        String(item.name || "").trim().toLowerCase() ===
+        String(productName || "").trim().toLowerCase()
+    );
+
+    return craft ? (craft.stockStatus || "In Stock") : "In Stock";
+}
+
+function displayCustomerStockStatus() {
+    const productCards = document.querySelectorAll(".product-card");
+
+    productCards.forEach(card => {
+        const title = card.querySelector("h3");
+        const productInfo = card.querySelector(".product-info");
+
+        if (!title || !productInfo) return;
+
+        const stockStatus = getCreatorCraftStock(title.textContent.trim());
+
+        let stockLabel = card.querySelector(".customer-stock-status");
+
+        if (!stockLabel) {
+            stockLabel = document.createElement("span");
+            stockLabel.className = "customer-stock-status";
+
+            const price = productInfo.querySelector(".price");
+
+            if (price) {
+                price.insertAdjacentElement("afterend", stockLabel);
+            } else {
+                productInfo.appendChild(stockLabel);
+            }
+        }
+
+        stockLabel.textContent = stockStatus;
+
+        stockLabel.classList.toggle(
+            "in-stock",
+            stockStatus === "In Stock"
+        );
+
+        stockLabel.classList.toggle(
+            "out-of-stock",
+            stockStatus === "Out of Stock"
+        );
+    });
+}
+
+displayCustomerStockStatus();
 /* ================= INITIAL SLIDE ================= */
 
 showFestival(0);
+/* ============ DISPLAY APPROVED CREATOR CRAFTS ============ */
+
+function displayCreatorCrafts() {
+
+    const container = document.getElementById(
+        "creatorCraftsContainer"
+    );
+
+    if (!container) return;
+
+    const crafts = JSON.parse(
+        localStorage.getItem("creatorCrafts") || "[]"
+    );
+
+    container.innerHTML = "";
+
+    const approvedCrafts = crafts.filter(
+        craft => craft.status === "Approved"
+    );
+
+    approvedCrafts.forEach(craft => {
+
+        const card = document.createElement("div");
+        card.className = "product-card";
+
+        card.innerHTML = `
+            <div class="product-image">
+                <img src="${craft.image}" alt="Craft">
+            </div>
+
+            <div class="product-info">
+                <h3></h3>
+                <p></p>
+                <span class="price"></span>
+                <span class="customer-stock-status"></span>
+            </div>
+        `;
+
+        card.querySelector("h3").textContent = craft.name;
+        card.querySelector("p").textContent = craft.category;
+        card.querySelector(".price").textContent = "₹" + craft.price;
+
+        const stockLabel = card.querySelector(
+            ".customer-stock-status"
+        );
+
+        const status = craft.stockStatus || "In Stock";
+
+        stockLabel.textContent = status;
+        stockLabel.classList.add(
+            status === "Out of Stock" ? "out-of-stock" : "in-stock"
+        );
+
+      card.addEventListener("click", () => {
+    openProduct(craft.name);
+});
+
+        container.appendChild(card);
+    });
+}
+
+displayCreatorCrafts();

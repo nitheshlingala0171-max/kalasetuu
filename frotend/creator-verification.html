@@ -1,9 +1,12 @@
- <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Kalasetu - Creator Verification</title>
+
     <link rel="stylesheet" href="creator-verification.css">
 </head>
 
@@ -25,8 +28,7 @@
             Verify your handmade craft profile to become a creator on Kalasetu.
         </p>
 
-        <!-- Steps -->
-
+        <!-- STEPS -->
         <div class="steps">
 
             <div class="step active">
@@ -60,68 +62,33 @@
 
         <form id="verificationForm">
 
-            <!-- Craft Type -->
-
+            <!-- CRAFT TYPE -->
             <div class="input-group">
 
-                <label for="craftType">
-                    Craft / Art Type
-                </label>
+                <label for="craftType">Craft / Art Type</label>
 
                 <select id="craftType" required>
 
-                    <option value="">
-                        Select your craft / art type
-                    </option>
-
-                    <option value="Pottery">
-                        Pottery
-                    </option>
-
-                    <option value="Handloom">
-                        Handloom
-                    </option>
-
-                    <option value="Woodcraft">
-                        Woodcraft
-                    </option>
-
-                    <option value="Jewellery">
-                        Jewellery
-                    </option>
-
-                    <option value="Basketry">
-                        Basketry
-                    </option>
-
-                    <option value="Painting">
-                        Painting
-                    </option>
-
-                    <option value="Embroidery">
-                        Embroidery
-                    </option>
-
-                    <option value="Leather Craft">
-                        Leather Craft
-                    </option>
-
-                    <option value="Other">
-                        Other
-                    </option>
+                    <option value="">Select your craft / art type</option>
+                    <option value="Pottery">Pottery</option>
+                    <option value="Handloom">Handloom</option>
+                    <option value="Woodcraft">Woodcraft</option>
+                    <option value="Jewellery">Jewellery</option>
+                    <option value="Basketry">Basketry</option>
+                    <option value="Painting">Painting</option>
+                    <option value="Embroidery">Embroidery</option>
+                    <option value="Leather Craft">Leather Craft</option>
+                    <option value="Other">Other</option>
 
                 </select>
 
             </div>
 
 
-            <!-- Location -->
-
+            <!-- LOCATION -->
             <div class="input-group">
 
-                <label for="location">
-                    Location
-                </label>
+                <label for="location">Location</label>
 
                 <input
                     type="text"
@@ -133,13 +100,10 @@
             </div>
 
 
-            <!-- Experience -->
-
+            <!-- EXPERIENCE -->
             <div class="input-group">
 
-                <label for="experience">
-                    Years of Experience
-                </label>
+                <label for="experience">Years of Experience</label>
 
                 <input
                     type="number"
@@ -152,13 +116,10 @@
             </div>
 
 
-            <!-- Craft Photo -->
-
+            <!-- CRAFT PHOTO -->
             <div class="input-group">
 
-                <label for="craftPhoto">
-                    Handmade Craft Photo
-                </label>
+                <label for="craftPhoto">Handmade Craft Photo</label>
 
                 <input
                     type="file"
@@ -172,9 +133,88 @@
             </div>
 
 
-            <!-- Submit -->
+            <!-- PAYMENT AND RETURN POLICY -->
+            <div class="payment-policy">
 
-            <button type="submit" class="verify-btn">
+                <h3>
+                    Important Instructions for Creators
+                </h3>
+
+                <p class="policy-subtitle">
+                    Please read the following Payment & Return Policy carefully.
+                </p>
+
+                <ol>
+
+                    <li>
+                        <strong>Payment Hold:</strong>
+                        When a customer purchases your craft, the payment
+                        will not be transferred to your account immediately.
+                    </li>
+
+                    <li>
+                        <strong>Admin Payment Management:</strong>
+                        The customer's payment will initially be held by
+                        Kalasetu Admin.
+                    </li>
+
+                    <li>
+                        <strong>2-Day Return Period:</strong>
+                        Customers will have 2 days to request a return
+                        after receiving their order.
+                    </li>
+
+                    <li>
+                        <strong>Payment Release:</strong>
+                        If the customer does not request a return within
+                        the 2-day period, the eligible payment will be
+                        released to your account.
+                    </li>
+
+                    <li>
+                        <strong>Return Requests:</strong>
+                        If a customer raises a return request within the
+                        return period, the payment will remain on hold
+                        until the request is resolved according to
+                        Kalasetu's return policy.
+                    </li>
+
+                    <li>
+                        <strong>Creator Agreement:</strong>
+                        Please read and understand all the above
+                        instructions before submitting your
+                        creator verification.
+                    </li>
+
+                </ol>
+
+
+                <!-- AGREEMENT CHECKBOX -->
+                <label class="policy-agreement">
+
+                    <input
+                        type="checkbox"
+                        id="policyAgreement"
+                        required
+                    >
+
+                    <span>
+                        I have read and agree to the above
+                        Payment & Return Policy.
+                    </span>
+
+                </label>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+            <button
+                type="submit"
+                class="verify-btn"
+                id="verifySubmit"
+                disabled
+            >
 
                 SUBMIT FOR VERIFICATION
 
@@ -186,7 +226,8 @@
 
 
         <p class="verification-note">
-            Your details will be reviewed by the Kalasetu admin before creator access is approved.
+            Your details will be reviewed by the Kalasetu admin
+            before creator access is approved.
         </p>
 
     </div>
@@ -194,7 +235,29 @@
 </div>
 
 
+<!-- AGREEMENT VALIDATION -->
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const agreement = document.getElementById("policyAgreement");
+    const submitButton = document.getElementById("verifySubmit");
+
+    agreement.addEventListener("change", function () {
+
+        submitButton.disabled = !agreement.checked;
+
+    });
+
+});
+
+</script>
+
+
 <script src="creator-verification.js"></script>
+
+<script src="translations.js"></script>
+<script src="language.js"></script>
 
 </body>
 </html>

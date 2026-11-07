@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalasetu - Refund Requests</title>
+    <link rel="stylesheet" href="admin-refunds.css">
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <header class="admin-header">
+        <div class="brand">
+            <div class="logo">
+                <img src="images/kalasetu-logo.png" alt="Kalasetu">
+            </div>
+            <div>
+                <h1>KALASETU</h1>
+                <p>ADMIN • REFUND REQUESTS</p>
+            </div>
+        </div>
+
+        <button class="back-btn"
+                onclick="window.location.href='admin-dashboard.html'">
+            ← DASHBOARD
+        </button>
+    </header>
+
+    <main class="admin-main">
+
+        <section class="page-heading">
+            <p class="small-title">CUSTOMER SUPPORT</p>
+            <h2>Refund Requests</h2>
+            <p>Review customer refund requests and update their status.</p>
+        </section>
+
+        <section class="refund-summary">
+            <div class="summary-card">
+                <span>Total Requests</span>
+                <strong id="totalRefunds">0</strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Pending</span>
+                <strong id="pendingRefunds">0</strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Approved</span>
+                <strong id="approvedRefunds">0</strong>
+            </div>
+
+            <div class="summary-card">
+                <span>Rejected</span>
+                <strong id="rejectedRefunds">0</strong>
+            </div>
+        </section>
+
+        <section class="refund-section">
+
+            <div class="section-heading">
+                <h3>Customer Refund Requests</h3>
+                <button onclick="loadRefunds()">↻ Refresh</button>
+            </div>
+
+            <p id="refundMessage">Loading refund requests...</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Refund ID</th>
+                            <th>Customer</th>
+                            <th>Order ID</th>
+                            <th>Amount</th>
+                            <th>Reason</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="refundTableBody">
+                        <tr>
+                            <td colspan="8">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        HANDMADE WITH TRADITION • CONNECTED THROUGH STORIES
+    </footer>
+
+</div>
+
+<script src="admin-refunds.js"></script>
+
+</body>
+</html>

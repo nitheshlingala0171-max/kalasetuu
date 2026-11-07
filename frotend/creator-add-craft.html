@@ -148,7 +148,39 @@
                     >
 
                 </div>
+<!-- PRICE BREAKDOWN -->
 
+<div class="price-breakdown">
+
+    <h3>Price Breakdown</h3>
+    <p>Enter your craft price. The amount will be divided automatically. You can edit each category.</p>
+
+    <div class="price-item">
+        <label for="creatorPrice">Creator Price (₹)</label>
+        <input type="number" id="creatorPrice" min="0" step="0.01" value="0">
+    </div>
+
+    <div class="price-item">
+        <label for="materialsPrice">Materials (₹)</label>
+        <input type="number" id="materialsPrice" min="0" step="0.01" value="0">
+    </div>
+
+    <div class="price-item">
+        <label for="packagingPrice">Packaging (₹)</label>
+        <input type="number" id="packagingPrice" min="0" step="0.01" value="0">
+    </div>
+
+    <div class="price-item">
+        <label for="platformPrice">Platform & Services (₹)</label>
+        <input type="number" id="platformPrice" min="0" step="0.01" value="0">
+    </div>
+
+    <div class="price-total">
+        <span>You Pay</span>
+        <strong id="totalCraftPrice">₹0.00</strong>
+    </div>
+
+</div>
 
                 <!-- Craft Story -->
 

@@ -26,13 +26,16 @@ const pool = new Pool({
 app.locals.pool = pool;
 
 
-// ================= CUSTOMER ROUTES =================
-
+// CUSTOMER ROUTES
 const customerRoutes = require("./customerRoutes");
-
 app.use("/api/customers", customerRoutes);
 
-
+// CREATOR ROUTES
+const creatorRoutes = require("./creatorRoutes");
+app.use("/api/creators", creatorRoutes);
+// CHAT ROUTES
+const chatRoutes = require("./chatRoutes");
+app.use("/api/chat", chatRoutes);
 // ================= HOME TEST =================
 
 app.get("/", (req, res) => {

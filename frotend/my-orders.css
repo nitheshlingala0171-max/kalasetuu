@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -100,6 +101,7 @@ body {
 
 .orders-container {
     width: 760px;
+    max-width: 100%;
 
     background: rgba(255, 250, 240, 0.96);
 
@@ -159,7 +161,8 @@ body {
     padding: 35px 20px;
 }
 
-.order-icon {
+.order-icon,
+.empty-icon {
     font-size: 40px;
     color: #9b5836;
 }
@@ -180,7 +183,8 @@ body {
 
 /* SHOP BUTTON */
 
-.shop-btn {
+.shop-btn,
+.empty-orders a {
     display: inline-block;
 
     background: #9b5836;
@@ -212,7 +216,7 @@ body {
 /* FOOTER */
 
 footer {
-    height: 60px;
+    min-height: 60px;
 
     display: flex;
     align-items: center;
@@ -231,6 +235,8 @@ footer {
     color: white;
     font-size: 12px;
 }
+
+
 /* ================= ORDER PRODUCT ================= */
 
 .order-product {
@@ -336,10 +342,127 @@ footer {
     font-weight: 600;
 }
 
+.status-delivered {
+    background: #e1efdc;
+    color: #37633a;
+}
+
+.status-cancelled {
+    background: #f5dede;
+    color: #a13c35;
+}
+
+
+/* ================= CANCEL ORDER BUTTON ================= */
+
+.cancel-order-btn {
+    margin-top: 15px;
+    margin-right: 8px;
+    padding: 11px 22px;
+    border: none;
+    border-radius: 7px;
+    background: #a13c35;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cancel-order-btn:hover {
+    background: #812d27;
+}
+
+
+/* ================= REFUND BUTTON ================= */
+
+.refund-order-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 11px 22px;
+
+    background: #8b5e3c;
+    color: white;
+
+    border: none;
+    border-radius: 7px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.refund-order-btn:hover {
+    background: #6f452b;
+}
+
+
+/* ================= REFUND STATUS ================= */
+
+.refund-status {
+    margin-top: 15px;
+    padding: 13px 16px;
+
+    background: #f6ebdd;
+    border: 1px solid #e0cdb2;
+    border-radius: 8px;
+
+    color: #5a3528;
+    font-size: 14px;
+    text-align: left;
+}
+
+.refund-status strong {
+    margin-right: 5px;
+}
+
 
 /* ================= MOBILE ================= */
 
 @media (max-width: 700px) {
+
+    .top-header {
+        height: auto;
+        min-height: 90px;
+        padding: 15px 5%;
+        gap: 12px;
+    }
+
+    .brand {
+        gap: 9px;
+    }
+
+    .logo-wrap {
+        width: 45px;
+        height: 45px;
+    }
+
+    .brand-text h1 {
+        font-size: 24px;
+    }
+
+    .brand-text p {
+        font-size: 8px;
+        letter-spacing: 1px;
+    }
+
+    .back-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .orders-container {
+        padding: 25px 15px;
+    }
+
+    .orders-container h2 {
+        font-size: 26px;
+    }
+
+    .order-card {
+        padding: 15px;
+    }
 
     .order-product {
         gap: 12px;
@@ -356,5 +479,224 @@ footer {
 
     .order-product strong {
         font-size: 14px;
+    }
+}
+
+/* ================= REFUND DETAILS PANEL ================= */
+
+.refund-details {
+    margin-top: 22px;
+    padding: 20px;
+    background: #fcf4e9;
+    border: 1px solid #dfc6a8;
+    border-radius: 12px;
+    text-align: left;
+}
+
+.refund-details-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0cdb2;
+}
+
+.refund-heading-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ead8c1;
+    color: #704536;
+    font-size: 23px;
+}
+
+.refund-details-heading h4 {
+    color: #5a3528;
+    font-family: Georgia, serif;
+    font-size: 19px;
+}
+
+.refund-details-heading p {
+    margin-top: 4px;
+    color: #795548;
+    font-size: 12px;
+}
+
+.refund-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.refund-info-item {
+    padding: 13px;
+    background: #fffaf0;
+    border: 1px solid #eadbc8;
+    border-radius: 8px;
+}
+
+.refund-info-item span,
+.refund-text-item span,
+.refund-admin-note span {
+    display: block;
+    margin-bottom: 7px;
+    color: #896b55;
+    font-size: 12px;
+}
+
+.refund-info-item strong {
+    color: #5a3528;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.refund-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: #f1dfc8;
+}
+
+.refund-approved {
+    background: #e1efdc !important;
+    color: #37633a !important;
+}
+
+.refund-pending {
+    background: #fff0c9 !important;
+    color: #85621b !important;
+}
+
+.refund-rejected {
+    background: #f5dede !important;
+    color: #a13c35 !important;
+}
+
+.payment-status {
+    color: #8b5e3c !important;
+}
+
+.refund-text-item,
+.refund-admin-note {
+    margin-top: 14px;
+    padding: 13px;
+    background: #fffaf0;
+    border: 1px solid #eadbc8;
+    border-radius: 8px;
+}
+
+.refund-text-item p,
+.refund-admin-note p {
+    color: #5a3528;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.refund-admin-note {
+    background: #f4eadc;
+}
+
+.refund-message {
+    margin-top: 15px;
+    padding: 12px;
+    background: #eaf2e5;
+    border-radius: 8px;
+    color: #37633a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.rejected-message {
+    background: #f8e6e3;
+    color: #a13c35;
+}
+
+
+/* ================= REFUND DEADLINE ================= */
+
+.refund-deadline,
+.refund-expired {
+    margin-top: 15px;
+    padding: 14px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.refund-deadline {
+    background: #f6ebdd;
+    border: 1px solid #e0cdb2;
+    color: #5a3528;
+}
+
+.refund-expired {
+    background: #f5dede;
+    border: 1px solid #e8c2bd;
+    color: #a13c35;
+}
+
+.refund-deadline p,
+.refund-expired p {
+    margin-top: 5px;
+}
+
+
+/* ================= MOBILE REFUND DETAILS ================= */
+
+@media (max-width: 700px) {
+    .refund-details {
+        padding: 14px;
+    }
+
+    .refund-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .refund-details-heading h4 {
+        font-size: 17px;
+    }
+}
+/* ================= ORDER ACTION BUTTONS ================= */
+
+.order-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.track-order-btn {
+    padding: 11px 22px;
+    border: none;
+    border-radius: 7px;
+    background: #8b5e3c;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.track-order-btn:hover {
+    background: #6f452b;
+}
+
+.order-actions .cancel-order-btn {
+    margin: 0;
+}
+
+@media (max-width: 700px) {
+    .order-actions {
+        flex-direction: column;
+    }
+
+    .order-actions button {
+        width: 100%;
     }
 }

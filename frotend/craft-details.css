@@ -817,3 +817,29 @@ body {
     }
 
 }
+/* Customer stock status */
+
+.customer-stock-status {
+    display: inline-block;
+    padding: 7px 12px;
+    margin-top: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.customer-stock-status.in-stock {
+    background: #e2f3e5;
+    color: #26743b;
+}
+
+.customer-stock-status.out-of-stock {
+    background: #ffe5e5;
+    color: #c62828;
+}
+
+.add-cart-btn:disabled,
+.buy-now-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

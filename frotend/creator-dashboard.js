@@ -1,411 +1,198 @@
-document.addEventListener("DOMContentLoaded", function () {
 
-    /* =====================================================
-       CREATOR ACCOUNT
-    ===================================================== */
+document.addEventListener("DOMContentLoaded", async function () {
 
-    const creatorData =
-        localStorage.getItem("creatorAccount");
+    // =========================================
+    // 1. GET LOGGED-IN CREATOR
+    // =========================================
 
+    let creator = null;
+
+    try {
+        creator = JSON.parse(
+            localStorage.getItem("loggedInCreator")
+        );
+    } catch (error) {
+        console.error("Creator data error:", error);
+    }
+
+    if (!creator || !creator.id) {
+        alert("Please login as a creator.");
+        window.location.href = "creator-auth.html";
+        return;
+    }
+
+    // Display creator name
     const creatorNameElement =
         document.getElementById("creatorName");
 
-    let creator = {};
-
-    if (creatorData) {
-
-        try {
-
-            creator = JSON.parse(creatorData);
-
-        } catch (error) {
-
-            console.log(
-                "Creator account data error:",
-                error
-            );
-
-        }
-
-    }
-
-
     if (creatorNameElement) {
-
         creatorNameElement.textContent =
             creator.name || "Creator";
-
     }
 
-
-
-    /* =====================================================
-       GET ALL VERIFICATION RECORDS
-    ===================================================== */
-
-    let verifications = [];
+    // =========================================
+    // 2. GET VERIFICATION DETAILS FROM POSTGRESQL
+    // =========================================
 
     try {
-
-        verifications =
-            JSON.parse(
-                localStorage.getItem(
-                    "creatorVerifications"
-                )
-            ) || [];
-
-    } catch (error) {
-
-        console.log(
-            "Verification records error:",
-            error
+        const response = await fetch(
+            `http://localhost:5000/api/creators/verification/${creator.id}`
         );
 
-        verifications = [];
+        const data = await response.json();
 
-    }
-
-
-
-    /* =====================================================
-       FIND CURRENT CREATOR
-    ===================================================== */
-
-    let matchingRecords = [];
-
-
-    if (Array.isArray(verifications)) {
-
-        matchingRecords =
-            verifications.filter(function (item) {
-
-                const sameContact =
-                    creator.contact &&
-                    item.contact &&
-                    String(item.contact).trim() ===
-                    String(creator.contact).trim();
-
-
-                const sameName =
-                    creator.name &&
-                    item.name &&
-                    String(item.name).trim().toLowerCase() ===
-                    String(creator.name).trim().toLowerCase();
-
-
-                return sameContact || sameName;
-
-            });
-
-    }
-
-
-
-    /* =====================================================
-       SELECT CORRECT VERIFICATION
-    ===================================================== */
-
-    let verification = null;
-
-
-    /*
-       First priority:
-       Approved record for this creator
-    */
-
-    const approvedRecord =
-        matchingRecords.find(function (item) {
-
-            return item.status === "Approved";
-
-        });
-
-
-    if (approvedRecord) {
-
-        verification =
-            approvedRecord;
-
-    }
-
-
-    /*
-       Second priority:
-       Pending record
-    */
-
-    if (!verification) {
-
-        const pendingRecord =
-            matchingRecords.find(function (item) {
-
-                return item.status === "Pending";
-
-            });
-
-
-        if (pendingRecord) {
-
-            verification =
-                pendingRecord;
-
-        }
-
-    }
-
-
-    /*
-       Third priority:
-       Rejected record
-    */
-
-    if (!verification) {
-
-        const rejectedRecord =
-            matchingRecords.find(function (item) {
-
-                return item.status === "Rejected";
-
-            });
-
-
-        if (rejectedRecord) {
-
-            verification =
-                rejectedRecord;
-
-        }
-
-    }
-
-
-
-    /* =====================================================
-       FALLBACK TO SINGLE VERIFICATION
-    ===================================================== */
-
-    if (!verification) {
-
-        try {
-
-            const singleData =
-                localStorage.getItem(
-                    "creatorVerification"
-                );
-
-
-            if (singleData) {
-
-                verification =
-                    JSON.parse(
-                        singleData
-                    );
-
-            }
-
-        } catch (error) {
-
-            console.log(
-                "Single verification error:",
-                error
+        if (!response.ok || !data.success || !data.creator) {
+            throw new Error(
+                data.message || "Unable to load creator verification."
             );
-
         }
 
-    }
+        const verification = data.creator;
 
+        // Save latest database details
+        localStorage.setItem(
+            "creatorVerification",
+            JSON.stringify(verification)
+        );
 
+        creator.status = verification.status;
+        creator.craft = verification.craft_type;
 
-    /* =====================================================
-       DISPLAY VERIFICATION INFORMATION
-    ===================================================== */
+        localStorage.setItem(
+            "loggedInCreator",
+            JSON.stringify(creator)
+        );
 
-    if (verification) {
+        // =========================================
+        // 3. VERIFICATION STATUS
+        // =========================================
+
+        const currentStatus =
+            verification.status || "Not Submitted";
+
+        window.creatorVerificationStatus = currentStatus;
 
         const craft =
-            document.getElementById(
-                "creatorCraft"
-            );
+            document.getElementById("creatorCraft");
 
         const location =
-            document.getElementById(
-                "creatorLocation"
-            );
+            document.getElementById("creatorLocation");
 
         const experience =
-            document.getElementById(
-                "creatorExperience"
-            );
+            document.getElementById("creatorExperience");
 
         const status =
-            document.getElementById(
-                "verificationStatus"
-            );
-
-
-
-        /* Craft */
+            document.getElementById("verificationStatus");
 
         if (craft) {
-
             craft.textContent =
-                verification.craftType ||
-                verification.craft ||
-                "Not available";
-
+                verification.craft_type || "Not available";
         }
-
-
-
-        /* Location */
 
         if (location) {
-
             location.textContent =
-                verification.location ||
-                "Not available";
-
+                verification.location || "Not available";
         }
 
-
-
-        /* Experience */
-
         if (experience) {
-
             experience.textContent =
                 verification.experience
                     ? verification.experience + " years"
                     : "Not available";
-
         }
-
-
-
-        /* Verification Status */
 
         if (status) {
+            status.textContent = currentStatus;
 
-            const currentStatus =
-                verification.status ||
-                "Under Review";
-
-
-            status.textContent =
-                currentStatus;
-
-
-            if (
-                currentStatus ===
-                "Approved"
-            ) {
-
-                status.style.background =
-                    "#dfead9";
-
-                status.style.color =
-                    "#557047";
-
-
-            } else if (
-                currentStatus ===
-                "Rejected"
-            ) {
-
-                status.style.background =
-                    "#f2d9d4";
-
-                status.style.color =
-                    "#9b4034";
-
-
+            if (currentStatus === "Approved") {
+                status.style.background = "#dfead9";
+                status.style.color = "#557047";
+            } else if (currentStatus === "Rejected") {
+                status.style.background = "#f2d9d4";
+                status.style.color = "#9b4034";
             } else {
-
-                status.style.background =
-                    "";
-
-                status.style.color =
-                    "";
-
+                status.style.background = "";
+                status.style.color = "";
             }
-
         }
 
+    } catch (error) {
+        console.error("Dashboard verification error:", error);
+
+        window.creatorVerificationStatus =
+            creator.status || "Not Submitted";
+
+        alert(
+            "Unable to load verification details. Please check your backend connection and try again."
+        );
     }
 
 });
 
 
-
-/* =====================================================
-   MY CRAFTS
-===================================================== */
+// =========================================
+// 4. MY CRAFTS
+// =========================================
 
 function openMyCrafts() {
 
-    window.location.href =
-        "creator-my-crafts.html";
+    if (window.creatorVerificationStatus !== "Approved") {
+        alert("My Crafts will be available after admin approval.");
+        return;
+    }
 
+    window.location.href = "creator-my-crafts.html";
 }
 
 
-
-/* =====================================================
-   ADD NEW CRAFT
-===================================================== */
+// =========================================
+// 5. ADD NEW CRAFT
+// =========================================
 
 function addNewCraft() {
 
-    window.location.href =
-        "creator-add-craft.html";
+    if (window.creatorVerificationStatus !== "Approved") {
+        alert("Your creator verification is pending. You can add crafts after admin approval.");
+        return;
+    }
 
+    window.location.href = "creator-add-craft.html";
 }
 
 
-
-/* =====================================================
-   ORDERS
-===================================================== */
+// =========================================
+// 6. ORDERS
+// =========================================
 
 function openOrders() {
-
-    window.location.href =
-        "creator-orders.html";
-
+    window.location.href = "creator-orders.html";
 }
 
 
-
-/* =====================================================
-   CREATOR PROFILE
-===================================================== */
+// =========================================
+// 7. CREATOR PROFILE
+// =========================================
 
 function openProfile() {
-
-    window.location.href =
-        "creator-profile.html";
-
+    window.location.href = "creator-profile.html";
 }
 
 
-
-/* =====================================================
-   LOGOUT
-===================================================== */
+// =========================================
+// 8. LOGOUT
+// =========================================
 
 function logout() {
 
-    const confirmLogout =
-        confirm(
-            "Are you sure you want to logout?"
-        );
-
+    const confirmLogout = confirm(
+        "Are you sure you want to logout?"
+    );
 
     if (confirmLogout) {
 
-        window.location.href =
-            "creator-auth.html";
+        localStorage.removeItem("loggedInCreator");
+        localStorage.removeItem("creatorVerification");
 
+        window.location.href = "creator-auth.html";
     }
-
 }

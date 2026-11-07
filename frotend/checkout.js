@@ -1,53 +1,129 @@
+
 /* =========================================================
    KALASETU - CHECKOUT JAVASCRIPT
-   PostgreSQL Connected Version
-   ========================================================= */
+   Price Breakdown + PostgreSQL Backend
+========================================================= */
+
+const checkoutItems = document.getElementById("checkoutItems");
+const checkoutTotal = document.getElementById("checkoutTotal");
+
+let cart = [];
+
+
+/* ================= PRICE FORMAT ================= */
+
+function formatMoney(amount) {
+    return "₹" + Number(amount || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+
+/* ================= PRICE CONVERSION ================= */
+
+function getNumericPrice(value) {
+    return Number(
+        String(value || 0)
+            .replace("₹", "")
+            .replace(/,/g, "")
+    ) || 0;
+}
+
+
+/* ================= GET PRICE BREAKDOWN ================= */
+
+function getBreakdown(item) {
+
+    const saved = item.priceBreakdown || {};
+
+    if (
+        item.priceBreakdown ||
+        item.creatorPrice !== undefined
+    ) {
+        const creatorPrice =
+            Number(saved.creatorPrice ?? item.creatorPrice) || 0;
+
+        const materials =
+            Number(saved.materials ?? item.materials) || 0;
+
+        const packaging =
+            Number(saved.packaging ?? item.packaging) || 0;
+
+        const platformServices =
+            Number(
+                saved.platformServices ?? item.platformServices
+            ) || 0;
+
+        const total =
+            Number(saved.total) ||
+            getNumericPrice(item.price) ||
+            (
+                creatorPrice +
+                materials +
+                packaging +
+                platformServices
+            );
+
+        return {
+            creatorPrice,
+            materials,
+            packaging,
+            platformServices,
+            total
+        };
+    }
+
+    // Fallback for older products
+
+    const price = getNumericPrice(item.price);
+
+    const creatorPrice = Math.round(price * 60) / 100;
+    const materials = Math.round(price * 20) / 100;
+    const packaging = Math.round(price * 10) / 100;
+
+    return {
+        creatorPrice,
+        materials,
+        packaging,
+        platformServices:
+            Math.round((price - creatorPrice - materials - packaging) * 100) / 100,
+        total: price
+    };
+}
 
 
 /* ================= LOAD CART ================= */
 
-let cart = [];
-
 try {
 
     const savedCart =
-        JSON.parse(
-            localStorage.getItem("cart")
-        ) || [];
+        JSON.parse(localStorage.getItem("cart")) || [];
 
     const currentOrder =
-        JSON.parse(
-            localStorage.getItem("currentOrder")
-        );
+        JSON.parse(localStorage.getItem("currentOrder"));
 
     // Buy Now flow
-    if (
-        savedCart.length === 0 &&
-        currentOrder
-    ) {
+
+    if (savedCart.length === 0 && currentOrder) {
 
         cart = [{
-            name:
-                currentOrder.name ||
-                "Craft Product",
+            name: currentOrder.name || "Craft Product",
+            image: currentOrder.image || "images/kalasetu-logo.png",
+            category: currentOrder.category || "Traditional Craft",
+            price: currentOrder.price || 0,
+            quantity: currentOrder.quantity || 1,
+            creator: currentOrder.creator || "Local Artisan",
 
-            image:
-                currentOrder.image ||
-                "images/kalasetu-logo.png",
-
-            category:
-                currentOrder.category ||
-                "Traditional Craft",
-
-            price:
-                currentOrder.price || 0,
-
-            quantity:
-                currentOrder.quantity || 1,
-
-            creator:
-                currentOrder.creator ||
-                "Local Artisan"
+            priceBreakdown:
+                currentOrder.priceBreakdown || {
+                    creatorPrice: currentOrder.creatorPrice,
+                    materials: currentOrder.materials,
+                    packaging: currentOrder.packaging,
+                    platformServices: currentOrder.platformServices,
+                    total: currentOrder.priceBreakdown?.total ||
+                        getNumericPrice(currentOrder.price)
+                }
         }];
 
     } else {
@@ -59,13 +135,11 @@ try {
 
 } catch (error) {
 
-    console.log(
-        "Checkout data loading error:",
-        error
-    );
-
+    console.error("Checkout data loading error:", error);
     cart = [];
+
 }
+
 
 /* ================= DISPLAY CHECKOUT ================= */
 
@@ -74,12 +148,8 @@ function displayCheckout() {
     if (cart.length === 0) {
 
         checkoutItems.innerHTML = `
-
             <div class="empty-order">
-
-                <h3>
-                    Your Cart is Empty
-                </h3>
+                <h3>Your Cart is Empty</h3>
 
                 <p>
                     Please add a craft to your cart
@@ -89,99 +159,115 @@ function displayCheckout() {
                 <a href="customer-home.html">
                     Explore Crafts
                 </a>
-
             </div>
-
         `;
 
-        checkoutTotal.textContent = "₹0";
-
+        checkoutTotal.textContent = formatMoney(0);
         return;
     }
-
 
     checkoutItems.innerHTML = "";
 
     let total = 0;
 
-
     cart.forEach(function (item) {
 
-        const quantity =
-            Number(item.quantity) || 1;
+        const quantity = Math.max(
+            1,
+            Number(item.quantity) || 1
+        );
 
+        const breakdown = getBreakdown(item);
 
-        const price =
-            Number(
-                String(item.price || 0)
-                    .replace("₹", "")
-                    .replace(/,/g, "")
-            ) || 0;
-
-
-        const itemTotal =
-            price * quantity;
-
+        const itemTotal = breakdown.total * quantity;
 
         total += itemTotal;
 
+        const itemElement = document.createElement("div");
 
-        const itemElement =
-            document.createElement("div");
-
-
-        itemElement.className =
-            "order-item";
-
+        itemElement.className = "order-item";
 
         itemElement.innerHTML = `
 
             <div class="order-item-image">
 
                 <img
-                    src="${item.image || "images/kalasetu-logo.png"}"
-                    alt="${item.name || "Craft"}"
+                    src="${escapeHTML(item.image || "images/kalasetu-logo.png")}"
+                    alt="${escapeHTML(item.name || "Craft")}"
                     onerror="this.src='images/kalasetu-logo.png'"
                 >
 
             </div>
 
-
             <div class="order-item-info">
 
                 <h4>
-                    ${item.name || "Craft Product"}
+                    ${escapeHTML(item.name || "Craft Product")}
                 </h4>
 
                 <p>
-                    ${item.category || "Traditional Craft"}
+                    ${escapeHTML(item.category || "Traditional Craft")}
                 </p>
 
                 <p>
                     Quantity: ${quantity}
                 </p>
 
-            </div>
+                <div class="checkout-price-breakdown">
 
+                    <h4>Price Breakdown</h4>
 
-            <div class="order-item-price">
+                    <div class="checkout-price-row">
+                        <span>Creator Price</span>
+                        <span>${formatMoney(breakdown.creatorPrice * quantity)}</span>
+                    </div>
 
-                ₹${itemTotal.toLocaleString("en-IN")}
+                    <div class="checkout-price-row">
+                        <span>Materials</span>
+                        <span>${formatMoney(breakdown.materials * quantity)}</span>
+                    </div>
+
+                    <div class="checkout-price-row">
+                        <span>Packaging</span>
+                        <span>${formatMoney(breakdown.packaging * quantity)}</span>
+                    </div>
+
+                    <div class="checkout-price-row">
+                        <span>Platform & Services</span>
+                        <span>${formatMoney(breakdown.platformServices * quantity)}</span>
+                    </div>
+
+                    <div class="checkout-price-row checkout-item-total">
+                        <strong>You Pay</strong>
+                        <strong>${formatMoney(itemTotal)}</strong>
+                    </div>
+
+                </div>
 
             </div>
 
         `;
 
-
-        checkoutItems.appendChild(
-            itemElement
-        );
+        checkoutItems.appendChild(itemElement);
 
     });
 
+    checkoutTotal.textContent = formatMoney(total);
+}
 
-    checkoutTotal.textContent =
-        "₹" + total.toLocaleString("en-IN");
+
+/* ================= HTML ESCAPE ================= */
+
+function escapeHTML(value) {
+
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+
 }
 
 
@@ -189,441 +275,295 @@ function displayCheckout() {
 
 document
     .getElementById("checkoutForm")
-    .addEventListener(
-        "submit",
-        async function (event) {
+    .addEventListener("submit", async function (event) {
 
-            event.preventDefault();
+        event.preventDefault();
 
+        /* CART CHECK */
 
-            /* ================= CART CHECK ================= */
+        if (cart.length === 0) {
+            alert("Your cart is empty.");
+            return;
+        }
 
-            if (cart.length === 0) {
 
-                alert(
-                    "Your cart is empty."
-                );
+        /* CUSTOMER LOGIN CHECK */
 
-                return;
-            }
+        const customerData =
+            localStorage.getItem("customerAccount");
 
+        if (!customerData) {
 
-            /* ================= CUSTOMER LOGIN CHECK ================= */
+            alert("Please login before placing an order.");
 
-            const customerData =
-                localStorage.getItem(
-                    "customerAccount"
-                );
+            window.location.href = "customer-auth.html";
+            return;
+        }
 
+        let customer;
 
-            if (!customerData) {
+        try {
 
-                alert(
-                    "Please login before placing an order."
-                );
+            customer = JSON.parse(customerData);
 
-                window.location.href =
-                    "customer-auth.html";
+        } catch (error) {
 
-                return;
-            }
+            alert("Customer information is invalid. Please login again.");
 
+            localStorage.removeItem("customerAccount");
 
-            let customer;
+            window.location.href = "customer-auth.html";
+            return;
+        }
 
-            try {
+        if (!customer.id) {
 
-                customer =
-                    JSON.parse(
-                        customerData
-                    );
+            alert("Customer ID not found. Please login again.");
+            return;
+        }
 
-            } catch (error) {
 
-                alert(
-                    "Customer information is invalid. Please login again."
-                );
+        /* CUSTOMER DETAILS */
 
-                localStorage.removeItem(
-                    "customerAccount"
-                );
+        const customerName =
+            document.getElementById("customerName").value.trim();
 
-                window.location.href =
-                    "customer-auth.html";
+        const phone =
+            document.getElementById("phone").value.trim();
 
-                return;
-            }
+        const address =
+            document.getElementById("address").value.trim();
 
+        const city =
+            document.getElementById("city").value.trim();
 
-            if (!customer.id) {
+        const state =
+            document.getElementById("state").value.trim();
 
-                alert(
-                    "Customer ID not found. Please login again."
-                );
+        const pincode =
+            document.getElementById("pincode").value.trim();
 
-                return;
-            }
 
+        /* VALIDATION */
 
-            /* ================= CUSTOMER DETAILS ================= */
+        if (
+            !customerName ||
+            !phone ||
+            !address ||
+            !city ||
+            !state ||
+            !pincode
+        ) {
 
-            const customerName =
-                document
-                    .getElementById(
-                        "customerName"
-                    )
-                    .value
-                    .trim();
+            alert("Please fill all delivery details.");
+            return;
+        }
 
+        if (!/^[0-9]{10}$/.test(phone)) {
 
-            const phone =
-                document
-                    .getElementById(
-                        "phone"
-                    )
-                    .value
-                    .trim();
+            alert("Please enter a valid 10-digit phone number.");
+            return;
+        }
 
+        if (!/^[0-9]{6}$/.test(pincode)) {
 
-            const address =
-                document
-                    .getElementById(
-                        "address"
-                    )
-                    .value
-                    .trim();
+            alert("Please enter a valid 6-digit pincode.");
+            return;
+        }
 
 
-            const city =
-                document
-                    .getElementById(
-                        "city"
-                    )
-                    .value
-                    .trim();
+        /* PAYMENT */
 
+        const selectedPayment =
+            document.querySelector(
+                'input[name="paymentMethod"]:checked'
+            );
 
-            const state =
-                document
-                    .getElementById(
-                        "state"
-                    )
-                    .value
-                    .trim();
+        if (!selectedPayment) {
 
+            alert("Please select a payment method.");
+            return;
+        }
 
-            const pincode =
-                document
-                    .getElementById(
-                        "pincode"
-                    )
-                    .value
-                    .trim();
+        const paymentMethod = selectedPayment.value;
 
 
-            /* ================= VALIDATION ================= */
+        /* TOTAL + ORDER ITEMS */
 
-            if (
-                customerName === "" ||
-                phone === "" ||
-                address === "" ||
-                city === "" ||
-                state === "" ||
-                pincode === ""
-            ) {
+        let total = 0;
 
-                alert(
-                    "Please fill all delivery details."
-                );
+        const orderItems = cart.map(function (item) {
 
-                return;
-            }
+            const quantity = Math.max(
+                1,
+                Number(item.quantity) || 1
+            );
 
+            const breakdown = getBreakdown(item);
 
-            if (
-                !/^[0-9]{10}$/.test(
-                    phone
-                )
-            ) {
+            const itemTotal = breakdown.total * quantity;
 
-                alert(
-                    "Please enter a valid 10-digit phone number."
-                );
+            total += itemTotal;
 
-                return;
-            }
+            return {
 
+                name: item.name || "Craft Product",
 
-            if (
-                !/^[0-9]{6}$/.test(
-                    pincode
-                )
-            ) {
+                image: item.image || "images/kalasetu-logo.png",
 
-                alert(
-                    "Please enter a valid 6-digit pincode."
-                );
+                category: item.category || "Traditional Craft",
 
-                return;
-            }
+                price: breakdown.total,
 
+                quantity: quantity,
 
-            /* ================= PAYMENT ================= */
+                creator: item.creator || "Local Artisan",
 
-            const selectedPayment =
-                document.querySelector(
-                    'input[name="paymentMethod"]:checked'
-                );
+                creatorPrice: breakdown.creatorPrice,
 
+                materials: breakdown.materials,
 
-            if (!selectedPayment) {
+                packaging: breakdown.packaging,
 
-                alert(
-                    "Please select a payment method."
-                );
+                platformServices: breakdown.platformServices,
 
-                return;
-            }
-
-
-            const paymentMethod =
-                selectedPayment.value;
-
-
-            /* ================= TOTAL ================= */
-
-            let total = 0;
-
-
-            const orderItems =
-                cart.map(function (item) {
-
-                    const price =
-                        Number(
-                            String(
-                                item.price || 0
-                            )
-                                .replace(
-                                    "₹",
-                                    ""
-                                )
-                                .replace(
-                                    /,/g,
-                                    ""
-                                )
-                        ) || 0;
-
-
-                    const quantity =
-                        Number(
-                            item.quantity
-                        ) || 1;
-
-
-                    total +=
-                        price * quantity;
-
-
-                    return {
-
-                        name:
-                            item.name ||
-                            "Craft Product",
-
-                        image:
-                            item.image ||
-                            "images/kalasetu-logo.png",
-
-                        category:
-                            item.category ||
-                            "Traditional Craft",
-
-                        price:
-                            price,
-
-                        quantity:
-                            quantity,
-
-                        creator:
-                            item.creator ||
-                            "Local Artisan"
-
-                    };
-
-                });
-
-
-            /* ================= BUTTON ================= */
-
-            const submitButton =
-                document.querySelector(
-                    '#checkoutForm button[type="submit"]'
-                );
-
-
-            if (submitButton) {
-
-                submitButton.disabled =
-                    true;
-
-                submitButton.textContent =
-                    "Placing Order...";
-
-            }
-
-
-            /* ================= SEND TO BACKEND ================= */
-
-            try {
-
-                const response =
-                    await fetch(
-                        "http://localhost:5000/api/customers/orders",
-                        {
-
-                            method: "POST",
-
-                            headers: {
-
-                                "Content-Type":
-                                    "application/json"
-
-                            },
-
-                            body: JSON.stringify({
-
-                                customerId:
-                                    customer.id,
-
-                                customerName:
-                                    customerName,
-
-                                phone:
-                                    phone,
-
-                                address:
-                                    address,
-
-                                city:
-                                    city,
-
-                                state:
-                                    state,
-
-                                pincode:
-                                    pincode,
-
-                                paymentMethod:
-                                    paymentMethod,
-
-                                totalPrice:
-                                    total,
-
-                                items:
-                                    orderItems
-
-                            })
-
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                console.log(
-                    "ORDER RESPONSE:",
-                    data
-                );
-
-
-                /* ================= SERVER ERROR ================= */
-
-                if (!response.ok) {
-
-                    alert(
-                        data.message ||
-                        "Unable to place order."
-                    );
-
-                    if (submitButton) {
-
-                        submitButton.disabled =
-                            false;
-
-                        submitButton.textContent =
-                            "Place Order";
-
-                    }
-
-                    return;
+                priceBreakdown: {
+                    creatorPrice: breakdown.creatorPrice,
+                    materials: breakdown.materials,
+                    packaging: breakdown.packaging,
+                    platformServices: breakdown.platformServices,
+                    total: breakdown.total
                 }
 
+            };
 
-                /* ================= SUCCESS ORDER ================= */
-
-                const order =
-                    data.order;
+        });
 
 
-                /* ================= SAVE CURRENT ORDER ================= */
+        /* BUTTON */
 
-                localStorage.setItem(
-                    "currentOrder",
-                    JSON.stringify(
-                        order
-                    )
-                );
+        const submitButton =
+            document.querySelector(
+                '#checkoutForm button[type="submit"]'
+            );
 
+        if (submitButton) {
 
-                /* ================= CLEAR CART ================= */
+            submitButton.disabled = true;
+            submitButton.textContent = "Placing Order...";
 
-                localStorage.removeItem(
-                    "cart"
-                );
+        }
 
 
-                /* ================= SUCCESS ================= */
+        /* SEND TO BACKEND */
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:5000/api/customers/orders",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        customerId: customer.id,
+
+                        customerName: customerName,
+
+                        phone: phone,
+
+                        address: address,
+
+                        city: city,
+
+                        state: state,
+
+                        pincode: pincode,
+
+                        paymentMethod: paymentMethod,
+
+                        totalPrice: total,
+
+                        items: orderItems
+
+                    })
+
+                }
+            );
+
+
+            const data = await response.json();
+
+            console.log("ORDER RESPONSE:", data);
+
+
+            /* SERVER ERROR */
+
+            if (!response.ok) {
 
                 alert(
-                    "Order placed successfully!"
+                    data.message || "Unable to place order."
                 );
-
-
-                /* ================= CONFIRMATION ================= */
-
-                window.location.href =
-                    "order-confirmation.html";
-
-
-            } catch (error) {
-
-                console.error(
-                    "Order placement error:",
-                    error
-                );
-
-
-                alert(
-                    "Unable to connect to server. Please make sure the backend is running."
-                );
-
 
                 if (submitButton) {
 
-                    submitButton.disabled =
-                        false;
-
-                    submitButton.textContent =
-                        "Place Order";
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Place Order";
 
                 }
+
+                return;
+            }
+
+
+            /* SUCCESS ORDER */
+
+            const order = data.order || data;
+
+            localStorage.setItem(
+                "currentOrder",
+                JSON.stringify(order)
+            );
+
+
+            /* CLEAR CART */
+
+            localStorage.removeItem("cart");
+
+
+            /* SUCCESS */
+
+            alert("Order placed successfully!");
+
+
+            /* CONFIRMATION */
+
+            window.location.href = "order-confirmation.html";
+
+
+        } catch (error) {
+
+            console.error("Order placement error:", error);
+
+            alert(
+                "Unable to connect to server. Please make sure the backend is running."
+            );
+
+            if (submitButton) {
+
+                submitButton.disabled = false;
+                submitButton.textContent = "Place Order";
 
             }
 
         }
-    );
+
+    });
 
 
 /* ================= CURRENT LOCATION ================= */
@@ -631,16 +571,10 @@ document
 function useCurrentLocation() {
 
     const address =
-        document.getElementById(
-            "address"
-        );
-
+        document.getElementById("address");
 
     const locationStatus =
-        document.getElementById(
-            "locationStatus"
-        );
-
+        document.getElementById("locationStatus");
 
     if (!navigator.geolocation) {
 
@@ -650,36 +584,25 @@ function useCurrentLocation() {
         return;
     }
 
-
     locationStatus.textContent =
         "Getting your current location...";
-
 
     navigator.geolocation.getCurrentPosition(
 
         function (position) {
 
-            const latitude =
-                position.coords.latitude;
-
-
-            const longitude =
-                position.coords.longitude;
-
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
 
             address.value =
                 "Current Location\n" +
-                "Latitude: " +
-                latitude +
-                "\nLongitude: " +
-                longitude;
-
+                "Latitude: " + latitude +
+                "\nLongitude: " + longitude;
 
             locationStatus.textContent =
                 "✓ Current location added";
 
         },
-
 
         function () {
 

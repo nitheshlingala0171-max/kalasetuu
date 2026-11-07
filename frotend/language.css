@@ -1,0 +1,130 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #33231e;
+    background:
+        linear-gradient(rgba(246, 235, 221, 0.78),
+                        rgba(246, 235, 221, 0.78)),
+        url("images/background.png") center/cover fixed;
+}
+
+/* HEADER */
+
+.header {
+    width: 100%;
+    padding: 12px 7%;
+    background: #fffaf3;
+    border-bottom: 1px solid #e5c9aa;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+}
+
+.brand h1 {
+    font-size: 30px;
+    color: #713d2b;
+}
+
+.brand p {
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-top: 3px;
+}
+
+/* LANGUAGE SECTION */
+
+.language-container {
+    width: 90%;
+    max-width: 850px;
+    margin: 65px auto;
+    text-align: center;
+}
+
+.language-container h2 {
+    font-size: 34px;
+    color: #713d2b;
+    margin-bottom: 12px;
+}
+
+.language-container > p {
+    font-size: 16px;
+    margin-bottom: 35px;
+}
+
+.language-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.language-grid button {
+    padding: 20px;
+    border: 1px solid #c99b75;
+    border-radius: 12px;
+    background: rgba(255, 250, 243, 0.85);
+    color: #713d2b;
+    font-family: inherit;
+    font-size: 21px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.language-grid button:hover {
+    background: #713d2b;
+    color: white;
+    transform: translateY(-3px);
+}
+
+.language-grid button.selected {
+    background: #713d2b;
+    color: white;
+    border: 2px solid #33231e;
+}
+
+.continue-btn {
+    margin-top: 35px;
+    padding: 14px 55px;
+    border: none;
+    border-radius: 30px;
+    background: #713d2b;
+    color: white;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.continue-btn:hover {
+    background: #4d2b20;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .language-container {
+        margin: 40px auto;
+    }
+
+    .language-container h2 {
+        font-size: 27px;
+    }
+
+    .language-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}

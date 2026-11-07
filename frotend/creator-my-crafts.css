@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -27,13 +26,10 @@ body {
 .crafts-header {
     position: relative;
     z-index: 1;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     padding: 18px 40px;
-
     background: rgba(255, 250, 240, 0.96);
     border-bottom: 1px solid #dfc9b7;
 }
@@ -47,10 +43,8 @@ body {
 .logo {
     width: 58px;
     height: 58px;
-
     border-radius: 50%;
     overflow: hidden;
-
     border: 2px solid #C65D3B;
     background: #fff;
 }
@@ -78,16 +72,11 @@ body {
 .back-btn {
     border: 1px solid #C65D3B;
     background: transparent;
-
     color: #8f5139;
-
     padding: 10px 16px;
-
     border-radius: 8px;
-
     font-size: 12px;
     font-weight: 700;
-
     cursor: pointer;
 }
 
@@ -99,12 +88,9 @@ body {
 .crafts-main {
     position: relative;
     z-index: 1;
-
     width: 100%;
     max-width: 1100px;
-
     margin: auto;
-
     padding: 45px 30px 30px;
 }
 
@@ -112,56 +98,40 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-
     gap: 25px;
-
     margin-bottom: 25px;
 }
 
 .small-title {
     color: #C65D3B;
-
     font-size: 11px;
     font-weight: 700;
-
     letter-spacing: 2px;
-
     margin-bottom: 7px;
 }
 
 .page-heading h2 {
     font-family: Georgia, serif;
-
     color: #5A3528;
-
     font-size: 32px;
-
     margin-bottom: 7px;
 }
 
 .page-heading p:last-child {
     color: #876e5e;
-
     font-size: 13px;
 }
 
 .add-btn {
     border: none;
-
     background: #8f5139;
     color: #fff;
-
     padding: 13px 18px;
-
     border-radius: 9px;
-
     font-size: 12px;
     font-weight: 700;
-
     letter-spacing: 0.7px;
-
     cursor: pointer;
-
     white-space: nowrap;
 }
 
@@ -169,144 +139,105 @@ body {
     background: #73402e;
 }
 
-
 /* Review Notice */
 
 .review-notice {
     display: flex;
     align-items: center;
-
     gap: 13px;
-
     background: rgba(255, 250, 240, 0.95);
-
     border: 1px solid #dfc9b7;
-
     border-radius: 11px;
-
     padding: 15px 18px;
-
     margin-bottom: 30px;
 }
 
 .notice-icon {
     width: 34px;
     height: 34px;
-
     border-radius: 50%;
-
     background: #e8dfd5;
-
     color: #8f5139;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-weight: bold;
-
     flex-shrink: 0;
 }
 
 .review-notice strong {
     display: block;
-
     color: #5A3528;
-
     font-size: 13px;
-
     margin-bottom: 4px;
 }
 
 .review-notice p {
     color: #876e5e;
-
     font-size: 11px;
-
     line-height: 1.5;
 }
-
 
 /* Crafts Section */
 
 .crafts-section {
     background: rgba(255, 250, 240, 0.96);
-
     border: 1px solid #dfc9b7;
-
     border-radius: 15px;
-
     padding: 25px;
 }
 
 .section-title {
     display: flex;
-
     justify-content: space-between;
     align-items: center;
-
     margin-bottom: 20px;
 }
 
 .section-title h3 {
     font-family: Georgia, serif;
-
     color: #5A3528;
-
     font-size: 21px;
 }
 
 .section-title span {
     color: #876e5e;
-
     font-size: 12px;
 }
-
 
 /* Crafts Grid */
 
 .crafts-grid {
     display: grid;
-
     grid-template-columns: repeat(3, 1fr);
-
     gap: 20px;
 }
-
 
 /* Craft Card */
 
 .craft-card {
     background: #fffdf8;
-
     border: 1px solid #dfc9b7;
-
     border-radius: 12px;
-
     overflow: hidden;
-
     transition: 0.2s;
 }
 
 .craft-card:hover {
     transform: translateY(-2px);
-
     box-shadow: 0 8px 20px rgba(90, 53, 40, 0.10);
 }
 
 .craft-image {
     width: 100%;
     height: 190px;
-
     background: #f1e6db;
 }
 
 .craft-image img {
     width: 100%;
     height: 100%;
-
     object-fit: cover;
-
     display: block;
 }
 
@@ -316,160 +247,109 @@ body {
 
 .craft-content h4 {
     color: #5A3528;
-
     font-family: Georgia, serif;
-
     font-size: 17px;
-
     margin-bottom: 5px;
 }
 
 .craft-category {
     color: #876e5e;
-
     font-size: 11px;
-
     margin-bottom: 13px;
 }
 
 .craft-bottom {
     display: flex;
-
     justify-content: space-between;
     align-items: center;
-
     gap: 10px;
-
     margin-bottom: 14px;
 }
 
 .craft-price {
     color: #C65D3B;
-
     font-size: 16px;
-
     font-weight: 700;
 }
 
 .craft-status {
     background: #eee6de;
-
     color: #876e5e;
-
     border-radius: 20px;
-
     padding: 5px 9px;
-
     font-size: 10px;
-
     font-weight: 600;
 }
 
 .craft-actions {
     display: flex;
-
     gap: 8px;
 }
 
 .craft-actions button {
     flex: 1;
-
     border: 1px solid #d7c2a6;
-
     background: transparent;
-
     color: #8f5139;
-
     padding: 9px;
-
     border-radius: 7px;
-
     font-size: 10px;
-
     font-weight: 700;
-
     cursor: pointer;
 }
 
 .craft-actions button:hover {
     background: #8f5139;
-
     color: #fff;
-
     border-color: #8f5139;
 }
-
 
 /* Empty State */
 
 .empty-state {
     text-align: center;
-
     padding: 50px 20px;
-
     border: 1px dashed #d7c2a6;
-
     border-radius: 12px;
-
     background: #fffdf8;
 }
 
 .empty-icon {
     width: 55px;
     height: 55px;
-
     margin: 0 auto 15px;
-
     border-radius: 50%;
-
     background: #f0e6dc;
-
     color: #8f5139;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-size: 25px;
 }
 
 .empty-state h3 {
     font-family: Georgia, serif;
-
     color: #5A3528;
-
     font-size: 20px;
-
     margin-bottom: 7px;
 }
 
 .empty-state p {
     color: #876e5e;
-
     font-size: 12px;
-
     line-height: 1.5;
-
     max-width: 420px;
-
     margin: 0 auto 18px;
 }
 
 .empty-state button {
     border: none;
-
     background: #8f5139;
-
     color: #fff;
-
     padding: 12px 17px;
-
     border-radius: 8px;
-
     font-size: 11px;
-
     font-weight: 700;
-
     cursor: pointer;
 }
 
@@ -477,37 +357,27 @@ body {
     background: #73402e;
 }
 
-
 /* Footer */
 
 footer {
     position: relative;
     z-index: 1;
-
     text-align: center;
-
     color: #876e5e;
-
     font-size: 10px;
-
     letter-spacing: 1.2px;
-
     padding: 25px 20px 30px;
 }
-
 
 /* Responsive */
 
 @media (max-width: 850px) {
-
     .crafts-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-
 }
 
 @media (max-width: 650px) {
-
     .crafts-header {
         padding: 15px 20px;
     }
@@ -554,4 +424,23 @@ footer {
         padding: 9px 11px;
         font-size: 10px;
     }
+}
+
+/* Stock management */
+
+.stock-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: #5a3528;
+}
+
+.stock-control select {
+    padding: 7px 10px;
+    border: 1px solid #c9a995;
+    border-radius: 7px;
+    background: #fffaf0;
+    color: #33231e;
 }

@@ -1,470 +1,262 @@
+
 document.addEventListener("DOMContentLoaded", function () {
 
-    const creatorRequests =
-        document.getElementById("creatorRequests");
+    const API = "http://localhost:5000/api/creators";
 
-    const approvedCreators =
-        document.getElementById("approvedCreators");
+    const creatorRequests = document.getElementById("creatorRequests");
+    const approvedCreators = document.getElementById("approvedCreators");
+    const emptyMessage = document.getElementById("emptyMessage");
 
-    const emptyMessage =
-        document.getElementById("emptyMessage");
+    const pendingCount = document.getElementById("pendingCount");
+    const approvedCount = document.getElementById("approvedCount");
+    const rejectedCount = document.getElementById("rejectedCount");
 
-    const pendingCount =
-        document.getElementById("pendingCount");
+    const adminEmail = document.getElementById("adminEmail");
 
-    const approvedCount =
-        document.getElementById("approvedCount");
-
-    const rejectedCount =
-        document.getElementById("rejectedCount");
-
-    const adminEmail =
-        document.getElementById("adminEmail");
-
-
-    /* ================= ADMIN LOGIN CHECK ================= */
-
-    const isAdminLoggedIn =
-        localStorage.getItem("adminLoggedIn");
-
-    if (isAdminLoggedIn !== "true") {
+    // ADMIN LOGIN CHECK
+    if (localStorage.getItem("adminLoggedIn") !== "true") {
         window.location.href = "admin-login.html";
         return;
     }
 
-
-    /* ================= ADMIN EMAIL ================= */
-
-    const savedAdminEmail =
-        localStorage.getItem("adminEmail");
-
+    const savedAdminEmail = localStorage.getItem("adminEmail");
     if (savedAdminEmail) {
         adminEmail.textContent = savedAdminEmail;
     }
 
-
-    /* ================= LOAD CREATORS ================= */
-
-    function loadCreators() {
-
-        let creators =
-            JSON.parse(
-                localStorage.getItem("creatorVerifications")
-            ) || [];
-
-
-        /* ---------- COUNTS ---------- */
-
-        const pendingCreators =
-            creators.filter(
-                creator => creator.status === "Pending"
-            );
-
-        const approved =
-            creators.filter(
-                creator => creator.status === "Approved"
-            );
-
-        const rejected =
-            creators.filter(
-                creator => creator.status === "Rejected"
-            );
-
-
-        pendingCount.textContent =
-            pendingCreators.length;
-
-        approvedCount.textContent =
-            approved.length;
-
-        rejectedCount.textContent =
-            rejected.length;
-
-
-        /* ---------- PENDING LIST ---------- */
-
-        creatorRequests.innerHTML = "";
-
-
-        if (pendingCreators.length === 0) {
-
-            emptyMessage.style.display = "block";
-
-        } else {
-
-            emptyMessage.style.display = "none";
-
-
-            pendingCreators.forEach(function (creator) {
-
-                const card =
-                    document.createElement("div");
-
-                card.className = "creator-card";
-
-
-                card.innerHTML = `
-
-                    <div class="creator-photo">
-
-                        <img
-                            src="${creator.craftPhoto || "images/creator.png"}"
-                            alt="Craft Photo"
-                        >
-
-                    </div>
-
-
-                    <div class="creator-details">
-
-                        <h4>
-                            ${creator.name || "Creator"}
-                        </h4>
-
-                        <p>
-                            <strong>Craft:</strong>
-                            ${creator.craftType || "Not provided"}
-                        </p>
-
-                        <p>
-                            <strong>Location:</strong>
-                            ${creator.location || "Not provided"}
-                        </p>
-
-                        <p>
-                            <strong>Experience:</strong>
-                            ${creator.experience || "Not provided"}
-                        </p>
-
-                        <span class="pending-badge">
-                            PENDING VERIFICATION
-                        </span>
-
-                    </div>
-
-
-                    <div class="creator-actions">
-
-                        <button
-                            class="view-btn"
-                            onclick="viewCreator('${creator.id}')"
-                        >
-                            VIEW DETAILS
-                        </button>
-
-
-                        <button
-                            class="approve-btn"
-                            onclick="approveCreator('${creator.id}')"
-                        >
-                            APPROVE
-                        </button>
-
-
-                        <button
-                            class="reject-btn"
-                            onclick="rejectCreator('${creator.id}')"
-                        >
-                            REJECT
-                        </button>
-
-                    </div>
-
-                `;
-
-
-                creatorRequests.appendChild(card);
-
-            });
-
-        }
-
-
-        /* ---------- APPROVED LIST ---------- */
-
-        approvedCreators.innerHTML = "";
-
-
-        if (approved.length === 0) {
-
-            approvedCreators.innerHTML = `
-
-                <div class="empty-message">
-
-                    <div class="empty-icon">
-                        —
-                    </div>
-
-                    <h3>
-                        No Approved Creators
-                    </h3>
-
-                    <p>
-                        Approved creators will appear here.
-                    </p>
-
-                </div>
-
-            `;
-
-        } else {
-
-            approved.forEach(function (creator) {
-
-                const card =
-                    document.createElement("div");
-
-                card.className = "approved-card";
-
-
-                card.innerHTML = `
-
-                    <div>
-
-                        <h4>
-                            ${creator.name || "Creator"}
-                        </h4>
-
-                        <p>
-                            ${creator.craftType || "Craft"} •
-                            ${creator.location || "Location not provided"}
-                        </p>
-
-                    </div>
-
-
-                    <span class="approved-badge">
-                        APPROVED
-                    </span>
-
-                `;
-
-
-                approvedCreators.appendChild(card);
-
-            });
-
-        }
-
+    let creators = [];
+
+    // SAFE TEXT
+    function safe(value) {
+        return String(value ?? "Not provided").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
     }
 
+    // LOAD CREATORS FROM POSTGRESQL
+    async function loadCreators() {
 
-    /* ================= INITIAL LOAD ================= */
+        creatorRequests.innerHTML = "<p>Loading creator requests...</p>";
 
-    loadCreators();
+        try {
+            const response = await fetch(`${API}/admin/creators`);
+            const data = await response.json();
 
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Unable to load creators.");
+            }
 
-    /* ================= VIEW CREATOR ================= */
+            creators = data.creators || [];
 
+            renderCreators();
+
+        } catch (error) {
+            console.error("Creator loading error:", error);
+
+            creatorRequests.innerHTML = `
+                <div class="empty-message">
+                    <h3>Unable to Load Creator Requests</h3>
+                    <p>${safe(error.message)}</p>
+                    <p>Check whether the backend server is running.</p>
+                    <button onclick="loadCreatorRequests()">RETRY</button>
+                </div>
+            `;
+        }
+    }
+
+    // RENDER CREATOR DETAILS
+    function renderCreators() {
+
+        const pending = creators.filter(c => c.status === "Pending");
+        const approved = creators.filter(c => c.status === "Approved");
+        const rejected = creators.filter(c => c.status === "Rejected");
+
+        pendingCount.textContent = pending.length;
+        approvedCount.textContent = approved.length;
+        rejectedCount.textContent = rejected.length;
+
+        // PENDING REQUESTS
+        creatorRequests.innerHTML = "";
+
+        emptyMessage.style.display =
+            pending.length === 0 ? "block" : "none";
+
+        pending.forEach(creator => {
+
+            const card = document.createElement("div");
+            card.className = "creator-card";
+
+            const photo = creator.craft_photo
+                ? `<img src="${safe(creator.craft_photo)}" alt="Uploaded craft photo">`
+                : `<p>No craft photo uploaded</p>`;
+
+            card.innerHTML = `
+                <div class="creator-photo">
+                    ${photo}
+                </div>
+
+                <div class="creator-details">
+                    <h4>${safe(creator.name)}</h4>
+
+                    <p><strong>Contact:</strong> ${safe(creator.contact)}</p>
+                    <p><strong>Craft:</strong> ${safe(creator.craft_type)}</p>
+                    <p><strong>Location:</strong> ${safe(creator.location)}</p>
+                    <p><strong>Experience:</strong> ${safe(creator.experience)}</p>
+                    <p><strong>Submitted:</strong> ${creator.submitted_at ? safe(new Date(creator.submitted_at).toLocaleString()) : "Not available"}</p>
+
+                    <span class="pending-badge">PENDING VERIFICATION</span>
+                </div>
+
+                <div class="creator-actions">
+                    <button class="view-btn" onclick="viewCreator('${safe(creator.id)}')">
+                        VIEW DETAILS
+                    </button>
+
+                    <button class="approve-btn" onclick="approveCreator('${safe(creator.id)}')">
+                        APPROVE
+                    </button>
+
+                    <button class="reject-btn" onclick="rejectCreator('${safe(creator.id)}')">
+                        REJECT
+                    </button>
+                </div>
+            `;
+
+            creatorRequests.appendChild(card);
+        });
+
+        // APPROVED CREATORS
+        approvedCreators.innerHTML = "";
+
+        if (approved.length === 0) {
+            approvedCreators.innerHTML = `
+                <div class="empty-message">
+                    <h3>No Approved Creators</h3>
+                    <p>Approved creators will appear here.</p>
+                </div>
+            `;
+        } else {
+
+            approved.forEach(creator => {
+
+                const card = document.createElement("div");
+                card.className = "approved-card";
+
+                card.innerHTML = `
+                    <div>
+                        <h4>${safe(creator.name)}</h4>
+                        <p>${safe(creator.craft_type)} • ${safe(creator.location)}</p>
+                    </div>
+
+                    <span class="approved-badge">APPROVED</span>
+                `;
+
+                approvedCreators.appendChild(card);
+            });
+        }
+    }
+
+    // VIEW CREATOR
     window.viewCreator = function (id) {
 
-        const creators =
-            JSON.parse(
-                localStorage.getItem("creatorVerifications")
-            ) || [];
-
-
-        const creator =
-            creators.find(
-                item => String(item.id) === String(id)
-            );
-
+        const creator = creators.find(
+            item => String(item.id) === String(id)
+        );
 
         if (!creator) {
             alert("Creator details not found.");
             return;
         }
 
-
         alert(
             "CREATOR DETAILS\n\n" +
-
-            "Name: " +
-            (creator.name || "Not provided") +
-
-            "\n\nCraft Type: " +
-            (creator.craftType || "Not provided") +
-
-            "\n\nLocation: " +
-            (creator.location || "Not provided") +
-
-            "\n\nExperience: " +
-            (creator.experience || "Not provided") +
-
-            "\n\nStatus: " +
-            (creator.status || "Pending")
+            "Name: " + (creator.name || "Not provided") +
+            "\nContact: " + (creator.contact || "Not provided") +
+            "\nCraft: " + (creator.craft_type || "Not provided") +
+            "\nLocation: " + (creator.location || "Not provided") +
+            "\nExperience: " + (creator.experience || "Not provided") +
+            "\nStatus: " + (creator.status || "Not provided")
         );
-
     };
 
-
-    /* ================= APPROVE CREATOR ================= */
-
-   window.approveCreator = function (id) {
-
-    const creators =
-        JSON.parse(
-            localStorage.getItem("creatorVerifications")
-        ) || [];
-
-    const creator =
-        creators.find(
-            item => String(item.id) === String(id)
-        );
-
-    if (!creator) {
-
-        alert("Creator not found.");
-
-        return;
-    }
-
-
-    const confirmApproval =
-        confirm(
-            "Approve " +
-            (creator.name || "this creator") +
-            " as a Kalasetu creator?"
-        );
-
-
-    if (!confirmApproval) {
-
-        return;
-    }
-
-
-    /* Update main creator verification record */
-
-    creator.status = "Approved";
-
-
-    /* Save all creator requests */
-
-    localStorage.setItem(
-        "creatorVerifications",
-        JSON.stringify(creators)
-    );
-
-
-    /* =====================================================
-       ALSO UPDATE SINGLE CREATOR VERIFICATION
-       This is used by Creator Dashboard
-    ===================================================== */
-
-    const currentVerification =
-        localStorage.getItem(
-            "creatorVerification"
-        );
-
-
-    if (currentVerification) {
+    // UPDATE STATUS IN POSTGRESQL
+    async function updateCreatorStatus(id, status) {
 
         try {
+            const response = await fetch(
+                `${API}/admin/creators/${encodeURIComponent(id)}/status`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ status })
+                }
+            );
 
-            const current =
-                JSON.parse(
-                    currentVerification
-                );
+            const data = await response.json();
 
-
-            if (
-                String(current.id) ===
-                String(creator.id)
-            ) {
-
-                current.status =
-                    "Approved";
-
-
-                localStorage.setItem(
-                    "creatorVerification",
-                    JSON.stringify(current)
-                );
-
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Status update failed.");
             }
 
+            alert(`Creator ${status.toLowerCase()} successfully!`);
+
+            await loadCreators();
+
         } catch (error) {
-
-            console.log(
-                "Creator verification update error:",
-                error
-            );
-
+            console.error("Status update error:", error);
+            alert(error.message);
         }
-
     }
 
+    // APPROVE
+    window.approveCreator = async function (id) {
 
-    alert(
-        "Creator approved successfully!"
-    );
-
-
-    loadCreators();
-
-};
-    /* ================= REJECT CREATOR ================= */
-
-    window.rejectCreator = function (id) {
-
-        const creators =
-            JSON.parse(
-                localStorage.getItem("creatorVerifications")
-            ) || [];
-
-
-        const creator =
-            creators.find(
-                item => String(item.id) === String(id)
-            );
-
+        const creator = creators.find(
+            item => String(item.id) === String(id)
+        );
 
         if (!creator) {
             alert("Creator not found.");
             return;
         }
 
+        if (confirm(`Approve ${creator.name} as a Kalasetu creator?`)) {
+            await updateCreatorStatus(id, "Approved");
+        }
+    };
 
-        const confirmRejection =
-            confirm(
-                "Reject " +
-                (creator.name || "this creator") +
-                " verification request?"
-            );
+    // REJECT
+    window.rejectCreator = async function (id) {
 
+        const creator = creators.find(
+            item => String(item.id) === String(id)
+        );
 
-        if (!confirmRejection) {
+        if (!creator) {
+            alert("Creator not found.");
             return;
         }
 
-
-        creator.status = "Rejected";
-
-
-        localStorage.setItem(
-            "creatorVerifications",
-            JSON.stringify(creators)
-        );
-
-
-        alert(
-            "Creator verification rejected."
-        );
-
-
-        loadCreators();
-
+        if (confirm(`Reject ${creator.name}'s verification request?`)) {
+            await updateCreatorStatus(id, "Rejected");
+        }
     };
+
+    // RETRY BUTTON
+    window.loadCreatorRequests = loadCreators;
+
+    // INITIAL LOAD
+    loadCreators();
 
 });
 
-
-/* ================= BACK TO DASHBOARD ================= */
-
+// BACK TO DASHBOARD
 function goBack() {
-
-    window.location.href =
-        "admin-dashboard.html";
-
+    window.location.href = "admin-dashboard.html";
 }

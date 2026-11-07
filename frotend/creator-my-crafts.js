@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     loadCrafts();
     loadVerificationStatus();
@@ -125,15 +124,24 @@ function loadCrafts() {
 
 
                 <div class="craft-bottom">
+                    <span class="craft-price">₹${price}</span>
+                    <span class="craft-status">${status}</span>
+                </div>
 
-                    <span class="craft-price">
-                        ₹${price}
-                    </span>
+                <div class="stock-control">
+                    <label>Stock availability</label>
 
-                    <span class="craft-status">
-                        ${status}
-                    </span>
+                    <select onchange="updateCraftStock(${index}, this.value)">
 
+                        <option value="In Stock" ${(craft.stockStatus || 'In Stock') === 'In Stock' ? 'selected' : ''}>
+                            In Stock
+                        </option>
+
+                        <option value="Out of Stock" ${craft.stockStatus === 'Out of Stock' ? 'selected' : ''}>
+                            Out of Stock
+                        </option>
+
+                    </select>
                 </div>
 
 
@@ -203,6 +211,18 @@ function loadVerificationStatus() {
             if (message) {
                 message.textContent =
                     "Your creator profile has been approved. Your crafts can now be visible to customers.";
+            }
+
+        } else if (verification.status === "Pending") {
+
+            if (title) {
+                title.textContent =
+                    "Verification Status: Pending";
+            }
+
+            if (message) {
+                message.textContent =
+                    "Your creator profile is under admin review. You may prepare and manage your crafts, but customers will only see crafts after the required approvals.";
             }
 
         } else if (verification.status === "Rejected") {
@@ -311,4 +331,31 @@ function goDashboard() {
 
     window.location.href =
         "creator-dashboard.html";
+}
+
+
+/* Stock management */
+
+function updateCraftStock(index, stockStatus) {
+
+    let crafts = JSON.parse(
+        localStorage.getItem("creatorCrafts") || "[]"
+    );
+
+    if (!crafts[index]) return;
+
+    crafts[index].stockStatus = stockStatus;
+
+    localStorage.setItem(
+        "creatorCrafts",
+        JSON.stringify(crafts)
+    );
+
+    alert(
+        stockStatus === "In Stock"
+            ? "Craft marked In Stock."
+            : "Craft marked Out of Stock."
+    );
+
+    loadCrafts();
 }

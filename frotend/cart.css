@@ -623,3 +623,98 @@ body {
         padding: 18px;
     }
 }
+/* =========================================
+   PRICE BREAKDOWN - KALASETU
+========================================= */
+
+.cart-price-breakdown {
+    width: 100%;
+    max-width: 420px;
+
+    margin-top: 16px;
+    padding: 16px;
+
+    background: #fff9f3;
+
+    border: 1px solid #d8b9a5;
+    border-radius: 10px;
+}
+
+.cart-price-breakdown h4 {
+    font-family: Georgia, serif;
+    font-size: 15px;
+
+    color: #5a3528;
+
+    margin-bottom: 12px;
+}
+
+.cart-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 7px 0;
+
+    font-size: 12px;
+    color: #765b4c;
+}
+
+.cart-price-row span:last-child {
+    font-weight: 600;
+    color: #5a3528;
+}
+
+.cart-item-total {
+    border-top: 1px solid #dcc8ad;
+
+    margin-top: 8px;
+    padding-top: 12px;
+
+    font-size: 14px;
+    color: #8e4e35;
+}
+
+.cart-item-total strong:last-child {
+    color: #a94d31;
+    font-size: 16px;
+}
+
+/* Cart item alignment */
+
+.cart-item {
+    align-items: flex-start;
+}
+
+.cart-item-info {
+    min-width: 0;
+}
+
+/* Responsive */
+
+@media (max-width: 700px) {
+
+    .cart-price-breakdown {
+        max-width: 100%;
+    }
+
+    .cart-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+}
+
+@media (max-width: 450px) {
+
+    .cart-price-breakdown {
+        padding: 12px;
+    }
+
+    .cart-price-row {
+        font-size: 11px;
+    }
+
+}

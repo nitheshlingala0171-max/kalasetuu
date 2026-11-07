@@ -344,3 +344,73 @@ body {
         opacity: 0;
     }
 }
+
+/* ================= CONFIRMED ITEMS ================= */
+
+.confirmed-item {
+    margin: 18px 0;
+    padding: 18px;
+    text-align: left;
+    background: #fff9f3;
+    border: 1px solid #dfd0c0;
+    border-radius: 12px;
+}
+
+.confirmed-item h3 {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    color: #5a3528;
+    margin-bottom: 12px;
+}
+
+.confirmed-item .detail-row {
+    padding: 10px 2px;
+    font-size: 13px;
+}
+
+/* ================= DELIVERY ADDRESS ================= */
+
+#deliveryAddress {
+    max-width: 65%;
+    text-align: right;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+/* ================= PRICE BREAKDOWN ================= */
+
+.confirmed-item .detail-row span {
+    color: #75645b;
+}
+
+.confirmed-item .detail-row strong {
+    color: #5a3528;
+}
+
+.confirmed-item .detail-row:last-child {
+    border-top: 1px solid #dfd0c0;
+    margin-top: 8px;
+    padding-top: 14px;
+}
+
+.confirmed-item .detail-row:last-child strong {
+    color: #a94d31;
+    font-size: 15px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 600px) {
+    #deliveryAddress {
+        max-width: 60%;
+        font-size: 12px;
+    }
+
+    .confirmed-item {
+        padding: 14px;
+    }
+
+    .confirmed-item .detail-row {
+        font-size: 12px;
+    }
+}

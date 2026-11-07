@@ -319,3 +319,71 @@ body {
 
     margin-top: 18px;
 }
+
+/* PAYMENT AND RETURN POLICY */
+
+.payment-policy {
+    background: #f3f8ef;
+    border: 1px solid #b7d2b0;
+    border-left: 5px solid #287447;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 25px 0;
+    text-align: left;
+}
+
+.payment-policy h3 {
+    color: #173f29;
+    font-size: 18px;
+    margin: 0 0 8px;
+}
+
+.policy-subtitle {
+    color: #58685b;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.payment-policy ol {
+    padding-left: 22px;
+    margin: 0;
+}
+
+.payment-policy li {
+    color: #35483a;
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+
+.payment-policy li strong {
+    color: #173f29;
+}
+
+.policy-agreement {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px;
+    margin-top: 18px;
+    background: #ffffff;
+    border: 1px solid #c8d9c4;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #173f29;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.policy-agreement input {
+    width: 17px;
+    height: 17px;
+    margin-top: 2px;
+    accent-color: #287447;
+    flex-shrink: 0;
+}
+
+.verify-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

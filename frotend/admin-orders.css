@@ -738,3 +738,50 @@ footer {
     }
 
 }
+/* =====================================================
+   COD SETTLEMENT
+===================================================== */
+
+.cod-settlement-box {
+    margin: 18px 0;
+    padding: 16px;
+    background: #F7EFE7;
+    border: 1px solid #D8B995;
+    border-radius: 10px;
+}
+
+.cod-settlement-box h4 {
+    margin-bottom: 12px;
+    color: #33231E;
+    font-size: 15px;
+}
+
+.cod-settlement-box p {
+    margin: 8px 0;
+    color: #594438;
+    font-size: 13px;
+}
+
+.cod-confirm-btn {
+    margin-top: 12px;
+    padding: 11px 18px;
+    background: #356B43;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cod-confirm-btn:hover {
+    background: #244D30;
+}
+
+.cod-received {
+    color: #28743B !important;
+    font-weight: bold;
+}
+
+.cod-waiting {
+    color: #946B29 !important;
+}
