@@ -24,42 +24,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const editingIndex = localStorage.getItem("editingCraftIndex");
 
+    function getCreator() {
+        return JSON.parse(
+            localStorage.getItem("loggedInCreator") ||
+            localStorage.getItem("creatorAccount") ||
+            "null"
+        );
+    }
+
     function money(value) {
         return Math.round((Number(value) || 0) * 100) / 100;
     }
 
-    function updateTotal(updatePriceField = true) {
-
-        const total = money(
-            breakdownInputs.reduce((sum, input) => {
-                return sum + Math.max(0, Number(input.value) || 0);
-            }, 0)
-        );
-
+    function updateTotal() {
+        const total = money(craftPrice.value);
         totalCraftPrice.textContent = "₹" + total.toFixed(2);
-
-        if (updatePriceField) {
-            craftPrice.value = total;
-        }
-
         return total;
     }
+
+    // AUTOMATIC PRICE DIVISION - 60:20:10:10
 
     function autoSplitPrice() {
 
         const price = money(craftPrice.value);
 
-        if (!price || price < 0) {
-            breakdownInputs.forEach(input => input.value = "0");
-            updateTotal(false);
+        if (price <= 0) {
+            breakdownInputs.forEach(input => {
+                input.value = "0.00";
+            });
+
+            updateTotal();
             return;
         }
 
-        const creator = money(price * 0.60);
-        const materials = money(price * 0.20);
-        const packaging = money(price * 0.10);
-
-        // Remaining amount ensures the total matches the entered price.
+        const creator = money(price * 60 / 100);
+        const materials = money(price * 20 / 100);
+        const packaging = money(price * 10 / 100);
         const platform = money(price - creator - materials - packaging);
 
         creatorPrice.value = creator.toFixed(2);
@@ -67,41 +67,58 @@ document.addEventListener("DOMContentLoaded", function () {
         packagingPrice.value = packaging.toFixed(2);
         platformPrice.value = platform.toFixed(2);
 
-        updateTotal(false);
+        updateTotal();
     }
 
     function getBreakdown() {
+
         return {
             creatorPrice: money(creatorPrice.value),
             materials: money(materialsPrice.value),
             packaging: money(packagingPrice.value),
             platformServices: money(platformPrice.value),
-            total: updateTotal(false)
+            total: money(craftPrice.value)
         };
     }
 
-    // AUTO SPLIT WHEN CREATOR ENTERS PRICE
+    function breakdownMatchesPrice() {
+
+        const breakdownTotal = money(
+            breakdownInputs.reduce((sum, input) => {
+                return sum + money(input.value);
+            }, 0)
+        );
+
+        return breakdownTotal === money(craftPrice.value);
+    }
+
+    // CRAFT PRICE CHANGE
+
     craftPrice.addEventListener("input", function () {
+
         if (!isLoadingCraft) {
             autoSplitPrice();
         }
+
     });
 
-    // MANUAL EDITING OF BREAKDOWN
+    // MANUAL BREAKDOWN EDIT
+
     breakdownInputs.forEach(input => {
 
         input.addEventListener("input", function () {
 
             if (Number(this.value) < 0) {
-                this.value = 0;
+                this.value = "0";
             }
 
-            updateTotal(true);
+            // Total craft price remains unchanged.
+            updateTotal();
+
         });
 
     });
 
-    // EDIT MODE
     if (
         editingIndex !== null &&
         editingIndex !== "" &&
@@ -111,6 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // IMAGE PREVIEW + COMPRESSION
+
     craftImage.addEventListener("change", function () {
 
         const file = this.files[0];
@@ -176,26 +194,19 @@ document.addEventListener("DOMContentLoaded", function () {
         reader.readAsDataURL(file);
     });
 
-    // FORM SUBMIT
-    form.addEventListener("submit", function (event) {
+
+    // FORM SUBMIT - BACKEND
+
+    form.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
-        let creatorAccount = {};
+        const creator = getCreator();
 
-        try {
-            creatorAccount = JSON.parse(
-                localStorage.getItem("creatorAccount") || "{}"
-            );
-        } catch (error) {
-            creatorAccount = {};
+        if (!creator || !creator.id) {
+            alert("Creator login details not found. Please login again.");
+            return;
         }
-
-        const creatorName =
-            creatorAccount.name ||
-            creatorAccount.fullName ||
-            creatorAccount.username ||
-            "Local Artisan";
 
         const name = document.getElementById("craftName").value.trim();
         const category = document.getElementById("craftCategory").value;
@@ -204,12 +215,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const breakdown = getBreakdown();
         const price = breakdown.total;
 
-        if (
-            name === "" ||
-            category === "" ||
-            story === "" ||
-            price <= 0
-        ) {
+        if (!name || !category || !story || price <= 0) {
             alert("Please fill all craft details and enter a valid price.");
             return;
         }
@@ -223,135 +229,123 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        if (imageData === "") {
+        if (!breakdownMatchesPrice()) {
+            alert(
+                "The total of Creator, Materials, Packaging and Platform & Services must equal the Craft Price."
+            );
+            return;
+        }
+
+        if (!imageData) {
             alert("Please upload a craft image.");
             return;
         }
 
-        let crafts = [];
-
-        try {
-            const savedCrafts = localStorage.getItem("creatorCrafts");
-
-            if (savedCrafts) {
-                crafts = JSON.parse(savedCrafts);
-            }
-
-            if (!Array.isArray(crafts)) {
-                crafts = [];
-            }
-
-        } catch (error) {
-            console.log("Craft data error:", error);
-            crafts = [];
-        }
-
         const craftDetails = {
+            creatorId: creator.id,
+            name,
+            category,
+            price,
+            story,
+            image: imageData,
             creatorPrice: breakdown.creatorPrice,
             materials: breakdown.materials,
             packaging: breakdown.packaging,
-            platformServices: breakdown.platformServices,
-            priceBreakdown: breakdown
+            platformServices: breakdown.platformServices
         };
 
-        // EDIT EXISTING CRAFT
-        if (
+        const isEditing =
             editingIndex !== null &&
             editingIndex !== "" &&
-            !isNaN(editingIndex)
-        ) {
+            !isNaN(editingIndex);
 
-            const index = Number(editingIndex);
+        try {
 
-            if (!crafts[index]) {
-                alert("Craft not found.");
-                return;
-            }
+            let response;
 
-            crafts[index].name = name;
-            crafts[index].category = category;
-            crafts[index].price = price;
-            crafts[index].story = story;
-            crafts[index].creatorName = creatorName;
+            if (isEditing) {
 
-            Object.assign(crafts[index], craftDetails);
-
-            if (imageData !== "") {
-                crafts[index].image = imageData;
-            }
-
-            crafts[index].status =
-                crafts[index].status || "Under Review";
-
-            try {
-                localStorage.setItem(
-                    "creatorCrafts",
-                    JSON.stringify(crafts)
+                const crafts = JSON.parse(
+                    localStorage.getItem("creatorCrafts") || "[]"
                 );
-            } catch (error) {
-                console.error(error);
-                alert("Unable to save craft. Please try a smaller image.");
-                return;
+
+                const index = Number(editingIndex);
+                const existingCraft = crafts[index];
+
+                if (!existingCraft || !existingCraft.id) {
+                    alert("Craft not found. Please return to My Crafts and try again.");
+                    return;
+                }
+
+                response = await fetch(
+                    `http://localhost:5000/api/creators/crafts/${existingCraft.id}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(craftDetails)
+                    }
+                );
+
+            } else {
+
+                response = await fetch(
+                    "http://localhost:5000/api/creators/crafts",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(craftDetails)
+                    }
+                );
+
+            }
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Unable to save craft.");
             }
 
             localStorage.removeItem("editingCraftIndex");
 
-            alert("Craft updated successfully!");
-            window.location.href = "creator-my-crafts.html";
-            return;
-        }
-
-        // CREATE NEW CRAFT
-        const newCraft = {
-
-            id: "craft_" + Date.now(),
-
-            name: name,
-            creatorName: creatorName,
-            category: category,
-            price: price,
-            ...craftDetails,
-            story: story,
-            image: imageData,
-            status: "Under Review",
-            stockStatus: "In Stock",
-            createdAt: new Date().toISOString()
-        };
-
-        crafts.push(newCraft);
-
-        try {
-            localStorage.setItem(
-                "creatorCrafts",
-                JSON.stringify(crafts)
+            alert(
+                isEditing
+                    ? "Craft updated successfully!"
+                    : "Craft added successfully!"
             );
+
+            window.location.href = "creator-my-crafts.html";
+
         } catch (error) {
-            console.error("Craft storage error:", error);
-            alert("Unable to save craft. Please try using a smaller image.");
-            return;
+
+            console.error("Craft save error:", error);
+            alert(error.message);
+
         }
 
-        alert("Craft added successfully!");
-        window.location.href = "creator-my-crafts.html";
     });
 
+
     // LOAD EDITING CRAFT
+
     function loadEditingCraft(index) {
-
-        const savedCrafts = localStorage.getItem("creatorCrafts");
-
-        if (!savedCrafts) return;
 
         let crafts = [];
 
         try {
-            crafts = JSON.parse(savedCrafts);
+            crafts = JSON.parse(
+                localStorage.getItem("creatorCrafts") || "[]"
+            );
         } catch (error) {
-            console.log("Craft data error:", error);
+            console.error("Craft data error:", error);
             return;
         }
 
         if (!Array.isArray(crafts) || !crafts[index]) {
+            alert("Craft not found. Please return to My Crafts.");
             return;
         }
 
@@ -364,25 +358,15 @@ document.addEventListener("DOMContentLoaded", function () {
         craftPrice.value = craft.price || "";
         document.getElementById("craftStory").value = craft.story || "";
 
-        const savedBreakdown = craft.priceBreakdown || craft;
+        creatorPrice.value = craft.creator_price ?? craft.creatorPrice ?? 0;
+        materialsPrice.value = craft.materials ?? 0;
+        packagingPrice.value = craft.packaging ?? 0;
 
-        if (
-            savedBreakdown.creatorPrice !== undefined &&
-            savedBreakdown.materials !== undefined &&
-            savedBreakdown.packaging !== undefined &&
-            savedBreakdown.platformServices !== undefined
-        ) {
+        platformPrice.value =
+            craft.platform_services ?? craft.platformServices ?? 0;
 
-            creatorPrice.value = savedBreakdown.creatorPrice;
-            materialsPrice.value = savedBreakdown.materials;
-            packagingPrice.value = savedBreakdown.packaging;
-            platformPrice.value = savedBreakdown.platformServices;
+        updateTotal();
 
-        } else {
-            autoSplitPrice();
-        }
-
-        updateTotal(false);
         isLoadingCraft = false;
 
         if (craft.image) {
@@ -394,13 +378,20 @@ document.addEventListener("DOMContentLoaded", function () {
             imagePreview.style.display = "block";
             imageData = craft.image;
             craftImage.removeAttribute("required");
+
         }
+
     }
 
 });
 
+
 /* BACK TO MY CRAFTS */
+
 function goBack() {
+
     localStorage.removeItem("editingCraftIndex");
+
     window.location.href = "creator-my-crafts.html";
+
 }

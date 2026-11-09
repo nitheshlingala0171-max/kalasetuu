@@ -1,8 +1,9 @@
 
 /* =====================================================
    KALASETU - CRAFT DETAILS
-   Fixed Products + Creator Crafts + Price Breakdown
+   Fixed Products + Database Creator Crafts + Price Breakdown
 ===================================================== */
+
 
 /* ================= FIXED PRODUCT DATA ================= */
 
@@ -57,62 +58,65 @@ const products = {
 };
 
 
-/* ================= GET SAVED CREATOR CRAFTS ================= */
-
-function getCreatorCrafts() {
-    try {
-        const crafts = JSON.parse(
-            localStorage.getItem("creatorCrafts") || "[]"
-        );
-
-        return Array.isArray(crafts) ? crafts : [];
-    } catch (error) {
-        console.error("Unable to load creator crafts:", error);
-        return [];
-    }
-}
-
-
 /* ================= GET PRODUCT NAME ================= */
 
 const params = new URLSearchParams(window.location.search);
 const productName = params.get("product");
 
 
-/* ================= FIND PRODUCT ================= */
+/* ================= DATABASE CREATOR CRAFT ================= */
 
-const creatorCraft = getCreatorCrafts().find(craft =>
-    String(craft.name || "").trim().toLowerCase() ===
-    String(productName || "").trim().toLowerCase()
-);
-
-let product = null;
+let creatorCraft = null;
+let product = products[productName] || null;
 
 
-/* ================= CREATOR UPLOADED CRAFT ================= */
+/* ================= LOAD CREATOR CRAFT FROM DATABASE ================= */
 
-if (creatorCraft) {
-    if (creatorCraft.status === "Approved") {
-        product = {
-            image: creatorCraft.image || "images/kalasetu-logo.png",
-            category: creatorCraft.category || "Handmade Craft",
-            price: "₹" + Number(creatorCraft.price || 0).toLocaleString("en-IN"),
-            creator: creatorCraft.creatorName || creatorCraft.creator || "Local Artisan",
-            story: creatorCraft.story || "A beautiful handmade craft created with care.",
-            isCreatorCraft: true
-        };
-    } else {
-        alert("This craft is not available for customers yet.");
-        window.location.href = "customer-home.html";
+async function loadCreatorCraftFromDatabase() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:5000/api/creators/admin/crafts"
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error("Unable to fetch crafts");
+        }
+
+        creatorCraft = data.crafts.find(craft =>
+            String(craft.name || "").trim().toLowerCase() ===
+            String(productName || "").trim().toLowerCase()
+            && craft.status === "Approved"
+        );
+
+        if (creatorCraft) {
+
+            product = {
+                image: creatorCraft.image || "images/kalasetu-logo.png",
+                category: creatorCraft.category || "Handmade Craft",
+                price: "₹" + Number(creatorCraft.price || 0).toLocaleString("en-IN"),
+                creator: creatorCraft.creator_name || "Local Artisan",
+                story: creatorCraft.story || "A beautiful handmade craft created with care.",
+                isCreatorCraft: true
+            };
+
+        }
+
+    } catch (error) {
+
+        console.error("Database Product Error:", error);
+
     }
-} else {
-    product = products[productName] || null;
 }
 
 
 /* ================= NUMERIC PRICE ================= */
 
 function getNumericPrice() {
+
     if (!product) return 0;
 
     return Number(
@@ -127,26 +131,13 @@ function getPriceBreakdown() {
 
     const total = getNumericPrice();
 
-    // Use the saved creator breakdown for uploaded crafts.
+    // Use saved creator price breakdown for uploaded crafts.
     if (product && product.isCreatorCraft && creatorCraft) {
 
-        const saved = creatorCraft.priceBreakdown || {};
-
-        const creator = Number(
-            saved.creatorPrice ?? creatorCraft.creatorPrice
-        );
-
-        const materials = Number(
-            saved.materials ?? creatorCraft.materials
-        );
-
-        const packaging = Number(
-            saved.packaging ?? creatorCraft.packaging
-        );
-
-        const platform = Number(
-            saved.platformServices ?? creatorCraft.platformServices
-        );
+        const creator = Number(creatorCraft.creator_price);
+        const materials = Number(creatorCraft.materials);
+        const packaging = Number(creatorCraft.packaging);
+        const platform = Number(creatorCraft.platform_services);
 
         const hasSavedBreakdown =
             Number.isFinite(creator) &&
@@ -156,6 +147,7 @@ function getPriceBreakdown() {
             creator + materials + packaging + platform > 0;
 
         if (hasSavedBreakdown) {
+
             return {
                 creatorPrice: creator,
                 materials: materials,
@@ -163,13 +155,15 @@ function getPriceBreakdown() {
                 platformServices: platform,
                 total: creator + materials + packaging + platform
             };
+
         }
     }
 
-    // Default split for fixed products or older crafts
+    // Default split for fixed products or older crafts.
     const creator = Math.round(total * 60) / 100;
     const materials = Math.round(total * 20) / 100;
     const packaging = Math.round(total * 10) / 100;
+
     const platform = Math.round(
         (total - creator - materials - packaging) * 100
     ) / 100;
@@ -187,10 +181,12 @@ function getPriceBreakdown() {
 /* ================= FORMAT PRICE ================= */
 
 function formatPrice(amount) {
+
     return "₹" + Number(amount || 0).toLocaleString("en-IN", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
+
 }
 
 
@@ -211,22 +207,112 @@ function displayPriceBreakdown() {
     };
 
     Object.entries(values).forEach(([id, amount]) => {
+
         const element = document.getElementById(id);
 
         if (element) {
             element.textContent = formatPrice(amount);
         }
+
     });
+
+}
+
+
+/* ================= GET CURRENT STOCK ================= */
+
+function getCurrentProductStock() {
+
+    if (!product) return "Out of Stock";
+
+    if (!product.isCreatorCraft) return "In Stock";
+
+    if (!creatorCraft || creatorCraft.status !== "Approved") {
+        return "Out of Stock";
+    }
+
+    return creatorCraft.stock_status || "In Stock";
+}
+
+
+/* ================= DISPLAY STOCK STATUS ================= */
+
+function updateProductStockDisplay() {
+
+    if (!product) return;
+
+    const priceRating =
+        document.querySelector(".price-rating");
+
+    if (!priceRating) return;
+
+    let stockLabel =
+        document.getElementById("productStockStatus");
+
+    if (!stockLabel) {
+
+        stockLabel = document.createElement("span");
+        stockLabel.id = "productStockStatus";
+
+        priceRating.insertAdjacentElement(
+            "afterend",
+            stockLabel
+        );
+
+    }
+
+    const stockStatus = getCurrentProductStock();
+
+    stockLabel.textContent = stockStatus;
+    stockLabel.className = "customer-stock-status";
+
+    stockLabel.classList.add(
+        stockStatus === "Out of Stock"
+            ? "out-of-stock"
+            : "in-stock"
+    );
+
+    const unavailable = stockStatus === "Out of Stock";
+
+    const addCartButton =
+        document.querySelector(".add-cart-btn");
+
+    const buyButton =
+        document.querySelector(".buy-now-btn");
+
+    if (addCartButton) {
+
+        addCartButton.disabled = unavailable;
+
+        addCartButton.textContent =
+            unavailable ? "Out of Stock" : "Add to Cart";
+
+    }
+
+    if (buyButton) {
+
+        buyButton.disabled = unavailable;
+
+        buyButton.textContent =
+            unavailable ? "Out of Stock" : "Order Now";
+
+    }
+
 }
 
 
 /* ================= LOAD PRODUCT DETAILS ================= */
 
-function loadProductDetails() {
+async function loadProductDetails() {
+
+    // First load creator crafts from PostgreSQL.
+    await loadCreatorCraftFromDatabase();
 
     if (!product) {
+
         alert("Product not found.");
         window.location.href = "customer-home.html";
+
         return;
     }
 
@@ -269,15 +355,17 @@ function loadProductDetails() {
 
     // Hide thumbnails only for creator crafts.
     if (product.isCreatorCraft) {
+
         const thumbnailSection =
             document.querySelector(".craft-thumbnails");
 
         if (thumbnailSection) {
             thumbnailSection.style.display = "none";
         }
+
     }
 
-    // Keep breakdown visible for ALL products.
+    // Keep breakdown visible for all products.
     const priceBreakdown =
         document.querySelector(".price-breakdown");
 
@@ -287,89 +375,13 @@ function loadProductDetails() {
 
     displayPriceBreakdown();
     updateProductStockDisplay();
+
 }
+
+
+/* ================= INITIALIZE PRODUCT DETAILS ================= */
 
 loadProductDetails();
-
-
-/* ================= GET CURRENT STOCK ================= */
-
-function getCurrentProductStock() {
-
-    if (!product) return "Out of Stock";
-
-    if (!product.isCreatorCraft) return "In Stock";
-
-    const crafts = getCreatorCrafts();
-
-    const latestCraft = crafts.find(craft =>
-        String(craft.name || "").trim().toLowerCase() ===
-        String(productName || "").trim().toLowerCase()
-    );
-
-    if (!latestCraft || latestCraft.status !== "Approved") {
-        return "Out of Stock";
-    }
-
-    return latestCraft.stockStatus || "In Stock";
-}
-
-
-/* ================= DISPLAY STOCK STATUS ================= */
-
-function updateProductStockDisplay() {
-
-    if (!product) return;
-
-    const priceRating =
-        document.querySelector(".price-rating");
-
-    if (!priceRating) return;
-
-    let stockLabel =
-        document.getElementById("productStockStatus");
-
-    if (!stockLabel) {
-        stockLabel = document.createElement("span");
-        stockLabel.id = "productStockStatus";
-
-        priceRating.insertAdjacentElement(
-            "afterend",
-            stockLabel
-        );
-    }
-
-    const stockStatus = getCurrentProductStock();
-
-    stockLabel.textContent = stockStatus;
-    stockLabel.className = "customer-stock-status";
-
-    stockLabel.classList.add(
-        stockStatus === "Out of Stock"
-            ? "out-of-stock"
-            : "in-stock"
-    );
-
-    const unavailable = stockStatus === "Out of Stock";
-
-    const addCartButton =
-        document.querySelector(".add-cart-btn");
-
-    const buyButton =
-        document.querySelector(".buy-now-btn");
-
-    if (addCartButton) {
-        addCartButton.disabled = unavailable;
-        addCartButton.textContent =
-            unavailable ? "Out of Stock" : "Add to Cart";
-    }
-
-    if (buyButton) {
-        buyButton.disabled = unavailable;
-        buyButton.textContent =
-            unavailable ? "Out of Stock" : "Order Now";
-    }
-}
 
 
 /* ================= THUMBNAILS ================= */
@@ -392,7 +404,9 @@ thumbnails.forEach(function (thumbnail) {
         });
 
         thumbnail.classList.add("active");
+
     });
+
 });
 
 
@@ -408,11 +422,14 @@ function searchProducts() {
     const value = searchInput.value.trim();
 
     if (value === "") {
+
         alert("Please enter something to search.");
         return;
+
     }
 
     alert("Searching for: " + value);
+
 }
 
 
@@ -421,11 +438,15 @@ function searchProducts() {
 const searchInput = document.getElementById("searchInput");
 
 if (searchInput) {
+
     searchInput.addEventListener("keydown", function (event) {
+
         if (event.key === "Enter") {
             searchProducts();
         }
+
     });
+
 }
 
 
@@ -434,11 +455,14 @@ if (searchInput) {
 function showMessage(item) {
 
     if (item === "Cart") {
+
         window.location.href = "cart.html";
         return;
+
     }
 
     alert(item + " feature will be added soon.");
+
 }
 
 
@@ -451,11 +475,14 @@ function showStory() {
     if (story) {
         story.scrollIntoView({ behavior: "smooth" });
     }
+
 }
 
 
 function showRelated() {
+
     alert("Related crafts will be available here.");
+
 }
 
 
@@ -465,10 +492,13 @@ function showValue() {
         document.querySelector(".price-breakdown");
 
     if (breakdown && product) {
+
         breakdown.scrollIntoView({
             behavior: "smooth"
         });
+
     }
+
 }
 
 
@@ -479,6 +509,8 @@ function createOrderItem(quantity = 1) {
     const breakdown = getPriceBreakdown();
 
     return {
+         craftId: creatorCraft ? Number(creatorCraft.id) : null,
+
         name: productName,
         image: product.image,
         category: product.category,
@@ -494,7 +526,9 @@ function createOrderItem(quantity = 1) {
             platformServices: breakdown.platformServices,
             total: breakdown.total
         }
+
     };
+
 }
 
 
@@ -503,19 +537,25 @@ function createOrderItem(quantity = 1) {
 function addToCart() {
 
     if (!product) {
+
         alert("Product not found.");
         return;
+
     }
 
     if (getCurrentProductStock() === "Out of Stock") {
+
         alert("This product is currently Out of Stock.");
         updateProductStockDisplay();
+
         return;
+
     }
 
     let cart = [];
 
     try {
+
         cart = JSON.parse(
             localStorage.getItem("cart") || "[]"
         );
@@ -523,8 +563,11 @@ function addToCart() {
         if (!Array.isArray(cart)) {
             cart = [];
         }
+
     } catch (error) {
+
         cart = [];
+
     }
 
     const existingItem = cart.find(
@@ -536,7 +579,7 @@ function addToCart() {
         existingItem.quantity =
             (Number(existingItem.quantity) || 1) + 1;
 
-        // Refresh the saved breakdown too.
+        // Refresh saved breakdown too.
         const updatedItem = createOrderItem(
             existingItem.quantity
         );
@@ -557,6 +600,7 @@ function addToCart() {
     alert(productName + " added to cart.");
 
     window.location.href = "cart.html";
+
 }
 
 
@@ -565,14 +609,19 @@ function addToCart() {
 function buyNow() {
 
     if (!product) {
+
         alert("Product not found.");
         return;
+
     }
 
     if (getCurrentProductStock() === "Out of Stock") {
+
         alert("This product is currently Out of Stock.");
         updateProductStockDisplay();
+
         return;
+
     }
 
     const order = createOrderItem(1);
@@ -583,4 +632,5 @@ function buyNow() {
     );
 
     window.location.href = "checkout.html";
+
 }

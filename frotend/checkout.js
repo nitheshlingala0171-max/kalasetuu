@@ -406,7 +406,7 @@ document
             total += itemTotal;
 
             return {
-
+                craftId: item.craftId || item.id || null,
                 name: item.name || "Craft Product",
 
                 image: item.image || "images/kalasetu-logo.png",

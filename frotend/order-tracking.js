@@ -64,6 +64,7 @@ function getStatusStep(status) {
 
 
 /* ================= UPDATE TIMELINE ================= */
+/* ================= UPDATE TIMELINE ================= */
 
 function updateTimeline(status) {
     const timelineItems = document.querySelectorAll(".timeline-item");
@@ -76,31 +77,53 @@ function updateTimeline(status) {
         const icon = item.querySelector(".timeline-icon");
 
         if (currentStep === -1) {
+            if (icon) {
+                icon.textContent = "○";
+            }
             return;
         }
 
-        if (index < currentStep) {
+        // Delivered ayithe all steps green tick
+        if (currentStep === 4) {
             item.classList.add("completed");
 
-        } else if (index === currentStep) {
-            item.classList.add("active");
+            if (icon) {
+                icon.textContent = "✓";
+            }
         }
 
-        if (icon) {
-            if (index < currentStep) {
+        // Normal completed steps
+        else if (index < currentStep) {
+            item.classList.add("completed");
+
+            if (icon) {
                 icon.textContent = "✓";
-            } else if (index === currentStep) {
+            }
+        }
+
+        // Current active step
+        else if (index === currentStep) {
+            item.classList.add("active");
+
+            if (icon) {
                 icon.textContent = "●";
-            } else {
+            }
+        }
+
+        // Upcoming steps
+        else {
+            if (icon) {
                 icon.textContent = "○";
             }
         }
     });
 
-    // Display cancellation information if order is cancelled
     let cancelledMessage = document.getElementById("cancelledMessage");
 
-    if (String(status).toLowerCase() === "cancelled") {
+    if (
+        String(status).trim().toLowerCase() === "cancelled" ||
+        String(status).trim().toLowerCase() === "canceled"
+    ) {
         if (!cancelledMessage) {
             cancelledMessage = document.createElement("div");
             cancelledMessage.id = "cancelledMessage";
@@ -119,7 +142,6 @@ function updateTimeline(status) {
         cancelledMessage.remove();
     }
 }
-
 
 /* ================= DISPLAY ORDER ================= */
 

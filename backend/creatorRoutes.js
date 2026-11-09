@@ -1,4 +1,4 @@
-
+console.log("CREATOR ROUTES LOADED");
 const express = require("express");
 const bcrypt = require("bcrypt");
 
@@ -357,7 +357,7 @@ router.get("/crafts/:creatorId", async (req, res) => {
         const result = await pool.query(
             `SELECT id, creator_id, name, category, price, story,
                     image, status, created_at, creator_price,
-                    materials, packaging, platform_services
+                    materials, packaging, platform_services,stock_status
              FROM crafts
              WHERE creator_id = $1
              ORDER BY created_at DESC`,
@@ -482,6 +482,7 @@ router.post("/crafts", async (req, res) => {
 // =====================================================
 
 router.put("/crafts/:craftId", async (req, res) => {
+     console.log("STOCK ROUTE HIT");
     try {
         const {
             creatorId,
@@ -610,6 +611,153 @@ router.delete("/crafts/:craftId", async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Unable to delete craft."
+        });
+    }
+});
+
+// =====================================================
+// CREATOR - UPDATE CRAFT STOCK
+// PUT /api/creators/crafts/:craftId/stock
+// =====================================================
+
+router.put("/crafts/:craftId/stock", async (req, res) => {
+    try {
+        const { creatorId, stockStatus } = req.body;
+        const pool = getPool(req);
+
+        const allowedStatuses = ["In Stock", "Out of Stock"];
+
+        if (!creatorId || !allowedStatuses.includes(stockStatus)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid stock details."
+            });
+        }
+
+        const result = await pool.query(
+            `UPDATE crafts
+             SET stock_status = $1
+             WHERE id = $2 AND creator_id = $3
+             RETURNING id, stock_status`,
+            [stockStatus, req.params.craftId, creatorId]
+        );
+
+        if (!result.rows.length) {
+            return res.status(404).json({
+                success: false,
+                message: "Craft not found."
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Stock updated successfully.",
+            craft: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("Stock update error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to update stock."
+        });
+    }
+});
+
+// =====================================================
+// ADMIN - GET ALL CRAFTS
+// GET /api/creators/admin/crafts
+// =====================================================
+
+router.get("/admin/crafts", async (req, res) => {
+    try {
+        const pool = getPool(req);
+
+        const result = await pool.query(
+            `SELECT
+                c.id,
+                c.creator_id,
+                c.name,
+                c.category,
+                c.price,
+                c.story,
+                c.image,
+                c.status,
+                c.created_at,
+                c.stock_status,
+                cr.name AS creator_name
+             FROM crafts c
+             LEFT JOIN creators cr ON cr.id = c.creator_id
+             ORDER BY c.created_at DESC, c.id DESC`
+        );
+
+        res.json({
+            success: true,
+            crafts: result.rows
+        });
+
+    } catch (error) {
+        console.error("Admin crafts loading error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to load crafts."
+        });
+    }
+});
+
+
+// =====================================================
+// ADMIN - APPROVE OR REJECT CRAFT
+// PUT /api/creators/admin/crafts/:craftId/status
+// =====================================================
+
+router.put("/admin/crafts/:craftId/status", async (req, res) => {
+    try {
+        const { status } = req.body;
+        const pool = getPool(req);
+
+        const allowedStatuses = [
+            "Approved",
+            "Rejected",
+            "Under Review"
+        ];
+
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid craft status."
+            });
+        }
+
+        const result = await pool.query(
+            `UPDATE crafts
+             SET status = $1
+             WHERE id = $2
+             RETURNING *`,
+            [status, req.params.craftId]
+        );
+
+        if (!result.rows.length) {
+            return res.status(404).json({
+                success: false,
+                message: "Craft not found."
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Craft status updated successfully.",
+            craft: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("Admin craft status update error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to update craft status."
         });
     }
 });

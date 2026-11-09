@@ -1,8 +1,15 @@
 
 const express = require("express");
 const bcrypt = require("bcrypt");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
 
 const router = express.Router();
+
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 
 // =====================================================
@@ -337,13 +344,18 @@ router.post("/orders", async (req, res) => {
             });
         }
 
-        const isCOD =
-            String(paymentMethod).trim().toLowerCase() === "cash on delivery";
+       const isCOD =
+    String(paymentMethod).trim().toLowerCase() === "cash on delivery";
 
-        const paymentStatus = "Pending";
-        const codSettlementStatus = isCOD
-            ? "Pending"
-            : "Not Applicable";
+if (!isCOD) {
+    return res.status(400).json({
+        success: false,
+        message: "Online payments must use Razorpay verification."
+    });
+}
+
+const paymentStatus = "Pending";
+const codSettlementStatus = "Pending";
 
         await client.query("BEGIN");
 
@@ -1065,6 +1077,7 @@ router.get("/refunds/:customerId", async (req, res) => {
                 r.reason,
                 r.description,
                 r.status,
+                r.payment_status,
                 r.admin_note,
                 r.requested_at,
                 o.total_price,
@@ -1108,6 +1121,7 @@ router.get("/admin/refunds", async (req, res) => {
                 r.reason,
                 r.description,
                 r.status,
+                r.payment_status,
                 r.admin_note,
                 r.requested_at,
                 o.total_price,
@@ -1205,7 +1219,488 @@ router.put("/admin/refunds/:refundId/status", async (req, res) => {
 
 
 // =====================================================
-// EXPORT ROUTER
+// ADMIN - MARK REFUND PAYMENT AS PROCESSED
 // =====================================================
 
+router.put("/admin/refunds/:refundId/payment-status", async (req, res) => {
+    const pool = req.app.locals.pool;
+    let client;
+
+    try {
+        const { refundId } = req.params;
+        client = await pool.connect();
+
+        await client.query("BEGIN");
+
+        const refundResult = await client.query(
+            `SELECT id, order_id, status, payment_status
+             FROM refund_requests
+             WHERE id = $1
+             FOR UPDATE`,
+            [refundId]
+        );
+
+        if (refundResult.rows.length === 0) {
+            await client.query("ROLLBACK");
+            return res.status(404).json({
+                success: false,
+                message: "Refund request not found."
+            });
+        }
+
+        const refund = refundResult.rows[0];
+
+        if (refund.status !== "Approved") {
+            await client.query("ROLLBACK");
+            return res.status(400).json({
+                success: false,
+                message: "Only approved refunds can be processed."
+            });
+        }
+
+        if (refund.payment_status === "Processed") {
+            await client.query("ROLLBACK");
+            return res.status(409).json({
+                success: false,
+                message: "Refund payment is already processed."
+            });
+        }
+
+        await client.query(
+            `UPDATE refund_requests
+             SET payment_status = 'Processed',
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = $1`,
+            [refundId]
+        );
+
+        await client.query(
+            `UPDATE orders
+             SET payment_status = 'Refunded'
+             WHERE id = $1`,
+            [refund.order_id]
+        );
+
+        await client.query("COMMIT");
+
+        res.json({
+            success: true,
+            message: "Refund payment marked as processed."
+        });
+
+    } catch (error) {
+        if (client) {
+            try {
+                await client.query("ROLLBACK");
+            } catch (rollbackError) {
+                console.error("Refund rollback error:", rollbackError);
+            }
+        }
+
+        console.error("Refund payment processing error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Server error while processing refund payment."
+        });
+
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+});
+
+
+// =====================================================
+// EXPORT ROUTER
+// =====================================================
+// =====================================================
+// RAZORPAY - CREATE TEST PAYMENT ORDER
+// =====================================================
+
+router.post("/payment/create-order", async (req, res) => {
+    try {
+        if (
+            !process.env.RAZORPAY_KEY_ID ||
+            !process.env.RAZORPAY_KEY_SECRET ||
+            process.env.RAZORPAY_KEY_ID === "your_test_key_id" ||
+            process.env.RAZORPAY_KEY_SECRET === "your_test_key_secret"
+        ) {
+            return res.status(503).json({
+                success: false,
+                message: "Razorpay Test Mode keys are not configured."
+            });
+        }
+
+        const {
+            customerId,
+            customerName,
+            phone,
+            address,
+            city,
+            state,
+            pincode,
+            items
+        } = req.body;
+
+        if (
+            !customerId || !customerName || !phone ||
+            !address || !city || !state || !pincode ||
+            !Array.isArray(items) || items.length === 0
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Incomplete payment details."
+            });
+        }
+
+        const pool = req.app.locals.pool;
+
+        const customerResult = await pool.query(
+            `SELECT id, status FROM customers WHERE id = $1`,
+            [customerId]
+        );
+
+        if (
+            customerResult.rows.length === 0 ||
+            customerResult.rows[0].status !== "Active"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "Invalid or inactive customer."
+            });
+        }
+
+        const fixedProducts = {
+            "Terracotta Handcrafted Pot": 499,
+            "Handloom Cotton Saree": 1299,
+            "Wooden Elephant Figurine": 699,
+            "Handmade Earrings": 349,
+            "Traditional Tea Set": 899,
+            "Handwoven Basket": 399
+        };
+
+        const verifiedItems = [];
+        let totalAmount = 0;
+
+        for (const item of items) {
+            const quantity = Number(item.quantity);
+
+            if (!Number.isInteger(quantity) || quantity < 1 || quantity > 50) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid product quantity."
+                });
+            }
+
+            let verifiedItem;
+
+            if (item.craftId) {
+                const craftResult = await pool.query(
+                    `SELECT id, name, category, price, image, stock_status, status
+                     FROM crafts
+                     WHERE id = $1`,
+                    [item.craftId]
+                );
+
+                if (
+                    craftResult.rows.length === 0 ||
+                    craftResult.rows[0].status !== "Approved" ||
+                    craftResult.rows[0].stock_status === "Out of Stock"
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "A selected craft is unavailable."
+                    });
+                }
+
+                const craft = craftResult.rows[0];
+
+                verifiedItem = {
+                    craftId: craft.id,
+                    name: craft.name,
+                    category: craft.category,
+                    image: craft.image || "images/kalasetu-logo.png",
+                    price: Number(craft.price),
+                    quantity,
+                    creator: item.creator || "Local Artisan"
+                };
+
+            } else {
+                const fixedPrice = fixedProducts[item.name];
+
+                if (fixedPrice === undefined) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid product selected."
+                    });
+                }
+
+                verifiedItem = {
+                    craftId: null,
+                    name: item.name,
+                    category: item.category || "Traditional Craft",
+                    image: item.image || "images/kalasetu-logo.png",
+                    price: fixedPrice,
+                    quantity,
+                    creator: item.creator || "Local Artisan"
+                };
+            }
+
+            totalAmount += verifiedItem.price * quantity;
+            verifiedItems.push(verifiedItem);
+        }
+
+        const amountPaise = Math.round(totalAmount * 100);
+
+        const razorpayOrder = await razorpay.orders.create({
+            amount: amountPaise,
+            currency: "INR",
+            receipt: `kalasetu_${customerId}_${Date.now()}`
+        });
+
+        const orderDetails = {
+            customerName,
+            phone,
+            address,
+            city,
+            state,
+            pincode,
+            items: verifiedItems
+        };
+
+        await pool.query(
+            `INSERT INTO payment_attempts
+             (customer_id, razorpay_order_id, amount_paise,
+              currency, order_details, payment_status)
+             VALUES ($1, $2, $3, 'INR', $4, 'Created')`,
+            [
+                customerId,
+                razorpayOrder.id,
+                amountPaise,
+                JSON.stringify(orderDetails)
+            ]
+        );
+
+        res.json({
+            success: true,
+            keyId: process.env.RAZORPAY_KEY_ID,
+            orderId: razorpayOrder.id,
+            amount: amountPaise,
+            currency: "INR"
+        });
+
+    } catch (error) {
+        console.error("Razorpay create order error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to create payment order."
+        });
+    }
+});
+
+
+// =====================================================
+// RAZORPAY - VERIFY PAYMENT AND SAVE CUSTOMER ORDER
+// =====================================================
+
+router.post("/payment/verify", async (req, res) => {
+    const pool = req.app.locals.pool;
+    let client;
+
+    try {
+        const {
+            customerId,
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature
+        } = req.body;
+
+        if (
+            !customerId ||
+            !razorpay_order_id ||
+            !razorpay_payment_id ||
+            !razorpay_signature
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Payment verification details are incomplete."
+            });
+        }
+
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+            .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+            .digest("hex");
+
+        const expectedBuffer = Buffer.from(expectedSignature);
+        const receivedBuffer = Buffer.from(razorpay_signature);
+
+        if (
+            expectedBuffer.length !== receivedBuffer.length ||
+            !crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Payment verification failed."
+            });
+        }
+
+        const payment = await razorpay.payments.fetch(
+            razorpay_payment_id
+        );
+
+        if (
+            payment.order_id !== razorpay_order_id ||
+            payment.status !== "captured"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Payment is not successfully captured."
+            });
+        }
+
+        client = await pool.connect();
+        await client.query("BEGIN");
+
+        const attemptResult = await client.query(
+            `SELECT *
+             FROM payment_attempts
+             WHERE razorpay_order_id = $1
+               AND customer_id = $2
+             FOR UPDATE`,
+            [razorpay_order_id, customerId]
+        );
+
+        if (attemptResult.rows.length === 0) {
+            await client.query("ROLLBACK");
+
+            return res.status(404).json({
+                success: false,
+                message: "Payment attempt not found."
+            });
+        }
+
+        const attempt = attemptResult.rows[0];
+
+        if (attempt.payment_status === "Paid") {
+            await client.query("ROLLBACK");
+
+            return res.status(409).json({
+                success: false,
+                message: "This payment has already been processed."
+            });
+        }
+
+        if (
+            Number(payment.amount) !== Number(attempt.amount_paise) ||
+            payment.currency !== attempt.currency
+        ) {
+            await client.query("ROLLBACK");
+
+            return res.status(400).json({
+                success: false,
+                message: "Payment amount verification failed."
+            });
+        }
+
+        const details = attempt.order_details;
+
+        const orderResult = await client.query(
+            `INSERT INTO orders
+             (
+                customer_id, customer_name, phone,
+                address, city, state, pincode,
+                payment_method, total_price, status,
+                payment_status, cod_settlement_status
+             )
+             VALUES ($1,$2,$3,$4,$5,$6,$7,'Razorpay',$8,
+                     'Pending','Paid','Not Applicable')
+             RETURNING id, customer_id, customer_name,
+                       total_price, status, payment_status, order_date`,
+            [
+                customerId,
+                details.customerName,
+                details.phone,
+                details.address,
+                details.city,
+                details.state,
+                details.pincode,
+                Number(attempt.amount_paise) / 100
+            ]
+        );
+
+        const order = orderResult.rows[0];
+
+        for (const item of details.items) {
+            await client.query(
+                `INSERT INTO order_items
+                 (
+                    order_id, craft_id, product_name,
+                    product_image, category, price,
+                    quantity, creator_name
+                 )
+                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+                [
+                    order.id,
+                    item.craftId,
+                    item.name,
+                    item.image,
+                    item.category,
+                    item.price,
+                    item.quantity,
+                    item.creator
+                ]
+            );
+        }
+
+        await client.query(
+            `UPDATE payment_attempts
+             SET payment_status = 'Paid',
+                 razorpay_payment_id = $1,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = $2`,
+            [razorpay_payment_id, attempt.id]
+        );
+
+        await client.query("COMMIT");
+
+        res.status(201).json({
+            success: true,
+            message: "Payment verified and order placed successfully.",
+            order: {
+                id: order.id,
+                customerId: order.customer_id,
+                customerName: order.customer_name,
+                totalPrice: Number(order.total_price),
+                status: order.status,
+                paymentStatus: order.payment_status,
+                orderDate: order.order_date
+            }
+        });
+
+    } catch (error) {
+        if (client) {
+            try {
+                await client.query("ROLLBACK");
+            } catch (rollbackError) {
+                console.error("Payment rollback error:", rollbackError);
+            }
+        }
+
+        console.error("Razorpay verification error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to verify payment."
+        });
+
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+});
 module.exports = router;

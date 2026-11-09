@@ -10,8 +10,8 @@ body {
     font-family: Georgia, "Times New Roman", serif;
     color: #33231e;
     background:
-        linear-gradient(rgba(246, 235, 221, 0.78),
-                        rgba(246, 235, 221, 0.78)),
+        linear-gradient(rgba(246, 235, 221, 0.30),
+                        rgba(246, 235, 221, 0.30)),
         url("images/background.png") center/cover fixed;
 }
 

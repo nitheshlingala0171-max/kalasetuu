@@ -400,65 +400,98 @@ displayCustomerStockStatus();
 /* ================= INITIAL SLIDE ================= */
 
 showFestival(0);
-/* ============ DISPLAY APPROVED CREATOR CRAFTS ============ */
 
-function displayCreatorCrafts() {
+/* ============ DISPLAY APPROVED CREATOR CRAFTS FROM DATABASE ============ */
 
-    const container = document.getElementById(
-        "creatorCraftsContainer"
-    );
+async function displayCreatorCrafts() {
+
+    const container = document.getElementById("creatorCraftsContainer");
 
     if (!container) return;
 
-    const crafts = JSON.parse(
-        localStorage.getItem("creatorCrafts") || "[]"
-    );
+    try {
 
-    container.innerHTML = "";
-
-    const approvedCrafts = crafts.filter(
-        craft => craft.status === "Approved"
-    );
-
-    approvedCrafts.forEach(craft => {
-
-        const card = document.createElement("div");
-        card.className = "product-card";
-
-        card.innerHTML = `
-            <div class="product-image">
-                <img src="${craft.image}" alt="Craft">
-            </div>
-
-            <div class="product-info">
-                <h3></h3>
-                <p></p>
-                <span class="price"></span>
-                <span class="customer-stock-status"></span>
-            </div>
-        `;
-
-        card.querySelector("h3").textContent = craft.name;
-        card.querySelector("p").textContent = craft.category;
-        card.querySelector(".price").textContent = "₹" + craft.price;
-
-        const stockLabel = card.querySelector(
-            ".customer-stock-status"
+        const response = await fetch(
+            "http://localhost:5000/api/creators/admin/crafts"
         );
 
-        const status = craft.stockStatus || "In Stock";
+        const data = await response.json();
 
-        stockLabel.textContent = status;
-        stockLabel.classList.add(
-            status === "Out of Stock" ? "out-of-stock" : "in-stock"
+        if (!response.ok || !data.success) {
+            throw new Error("Unable to load crafts");
+        }
+
+        container.innerHTML = "";
+
+        // Display only Admin Approved crafts
+        const approvedCrafts = data.crafts.filter(
+            craft => craft.status === "Approved"
         );
 
-      card.addEventListener("click", () => {
-    openProduct(craft.name);
-});
+        approvedCrafts.forEach(craft => {
 
-        container.appendChild(card);
-    });
+            const card = document.createElement("div");
+            card.className = "product-card";
+
+            const imageBox = document.createElement("div");
+            imageBox.className = "product-image";
+
+            const img = document.createElement("img");
+            img.src = craft.image || "";
+            img.alt = craft.name || "Craft";
+
+            imageBox.appendChild(img);
+
+            const info = document.createElement("div");
+            info.className = "product-info";
+
+            const title = document.createElement("h3");
+            title.textContent = craft.name;
+
+            const category = document.createElement("p");
+            category.textContent = craft.category;
+
+            const price = document.createElement("span");
+            price.className = "price";
+            price.textContent = "₹" + craft.price;
+
+            const stock = document.createElement("span");
+            stock.className = "customer-stock-status";
+
+            const stockStatus = craft.stock_status || "In Stock";
+
+            stock.textContent = stockStatus;
+
+            stock.classList.add(
+                stockStatus === "Out of Stock"
+                    ? "out-of-stock"
+                    : "in-stock"
+            );
+
+            info.appendChild(title);
+            info.appendChild(category);
+            info.appendChild(price);
+            info.appendChild(stock);
+
+            card.appendChild(imageBox);
+            card.appendChild(info);
+
+            card.addEventListener("click", () => {
+                openProduct(craft.name);
+            });
+
+            container.appendChild(card);
+
+        });
+
+    } catch (error) {
+
+        console.error("Customer Crafts Error:", error);
+
+        container.innerHTML =
+            "<p>Unable to load crafts. Please try again.</p>";
+
+    }
 }
 
 displayCreatorCrafts();

@@ -50,38 +50,63 @@ async function loadRefunds() {
             const reason = escapeHTML(refund.reason || "-");
             const customer = escapeHTML(refund.customer_name || "Customer");
             const status = escapeHTML(refund.status || "Pending");
+            const paymentStatus = refund.payment_status || "Not Processed";
+
+            let actionHTML = "-";
+
+            if (refund.status === "Pending") {
+                actionHTML = `
+                    <div class="action-buttons">
+                        <button class="approve-btn"
+                            onclick="updateRefund(${refund.id}, 'Approved')">
+                            Approve
+                        </button>
+
+                        <button class="reject-btn"
+                            onclick="updateRefund(${refund.id}, 'Rejected')">
+                            Reject
+                        </button>
+                    </div>
+                `;
+            } else if (
+                refund.status === "Approved" &&
+                paymentStatus !== "Processed"
+            ) {
+                actionHTML = `
+                    <button class="approve-btn"
+                        onclick="processRefundPayment(${refund.id})">
+                        Mark as Processed
+                    </button>
+                `;
+            } else if (paymentStatus === "Processed") {
+                actionHTML = `
+                    <span class="status approved">Processed</span>
+                `;
+            }
 
             row.innerHTML = `
                 <td>${refund.id}</td>
+
                 <td>
                     <strong>${customer}</strong><br>
                     <small>${escapeHTML(refund.customer_contact || "")}</small>
                 </td>
+
                 <td>${refund.order_id}</td>
+
                 <td>₹${Number(refund.total_price || 0).toFixed(2)}</td>
+
                 <td>${reason}</td>
+
                 <td>${date}</td>
+
                 <td>
                     <span class="status ${statusClass}">${status}</span>
+                    <br>
+                    <small>Payment: ${escapeHTML(paymentStatus)}</small>
                 </td>
-                <td>
-                    ${
-                        refund.status === "Pending"
-                        ? `
-                            <div class="action-buttons">
-                                <button class="approve-btn"
-                                    onclick="updateRefund(${refund.id}, 'Approved')">
-                                    Approve
-                                </button>
-                                <button class="reject-btn"
-                                    onclick="updateRefund(${refund.id}, 'Rejected')">
-                                    Reject
-                                </button>
-                            </div>
-                        `
-                        : "-"
-                    }
-                </td>
+
+                <td>${actionHTML}</td>
             `;
 
             refundTableBody.appendChild(row);
@@ -94,6 +119,9 @@ async function loadRefunds() {
             `<tr><td colspan="8">Unable to load refund requests.</td></tr>`;
     }
 }
+
+
+// APPROVE OR REJECT REFUND
 
 async function updateRefund(refundId, status) {
     const action = status === "Approved" ? "approve" : "reject";
@@ -126,13 +154,50 @@ async function updateRefund(refundId, status) {
         }
 
         alert(data.message || "Refund status updated.");
-        loadRefunds();
+        await loadRefunds();
 
     } catch (error) {
         console.error("Refund update error:", error);
         alert(error.message);
     }
 }
+
+
+// MARK REFUND PAYMENT AS PROCESSED
+
+async function processRefundPayment(refundId) {
+    const confirmed = confirm(
+        "Mark this refund payment as Processed? This is a demo status update, not an actual bank transfer."
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch(
+            `${API_BASE}/admin/refunds/${refundId}/payment-status`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to process refund.");
+        }
+
+        alert(data.message || "Refund marked as processed.");
+        await loadRefunds();
+
+    } catch (error) {
+        console.error("Refund payment error:", error);
+        alert(error.message);
+    }
+}
+
 
 function escapeHTML(value) {
     return String(value).replace(/[&<>"']/g, char => ({

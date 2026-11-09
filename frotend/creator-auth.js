@@ -43,9 +43,14 @@ creatorForm.addEventListener("submit", async function (event) {
 
         const creator = data.creator;
 
-        localStorage.setItem(
-            "loggedInCreator",
-            JSON.stringify(creator)
+       localStorage.setItem(
+    "loggedInCreator",
+    JSON.stringify(creator)
+);
+
+localStorage.setItem(
+    "creatorAccount",
+    JSON.stringify(creator)
         );
 
         // STEP 2: Get verification status
@@ -63,6 +68,9 @@ creatorForm.addEventListener("submit", async function (event) {
        const verification = verificationData.creator;
 
         const status = verification.status;
+        console.log("LOGIN CREATOR:", creator);
+console.log("VERIFICATION DATA:", verification);
+console.log("CREATOR STATUS:", status);
 
         // STEP 3: First login - verification not submitted
         if (!status || status === "Not Submitted") {
