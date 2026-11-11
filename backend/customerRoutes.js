@@ -5,11 +5,16 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 
 const router = express.Router();
+// DEMO OTP STORAGE (temporary; clears when server restarts)
+const passwordResetOtps = new Map();
 
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+const razorpay =
+    process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
+        ? new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
+        })
+        : null;
 
 
 // =====================================================
@@ -139,6 +144,308 @@ router.post("/login", async (req, res) => {
     }
 });
 
+// =====================================================
+// CUSTOMER - CHANGE PASSWORD
+// =====================================================
+
+router.put("/change-password", async (req, res) => {
+    try {
+        const { customerId, currentPassword, newPassword } = req.body;
+
+        if (!customerId || !currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Please fill all password fields."
+            });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "New password must contain at least 8 characters."
+            });
+        }
+
+        if (currentPassword === newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "New password must be different from current password."
+            });
+        }
+
+        const pool = req.app.locals.pool;
+
+        const result = await pool.query(
+            `SELECT id, password, status
+             FROM customers
+             WHERE id = $1`,
+            [customerId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Customer not found."
+            });
+        }
+
+        const customer = result.rows[0];
+
+        if (customer.status !== "Active") {
+            return res.status(403).json({
+                success: false,
+                message: "Customer account is not active."
+            });
+        }
+
+        const passwordMatch = await bcrypt.compare(
+            currentPassword,
+            customer.password
+        );
+
+        if (!passwordMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Current password is incorrect."
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await pool.query(
+            `UPDATE customers
+             SET password = $1
+             WHERE id = $2`,
+            [hashedPassword, customerId]
+        );
+
+        return res.json({
+            success: true,
+            message: "Password changed successfully."
+        });
+
+    } catch (error) {
+        console.error("Change password error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while changing password."
+        });
+    }
+});
+
+
+// =====================================================
+// CUSTOMER - SAVED ADDRESSES
+// =====================================================
+
+// GET ALL SAVED ADDRESSES
+router.get("/addresses/:customerId", async (req, res) => {
+    try {
+        const pool = req.app.locals.pool;
+        const { customerId } = req.params;
+
+        const result = await pool.query(
+            `SELECT * FROM customer_addresses
+             WHERE customer_id = $1
+             ORDER BY id DESC`,
+            [customerId]
+        );
+
+        res.json({
+            success: true,
+            addresses: result.rows
+        });
+
+    } catch (error) {
+        console.error("Get addresses error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Unable to load addresses."
+        });
+    }
+});
+
+
+// ADD SAVED ADDRESS
+router.post("/addresses", async (req, res) => {
+    try {
+        const {
+            customerId, name, phone, house,
+            street, city, state, pincode, addressType
+        } = req.body;
+
+        if (
+            !customerId || !name || !phone || !house ||
+            !city || !state || !pincode
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Please fill all required address fields."
+            });
+        }
+
+        const pool = req.app.locals.pool;
+
+        const result = await pool.query(
+            `INSERT INTO customer_addresses
+            (customer_id, name, phone, house, street,
+             city, state, pincode, address_type)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+             RETURNING *`,
+            [
+                customerId, name, phone, house,
+                street || null, city, state, pincode,
+                addressType || "Home"
+            ]
+        );
+
+        res.status(201).json({
+            success: true,
+            message: "Address saved successfully.",
+            address: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("Add address error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Unable to save address."
+        });
+    }
+});
+
+
+// UPDATE SAVED ADDRESS
+router.put("/addresses/:addressId", async (req, res) => {
+    try {
+        const { addressId } = req.params;
+        const {
+            customerId, name, phone, house,
+            street, city, state, pincode, addressType
+        } = req.body;
+
+        const pool = req.app.locals.pool;
+
+        const result = await pool.query(
+            `UPDATE customer_addresses
+             SET name=$1, phone=$2, house=$3, street=$4,
+                 city=$5, state=$6, pincode=$7, address_type=$8
+             WHERE id=$9 AND customer_id=$10
+             RETURNING *`,
+            [
+                name, phone, house, street || null,
+                city, state, pincode, addressType || "Home",
+                addressId, customerId
+            ]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Address not found."
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Address updated successfully.",
+            address: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("Update address error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Unable to update address."
+        });
+    }
+});
+
+
+// DELETE SAVED ADDRESS
+router.delete("/addresses/:addressId", async (req, res) => {
+    try {
+        const { addressId } = req.params;
+        const { customerId } = req.body;
+
+        const pool = req.app.locals.pool;
+
+        const result = await pool.query(
+            `DELETE FROM customer_addresses
+             WHERE id=$1 AND customer_id=$2
+             RETURNING id`,
+            [addressId, customerId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Address not found."
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Address deleted successfully."
+        });
+
+    } catch (error) {
+        console.error("Delete address error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Unable to delete address."
+        });
+    }
+});
+// UPDATE CUSTOMER PROFILE
+
+router.put("/profile/:customerId", async (req, res) => {
+    try {
+        const { customerId } = req.params;
+        const { name, contact } = req.body;
+
+        if (!name || !contact) {
+            return res.status(400).json({
+                message: "Name and mobile number are required."
+            });
+        }
+
+        if (!/^[0-9]{10}$/.test(String(contact))) {
+            return res.status(400).json({
+                message: "Enter a valid 10-digit mobile number."
+            });
+        }
+
+        const pool = req.app.locals.pool;
+
+        const result = await pool.query(
+            `UPDATE customers
+             SET name = $1, contact = $2
+             WHERE id = $3
+             RETURNING id, name, contact`,
+            [name.trim(), contact, customerId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "Customer not found."
+            });
+        }
+
+        res.json({
+            message: "Profile updated successfully!",
+            customer: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("Profile update error:", error);
+
+        res.status(500).json({
+            message: "Unable to update profile."
+        });
+    }
+});
 
 // =====================================================
 // GET CUSTOMER PROFILE
@@ -344,18 +651,11 @@ router.post("/orders", async (req, res) => {
             });
         }
 
-       const isCOD =
+      const isCOD =
     String(paymentMethod).trim().toLowerCase() === "cash on delivery";
 
-if (!isCOD) {
-    return res.status(400).json({
-        success: false,
-        message: "Online payments must use Razorpay verification."
-    });
-}
-
-const paymentStatus = "Pending";
-const codSettlementStatus = "Pending";
+const paymentStatus = isCOD ? "Pending" : "Paid (Demo)";
+const codSettlementStatus = isCOD ? "Pending" : "Not Applicable";
 
         await client.query("BEGIN");
 
@@ -1077,7 +1377,7 @@ router.get("/refunds/:customerId", async (req, res) => {
                 r.reason,
                 r.description,
                 r.status,
-                r.payment_status,
+                o.payment_status,
                 r.admin_note,
                 r.requested_at,
                 o.total_price,
@@ -1121,7 +1421,7 @@ router.get("/admin/refunds", async (req, res) => {
                 r.reason,
                 r.description,
                 r.status,
-                r.payment_status,
+                o.payment_status,
                 r.admin_note,
                 r.requested_at,
                 o.total_price,
@@ -1703,4 +2003,235 @@ router.post("/payment/verify", async (req, res) => {
         }
     }
 });
+// UPDATE CUSTOMER PROFILE
+router.put("/profile/:customerId", async (req, res) => {
+    try {
+        const pool = req.app.locals.pool;
+
+        const { customerId } = req.params;
+        const { name, contact } = req.body;
+
+        if (!name || !contact) {
+            return res.status(400).json({
+                success: false,
+                message: "Name and mobile number are required."
+            });
+        }
+
+        const result = await pool.query(
+            `UPDATE customers
+             SET name = $1, contact = $2
+             WHERE id = $3
+             RETURNING id, name, contact`,
+            [name, contact, customerId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Customer not found."
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Profile updated successfully!",
+            customer: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("Profile update error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to update profile."
+        });
+    }
+});
+
+// =====================================================
+// FORGOT PASSWORD - GENERATE DEMO OTP
+// =====================================================
+
+router.post("/forgot-password/send-otp", async (req, res) => {
+    try {
+        const contact = String(req.body.contact || "").trim();
+
+        if (!contact) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter your registered mobile number."
+            });
+        }
+
+        const pool = req.app.locals.pool;
+
+        const result = await pool.query(
+            `SELECT id, contact, status
+             FROM customers
+             WHERE contact = $1`,
+            [contact]
+        );
+
+        if (
+            result.rows.length === 0 ||
+            result.rows[0].status !== "Active"
+        ) {
+            return res.status(404).json({
+                success: false,
+                message: "Registered active customer not found."
+            });
+        }
+
+        const customer = result.rows[0];
+
+        // 60-second resend limit
+        const existing = passwordResetOtps.get(contact);
+
+        if (existing && Date.now() - existing.createdAt < 60000) {
+            return res.status(429).json({
+                success: false,
+                message: "Please wait 60 seconds before requesting another OTP."
+            });
+        }
+
+        // Generate a six-digit OTP
+        const otp = String(
+            crypto.randomInt(100000, 1000000)
+        );
+
+        passwordResetOtps.set(contact, {
+            customerId: customer.id,
+            otp: otp,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 5 * 60 * 1000,
+            attempts: 0
+        });
+
+        res.json({
+            success: true,
+            message: "Demo OTP generated successfully.",
+            demoOtp: otp,
+            expiresIn: "5 minutes"
+        });
+
+    } catch (error) {
+        console.error("Forgot password OTP error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to generate OTP."
+        });
+    }
+});
+
+
+// =====================================================
+// FORGOT PASSWORD - VERIFY OTP AND RESET PASSWORD
+// =====================================================
+
+router.post("/forgot-password/reset", async (req, res) => {
+    try {
+        const contact = String(req.body.contact || "").trim();
+        const otp = String(req.body.otp || "").trim();
+        const newPassword = String(req.body.newPassword || "");
+
+        if (!contact || !otp || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Please fill all required fields."
+            });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must contain at least 8 characters."
+            });
+        }
+
+        const record = passwordResetOtps.get(contact);
+
+        if (!record) {
+            return res.status(400).json({
+                success: false,
+                message: "OTP not found. Please request a new OTP."
+            });
+        }
+
+        if (Date.now() > record.expiresAt) {
+            passwordResetOtps.delete(contact);
+
+            return res.status(400).json({
+                success: false,
+                message: "OTP expired. Please request a new OTP."
+            });
+        }
+
+        if (record.attempts >= 5) {
+            passwordResetOtps.delete(contact);
+
+            return res.status(429).json({
+                success: false,
+                message: "Too many incorrect attempts. Request a new OTP."
+            });
+        }
+
+        if (otp !== record.otp) {
+            record.attempts += 1;
+
+            if (record.attempts >= 5) {
+                passwordResetOtps.delete(contact);
+
+                return res.status(429).json({
+                    success: false,
+                    message: "Too many incorrect attempts. Request a new OTP."
+                });
+            }
+
+            return res.status(400).json({
+                success: false,
+                message: "Incorrect OTP. Please try again."
+            });
+        }
+
+        const pool = req.app.locals.pool;
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const updateResult = await pool.query(
+            `UPDATE customers
+             SET password = $1
+             WHERE id = $2 AND status = 'Active'
+             RETURNING id`,
+            [hashedPassword, record.customerId]
+        );
+
+        if (updateResult.rows.length === 0) {
+            passwordResetOtps.delete(contact);
+
+            return res.status(404).json({
+                success: false,
+                message: "Customer account not found or inactive."
+            });
+        }
+
+        // OTP can be used only once
+        passwordResetOtps.delete(contact);
+
+        res.json({
+            success: true,
+            message: "Password reset successfully. Please login with your new password."
+        });
+
+    } catch (error) {
+        console.error("Password reset error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to reset password."
+        });
+    }
+});
+
 module.exports = router;

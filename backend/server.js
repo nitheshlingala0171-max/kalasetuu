@@ -42,6 +42,8 @@ app.use("/api/creators", creatorRoutes);
 // CHAT ROUTES
 const chatRoutes = require("./chatRoutes");
 app.use("/api/chat", chatRoutes);
+const customCraftRoutes = require("./customCraftRoutes");
+app.use("/api/custom-crafts", customCraftRoutes);
 // ================= HOME TEST =================
 
 app.get("/", (req, res) => {

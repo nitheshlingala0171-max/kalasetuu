@@ -1,3 +1,4 @@
+
 const express = require("express");
 
 const router = express.Router();
@@ -46,7 +47,6 @@ router.post("/conversations", async (req, res) => {
             });
         }
 
-        // If a craft ID is supplied, verify that it belongs to this creator.
         if (craftId !== undefined && craftId !== null) {
             const craft = await pool.query(
                 `SELECT id
@@ -63,8 +63,6 @@ router.post("/conversations", async (req, res) => {
             }
         }
 
-        // Find an existing conversation for this exact customer,
-        // creator and craft combination.
         let result = await pool.query(
             `SELECT id, customer_id, creator_id, craft_id, created_at
              FROM conversations
@@ -107,7 +105,158 @@ router.post("/conversations", async (req, res) => {
     }
 });
 
+// =====================================================
+// CREATE OR GET CUSTOM CRAFT REQUEST CONVERSATION
+// POST /api/chat/custom-request/:requestId/conversation
+// =====================================================
 
+router.post("/custom-request/:requestId/conversation", async (req, res) => {
+    const pool = getPool(req);
+    const client = await pool.connect();
+
+    try {
+        const { requestId } = req.params;
+        const { creatorId } = req.body;
+
+        if (!requestId || !creatorId) {
+            return res.status(400).json({
+                success: false,
+                message: "Request ID and Creator ID are required."
+            });
+        }
+
+        await client.query("BEGIN");
+
+        // Check whether the request was accepted by this creator
+        const requestResult = await client.query(
+            `SELECT
+                id,
+                customer_id,
+                accepted_creator_id,
+                status
+             FROM custom_craft_requests
+             WHERE id = $1
+             FOR UPDATE`,
+            [requestId]
+        );
+
+        if (!requestResult.rows.length) {
+            await client.query("ROLLBACK");
+
+            return res.status(404).json({
+                success: false,
+                message: "Custom craft request not found."
+            });
+        }
+
+        const request = requestResult.rows[0];
+
+        if (
+            request.status !== "ACCEPTED" ||
+            Number(request.accepted_creator_id) !== Number(creatorId)
+        ) {
+            await client.query("ROLLBACK");
+
+            return res.status(403).json({
+                success: false,
+                message: "Only the creator who accepted this request can open its chat."
+            });
+        }
+
+        // Check customer
+        const customerResult = await client.query(
+            `SELECT id, status
+             FROM customers
+             WHERE id = $1`,
+            [request.customer_id]
+        );
+
+        if (
+            !customerResult.rows.length ||
+            customerResult.rows[0].status !== "Active"
+        ) {
+            await client.query("ROLLBACK");
+
+            return res.status(404).json({
+                success: false,
+                message: "Active customer not found."
+            });
+        }
+
+        // Create a separate conversation for this request
+        let conversationResult = await client.query(
+            `INSERT INTO conversations
+                (customer_id, creator_id, craft_id, custom_request_id)
+             VALUES ($1, $2, NULL, $3)
+             ON CONFLICT (custom_request_id)
+             WHERE custom_request_id IS NOT NULL
+             DO NOTHING
+             RETURNING
+                id,
+                customer_id,
+                creator_id,
+                craft_id,
+                custom_request_id,
+                created_at`,
+            [request.customer_id, creatorId, requestId]
+        );
+
+        let isNew = conversationResult.rows.length > 0;
+
+        // If conversation already exists, open it
+        if (!isNew) {
+            conversationResult = await client.query(
+                `SELECT
+                    id,
+                    customer_id,
+                    creator_id,
+                    craft_id,
+                    custom_request_id,
+                    created_at
+                 FROM conversations
+                 WHERE custom_request_id = $1`,
+                [requestId]
+            );
+        }
+
+        if (!conversationResult.rows.length) {
+            throw new Error("Unable to create or find custom request conversation.");
+        }
+
+        const conversation = conversationResult.rows[0];
+
+        // Verify that the existing conversation belongs to the correct participants
+        if (
+            Number(conversation.customer_id) !== Number(request.customer_id) ||
+            Number(conversation.creator_id) !== Number(creatorId)
+        ) {
+            throw new Error("Conversation participant mismatch.");
+        }
+
+        await client.query("COMMIT");
+
+        return res.status(isNew ? 201 : 200).json({
+            success: true,
+            message: isNew
+                ? "Custom request conversation created."
+                : "Existing custom request conversation opened.",
+            conversation
+        });
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+
+        console.error("Custom request conversation error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to open custom request conversation."
+        });
+
+    } finally {
+        client.release();
+    }
+});
 // =====================================================
 // CUSTOMER - GET ALL CONVERSATIONS
 // GET /api/chat/customer/:customerId
@@ -197,7 +346,8 @@ router.get("/creator/:creatorId", async (req, res) => {
                 cf.image AS craft_image,
                 lm.message AS last_message,
                 lm.sender_type AS last_sender_type,
-                lm.created_at AS last_message_at
+                lm.created_at AS last_message_at,
+                COALESCE(unread.unread_count, 0)::int AS unread_count
 
              FROM conversations cv
 
@@ -211,6 +361,14 @@ router.get("/creator/:creatorId", async (req, res) => {
                 ORDER BY created_at DESC, id DESC
                 LIMIT 1
              ) lm ON TRUE
+
+             LEFT JOIN LATERAL (
+                SELECT COUNT(*) AS unread_count
+                FROM messages
+                WHERE conversation_id = cv.id
+                  AND sender_type = 'customer'
+                  AND is_read = FALSE
+             ) unread ON TRUE
 
              WHERE cv.creator_id = $1
              ORDER BY COALESCE(lm.created_at, cv.created_at) DESC`,
@@ -291,7 +449,6 @@ router.get("/conversations/:conversationId/messages", async (req, res) => {
             [conversationId]
         );
 
-        // Mark messages sent by the other participant as read.
         if (customerId) {
             await pool.query(
                 `UPDATE messages
@@ -367,7 +524,6 @@ router.post("/conversations/:conversationId/messages", async (req, res) => {
 
         const chat = conversation.rows[0];
 
-        // Ensure the sender belongs to this conversation.
         const isParticipant =
             senderType === "customer"
                 ? Number(senderId) === Number(chat.customer_id)
