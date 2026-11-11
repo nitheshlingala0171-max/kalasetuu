@@ -141,6 +141,133 @@ try {
 }
 
 
+/* ================= SAVED ADDRESS INTEGRATION ================= */
+
+let savedAddresses = [];
+
+function loadSavedAddresses() {
+
+    const customer = JSON.parse(
+        localStorage.getItem("customerAccount") || "null"
+    );
+
+    const select = document.getElementById("savedAddressSelect");
+    const message = document.getElementById("savedAddressMessage");
+
+    if (!select || !customer || !customer.id) return;
+
+    const storageKey = "savedAddresses_" + customer.id;
+
+    savedAddresses = JSON.parse(
+        localStorage.getItem(storageKey) || "[]"
+    );
+
+    select.innerHTML = `
+        <option value="">Enter a new address</option>
+    `;
+
+    if (savedAddresses.length === 0) {
+        message.textContent = "No saved addresses. Enter a new address below.";
+        return;
+    }
+
+    savedAddresses.forEach((address, index) => {
+
+        const option = document.createElement("option");
+
+        option.value = index;
+
+        option.textContent =
+            address.type + " - " +
+            address.city + " (" +
+            address.pincode + ")";
+
+        select.appendChild(option);
+
+    });
+
+    message.textContent =
+        savedAddresses.length + " saved address(es) available.";
+}
+
+
+/* ================= SELECT SAVED ADDRESS ================= */
+
+document.getElementById("savedAddressSelect")
+    .addEventListener("change", function () {
+
+        const index = this.value;
+if (index === "") {
+    document.getElementById("address").value = "";
+    document.getElementById("city").value = "";
+    document.getElementById("state").value = "";
+    document.getElementById("pincode").value = "";
+
+    loadCustomerDetails();
+
+    document.getElementById("savedAddressMessage").textContent =
+        "Enter your new delivery address.";
+
+    return;
+}
+
+        const address = savedAddresses[Number(index)];
+
+        if (!address) return;
+
+        document.getElementById("customerName").value =
+            address.name || "";
+
+        document.getElementById("phone").value =
+            address.phone || "";
+
+        document.getElementById("address").value =
+            (address.house || "") + ", " +
+            (address.street || "");
+
+        document.getElementById("city").value =
+            address.city || "";
+
+        document.getElementById("state").value =
+            address.state || "";
+
+        document.getElementById("pincode").value =
+            address.pincode || "";
+
+        document.getElementById("savedAddressMessage").textContent =
+            "✓ Saved address selected successfully.";
+
+    });
+
+
+/* ================= LOAD CUSTOMER DEFAULT DETAILS ================= */
+
+function loadCustomerDetails() {
+
+    const customer = JSON.parse(
+        localStorage.getItem("customerAccount") || "null"
+    );
+
+    if (!customer) return;
+
+    document.getElementById("customerName").value =
+        customer.name ||
+        customer.customer_name ||
+        customer.fullName || "";
+
+    document.getElementById("phone").value =
+        customer.phone ||
+        customer.mobile ||
+        customer.contact ||
+        customer.phone_number || "";
+}
+
+
+/* ================= START SAVED ADDRESS ================= */
+
+loadCustomerDetails();
+loadSavedAddresses();
+
 /* ================= DISPLAY CHECKOUT ================= */
 
 function displayCheckout() {

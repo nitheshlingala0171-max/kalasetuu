@@ -988,3 +988,244 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+/* =====================================================
+   CUSTOMER CONVERSATION LIST - IMPROVED DESIGN
+===================================================== */
+
+#conversationListScreen {
+    display: none;
+    width: calc(100% - 40px) !important;
+    max-width: 1050px !important;
+    min-height: 480px !important;
+    margin: 38px auto !important;
+    padding: 32px !important;
+
+    background: #fffdf9 !important;
+    border: 1px solid #dfcbb7 !important;
+    border-radius: 16px !important;
+
+    box-shadow: 0 12px 35px rgba(57, 37, 30, 0.15);
+
+    color: #39251e;
+}
+
+#conversationListScreen h2 {
+    font-family: Georgia, serif;
+    font-size: 27px;
+    color: #39251e;
+    margin-bottom: 8px !important;
+}
+
+#conversationListScreen h2::after {
+    content: "Continue your conversations with local artisans";
+    display: block;
+    margin-top: 9px;
+    color: #8d7566;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+}
+
+/* Conversation list */
+
+#conversationItems {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+/* Individual conversation card */
+
+#conversationItems button {
+    position: relative;
+    min-height: 82px;
+    padding: 18px 22px !important;
+    margin: 0 !important;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    background: #ffffff !important;
+    border: 1px solid #e5d4c3 !important;
+    border-radius: 12px !important;
+
+    text-align: left;
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+}
+
+#conversationItems button:hover {
+    background: #fbf3e9 !important;
+    border-color: #bd6745 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(57, 37, 30, 0.10);
+}
+
+#conversationItems button:focus-visible {
+    outline: 3px solid #bd6745;
+    outline-offset: 3px;
+}
+
+#conversationItems button strong {
+    color: #39251e !important;
+    font-size: 16px !important;
+    font-family: Georgia, serif;
+}
+
+#conversationItems button div:nth-child(2) {
+    color: #a95738 !important;
+    font-size: 13px !important;
+}
+
+#conversationItems button div:nth-child(3) {
+    color: #756357 !important;
+    font-size: 12px !important;
+}
+
+/* Empty conversation message */
+
+#conversationItems > p {
+    padding: 55px 20px !important;
+    margin-top: 15px;
+
+    background: #faf4eb;
+    border: 1px dashed #cdb394;
+    border-radius: 12px;
+
+    color: #684333 !important;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* =====================================================
+   HEADER AND NAVIGATION IMPROVEMENTS
+===================================================== */
+
+.top-header {
+    position: relative;
+    z-index: 10;
+    background: #fffdf9 !important;
+    box-shadow: 0 4px 18px rgba(57, 37, 30, 0.10);
+}
+
+.back-btn {
+    background: #684333;
+    color: #ffffff;
+    border-color: #684333;
+    font-weight: 600;
+}
+
+.back-btn:hover {
+    background: #a95738;
+    border-color: #a95738;
+    color: #ffffff;
+}
+
+/* =====================================================
+   PAGE BACKGROUND - BETTER VISIBILITY
+===================================================== */
+
+body {
+    background:
+        linear-gradient(
+            rgba(244, 234, 220, 0.32),
+            rgba(244, 234, 220, 0.32)
+        ),
+        url("./images/background.png");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* =====================================================
+   CHAT LAYOUT IMPROVEMENTS
+===================================================== */
+
+.chat-layout {
+    background: #fffdf9;
+    box-shadow: 0 15px 40px rgba(57, 37, 30, 0.15);
+}
+
+.chat-top {
+    background: #fffdf9;
+}
+
+.chat-messages {
+    background: #fffaf4;
+}
+
+.message-input-area {
+    background: #ffffff;
+}
+
+.message-input-area input {
+    color: #39251e;
+    background: #ffffff;
+}
+
+.send-btn {
+    background: #a95738;
+}
+
+.send-btn:hover {
+    background: #87452e;
+}
+
+/* =====================================================
+   RESPONSIVE CONVERSATION LIST
+===================================================== */
+
+@media (max-width: 700px) {
+
+    #conversationListScreen {
+        width: calc(100% - 20px) !important;
+        margin: 20px auto !important;
+        padding: 20px !important;
+        min-height: 400px !important;
+    }
+
+    #conversationListScreen h2 {
+        font-size: 22px;
+    }
+
+    #conversationItems button {
+        padding: 15px !important;
+    }
+
+    #conversationItems button strong {
+        font-size: 14px !important;
+    }
+}
+.all-chats-btn {
+    padding: 10px 14px;
+    border: 1px solid #bd6745;
+    border-radius: 7px;
+    background: #fff8ef;
+    color: #684333;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.all-chats-btn:hover {
+    background: #684333;
+    color: white;
+}
+
+.chat-top {
+    gap: 12px;
+}
+
+@media (max-width: 700px) {
+    .all-chats-btn {
+        padding: 8px;
+        font-size: 10px;
+    }
+}

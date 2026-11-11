@@ -62,6 +62,7 @@ const products = {
 
 const params = new URLSearchParams(window.location.search);
 const productName = params.get("product");
+const requestedCraftId = params.get("craftId");
 
 
 /* ================= DATABASE CREATOR CRAFT ================= */
@@ -86,11 +87,18 @@ async function loadCreatorCraftFromDatabase() {
             throw new Error("Unable to fetch crafts");
         }
 
-        creatorCraft = data.crafts.find(craft =>
-            String(craft.name || "").trim().toLowerCase() ===
-            String(productName || "").trim().toLowerCase()
-            && craft.status === "Approved"
-        );
+       creatorCraft = data.crafts.find(craft => {
+
+    if (craft.status !== "Approved") return false;
+
+    if (requestedCraftId) {
+        return String(craft.id) === String(requestedCraftId);
+    }
+
+    return String(craft.name || "").trim().toLowerCase() ===
+        String(productName || "").trim().toLowerCase();
+
+});
 
         if (creatorCraft) {
 
@@ -633,4 +641,18 @@ function buyNow() {
 
     window.location.href = "checkout.html";
 
+
+}
+function chatWithCreator() {
+
+    if (!creatorCraft || !creatorCraft.creator_id) {
+        alert("Creator details are not available for this product.");
+        return;
+    }
+
+    const creatorId = creatorCraft.creator_id;
+    const craftId = creatorCraft.id;
+
+    window.location.href =
+        `chat-with-creator.html?creatorId=${creatorId}&craftId=${craftId}`;
 }

@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saved Address | Kalasetu</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: #4e372d;
+    overflow-x: hidden;
+}
+
+.address-page {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 28px 20px 50px;
+
+    background-image: url("./images/background.png");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.address-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(246, 235, 221, 0.25);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.address-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* LOGO */
+
+.address-logo {
+    width: 82px;
+    height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+.address-logo img {
+    width: 78px;
+    height: 78px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* BRAND */
+
+.address-brand {
+    font-family: Georgia, serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: #4f2f23;
+}
+
+.address-tagline {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: #8b6757;
+    margin-top: 5px;
+    margin-bottom: 18px;
+}
+
+/* CARD */
+
+.card {
+    width: 100%;
+    background: rgba(255, 250, 242, 0.96);
+    border: 1px solid #dfc6a8;
+    border-radius: 18px;
+    padding: 28px 30px;
+    box-shadow: 0 12px 35px rgba(78, 50, 32, 0.16);
+}
+
+.card h2 {
+    font-family: Georgia, serif;
+    color: #573326;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.description {
+    color: #8c6c5c;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+/* FORM */
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #704b39;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dfc3a3;
+    border-radius: 8px;
+    background: #fffdf9;
+    color: #4e372d;
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: #98532f;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    border-radius: 22px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 11px 18px;
+}
+
+.save-btn {
+    width: 100%;
+    margin-top: 22px;
+    background: #8b5032;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #643a2b;
+}
+
+.cancel-btn {
+    width: 100%;
+    margin-top: 10px;
+    background: #ead8c3;
+    color: #704532;
+}
+
+#formMessage {
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* SAVED ADDRESSES */
+
+.saved-heading {
+    margin-top: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e6d4bd;
+    font-family: Georgia, serif;
+    color: #573326;
+    font-size: 19px;
+}
+
+.address-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    margin-top: 15px;
+}
+
+.address-item {
+    background: #fffdf8;
+    border: 1px solid #dfc7aa;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.address-item h3 {
+    color: #603d2c;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.address-item p {
+    font-size: 13px;
+    color: #795b49;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.address-actions {
+    display: flex;
+    gap: 9px;
+    margin-top: 13px;
+}
+
+.edit-btn {
+    background: #ead8c3;
+    color: #704532;
+}
+
+.delete-btn {
+    background: #f4dddd;
+    color: #9a3939;
+}
+
+.empty-message {
+    padding: 18px;
+    text-align: center;
+    color: #8c6c5c;
+    font-size: 13px;
+    background: #f8efe2;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #8f5139;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+@media(max-width: 600px) {
+    .address-page {
+        padding: 22px 15px 40px;
+        background-attachment: scroll;
+    }
+
+    .card {
+        padding: 23px 18px;
+    }
+
+    .address-brand {
+        font-size: 23px;
+    }
+}
+
+@media(max-width: 420px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main class="address-page">
+
+    <div class="address-overlay"></div>
+
+    <section class="address-container">
+
+        <!-- LOGO -->
+        <div class="address-logo">
+            <img src="images/kalasetu-logo.png"
+                 alt="Kalasetu Logo">
+        </div>
+
+        <!-- BRAND -->
+        <div class="address-brand">KALASETU</div>
+
+        <div class="address-tagline">
+            TRADITION • CRAFT • STORY
+        </div>
+
+        <section class="card">
+
+            <h2>Saved Address</h2>
+
+            <p class="description">
+                Save your delivery addresses for faster checkout.
+            </p>
+
+            <!-- ADDRESS FORM -->
+
+            <form id="addressForm">
+
+                <label for="addressType">Address Type</label>
+
+                <select id="addressType" required>
+                    <option value="Home">Home</option>
+                    <option value="Work">Work</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <label for="addressName">Customer Name</label>
+
+                <input type="text"
+                       id="addressName"
+                       placeholder="Enter your name"
+                       required>
+
+                <label for="addressPhone">Mobile Number</label>
+
+                <input type="tel"
+                       id="addressPhone"
+                       maxlength="10"
+                       pattern="[0-9]{10}"
+                       placeholder="10-digit mobile number"
+                       required>
+
+                <label for="house">House / Door Number</label>
+
+                <input type="text"
+                       id="house"
+                       placeholder="Enter house number"
+                       required>
+
+                <label for="street">Street / Area</label>
+
+                <input type="text"
+                       id="street"
+                       placeholder="Enter street or area"
+                       required>
+
+                <div class="form-row">
+
+                    <div>
+                        <label for="city">City</label>
+                        <input type="text"
+                               id="city"
+                               placeholder="City"
+                               required>
+                    </div>
+
+                    <div>
+                        <label for="state">State</label>
+                        <input type="text"
+                               id="state"
+                               placeholder="State"
+                               required>
+                    </div>
+
+                </div>
+
+                <label for="pincode">PIN Code</label>
+
+                <input type="text"
+                       id="pincode"
+                       maxlength="6"
+                       pattern="[0-9]{6}"
+                       placeholder="6-digit PIN code"
+                       required>
+
+                <button type="submit"
+                        class="save-btn"
+                        id="saveButton">
+                    Save Address
+                </button>
+
+                <button type="button"
+                        class="cancel-btn"
+                        id="cancelButton"
+                        style="display:none;">
+                    Cancel Editing
+                </button>
+
+                <p id="formMessage"></p>
+
+            </form>
+
+            <!-- SAVED ADDRESS LIST -->
+
+            <h3 class="saved-heading">
+                My Saved Addresses
+            </h3>
+
+            <div id="addressList" class="address-list"></div>
+
+            <a href="customer-profile.html" class="back-link">
+                ← Back to Profile
+            </a>
+
+        </section>
+
+    </section>
+
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+
+    const API = "http://localhost:5000/api/customers";
+
+    let account;
+
+    try {
+        account = JSON.parse(
+            localStorage.getItem("customerAccount") || "null"
+        );
+    } catch {
+        account = null;
+    }
+
+    if (!account || !account.id) {
+        alert("Please login first.");
+        window.location.href = "customer-auth.html";
+        return;
+    }
+
+    let savedAddresses = [];
+    let editingId = null;
+
+    const form = document.getElementById("addressForm");
+    const addressList = document.getElementById("addressList");
+    const formMessage = document.getElementById("formMessage");
+    const saveButton = document.getElementById("saveButton");
+    const cancelButton = document.getElementById("cancelButton");
+
+    const fields = {
+        type: document.getElementById("addressType"),
+        name: document.getElementById("addressName"),
+        phone: document.getElementById("addressPhone"),
+        house: document.getElementById("house"),
+        street: document.getElementById("street"),
+        city: document.getElementById("city"),
+        state: document.getElementById("state"),
+        pincode: document.getElementById("pincode")
+    };
+
+    function showMessage(message, success = true) {
+        formMessage.style.color = success ? "#38713c" : "#b3261e";
+        formMessage.textContent = message;
+    }
+
+    function getFormData() {
+        return {
+            type: fields.type.value,
+            name: fields.name.value.trim(),
+            phone: fields.phone.value.trim(),
+            house: fields.house.value.trim(),
+            street: fields.street.value.trim(),
+            city: fields.city.value.trim(),
+            state: fields.state.value.trim(),
+            pincode: fields.pincode.value.trim()
+        };
+    }
+
+    async function apiRequest(url, options = {}) {
+        const response = await fetch(API + url, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(data.message || "Request failed.");
+        }
+
+        return data;
+    }
+
+    // LOAD ADDRESSES FROM DATABASE
+
+    async function loadAddresses() {
+        addressList.innerHTML = `
+            <div class="empty-message">Loading addresses...</div>
+        `;
+
+        try {
+            const data = await apiRequest(
+                "/addresses/" + encodeURIComponent(account.id)
+            );
+
+            savedAddresses = Array.isArray(data)
+                ? data
+                : (data.addresses || []);
+
+            displayAddresses();
+
+        } catch (error) {
+            addressList.innerHTML = `
+                <div class="empty-message">
+                    ${error.message}
+                </div>
+            `;
+        }
+    }
+
+    // DISPLAY ADDRESSES
+
+    function displayAddresses() {
+        addressList.innerHTML = "";
+
+        if (savedAddresses.length === 0) {
+            addressList.innerHTML = `
+                <div class="empty-message">
+                    No saved addresses yet.
+                    Add your first delivery address above.
+                </div>
+            `;
+            return;
+        }
+
+        savedAddresses.forEach(function (address) {
+
+            const item = document.createElement("div");
+            item.className = "address-item";
+
+            const heading = document.createElement("h3");
+            heading.textContent =
+                (address.address_type || address.type || "Home") +
+                " Address";
+
+            const details = document.createElement("p");
+
+            details.textContent =
+                (address.name || "") + "\n" +
+                (address.phone || "") + "\n" +
+                (address.house || "") + ", " +
+                (address.street || "") + "\n" +
+                (address.city || "") + ", " +
+                (address.state || "") + "\n" +
+                "PIN: " + (address.pincode || "");
+
+            details.style.whiteSpace = "pre-line";
+
+            const actions = document.createElement("div");
+            actions.className = "address-actions";
+
+            const editButton = document.createElement("button");
+            editButton.className = "edit-btn";
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", function () {
+                editAddress(address);
+            });
+
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "delete-btn";
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", function () {
+                deleteAddress(address.id);
+            });
+
+            actions.append(editButton, deleteButton);
+            item.append(heading, details, actions);
+            addressList.appendChild(item);
+        });
+    }
+
+    // SAVE OR UPDATE
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const address = getFormData();
+
+        if (!/^[0-9]{10}$/.test(address.phone)) {
+            showMessage("Enter a valid 10-digit mobile number.", false);
+            return;
+        }
+
+        if (!/^[0-9]{6}$/.test(address.pincode)) {
+            showMessage("Enter a valid 6-digit PIN code.", false);
+            return;
+        }
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Please wait...";
+
+        try {
+            const payload = {
+                customerId: account.id,
+                name: address.name,
+                phone: address.phone,
+                house: address.house,
+                street: address.street,
+                city: address.city,
+                state: address.state,
+                pincode: address.pincode,
+                addressType: address.type
+            };
+
+            if (editingId === null) {
+                await apiRequest("/addresses", {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+
+                showMessage("Address saved successfully!");
+
+            } else {
+                await apiRequest(
+                    "/addresses/" + encodeURIComponent(editingId),
+                    {
+                        method: "PUT",
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                showMessage("Address updated successfully!");
+            }
+
+            resetForm();
+            await loadAddresses();
+
+        } catch (error) {
+            showMessage(error.message, false);
+        } finally {
+            saveButton.disabled = false;
+            saveButton.textContent =
+                editingId === null ? "Save Address" : "Update Address";
+        }
+    });
+
+    // EDIT
+
+    function editAddress(address) {
+        editingId = address.id;
+
+        fields.type.value =
+            address.address_type || address.type || "Home";
+
+        fields.name.value = address.name || "";
+        fields.phone.value = address.phone || "";
+        fields.house.value = address.house || "";
+        fields.street.value = address.street || "";
+        fields.city.value = address.city || "";
+        fields.state.value = address.state || "";
+        fields.pincode.value = address.pincode || "";
+
+        saveButton.textContent = "Update Address";
+        cancelButton.style.display = "block";
+
+        showMessage("Editing selected address.");
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // DELETE
+
+    async function deleteAddress(addressId) {
+        if (!confirm("Are you sure you want to delete this address?")) {
+            return;
+        }
+
+        try {
+            await apiRequest(
+                "/addresses/" + encodeURIComponent(addressId),
+                {
+                    method: "DELETE",
+                    body: JSON.stringify({
+                        customerId: account.id
+                    })
+                }
+            );
+
+            if (String(editingId) === String(addressId)) {
+                resetForm();
+            }
+
+            showMessage("Address deleted successfully!");
+            await loadAddresses();
+
+        } catch (error) {
+            showMessage(error.message, false);
+        }
+    }
+
+    // RESET
+
+    function resetForm() {
+        form.reset();
+        editingId = null;
+        saveButton.textContent = "Save Address";
+        cancelButton.style.display = "none";
+    }
+
+    cancelButton.addEventListener("click", function () {
+        resetForm();
+        showMessage("");
+    });
+
+    // DEFAULT CUSTOMER DETAILS
+
+    fields.name.value =
+        account.name ||
+        account.customer_name ||
+        account.fullName || "";
+
+    fields.phone.value =
+        account.phone ||
+        account.mobile ||
+        account.contact ||
+        account.phone_number || "";
+
+    await loadAddresses();
+});
+</script>
+
+</body>
+</html>

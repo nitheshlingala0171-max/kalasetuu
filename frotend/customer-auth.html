@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,85 +31,86 @@
                 <span></span>
             </div>
 
-
             <!-- Authentication Card -->
             <div class="auth-card">
 
-                <p class="welcome">WELCOME BACK</p>
-
-                <h2>Customer Login</h2>
-
-                <p class="sub-text">
-                    Discover beautiful handmade crafts and stories.
+                <p class="welcome" data-i18n="welcomeBack">
+                    WELCOME BACK
                 </p>
 
+                <h2 data-i18n="customerLogin">
+                    Customer Login
+                </h2>
+
+                <p class="sub-text" data-i18n="customerDescription">
+                    Discover beautiful handmade crafts and stories.
+                </p>
 
                 <form id="customerForm">
 
                     <div class="input-group">
-                        <label for="email">Email or Phone</label>
+                        <label for="email" data-i18n="emailOrPhone">
+                            Email or Phone
+                        </label>
 
                         <input
                             type="text"
                             id="email"
-                            placeholder="Enter your email or phone"
-                            required
+                            data-i18n-placeholder="enterEmailPhone"
                         >
                     </div>
 
-
                     <div class="input-group">
-                        <label for="password">Password</label>
+                        <label for="password" data-i18n="password">
+                            Password
+                        </label>
 
                         <input
                             type="password"
                             id="password"
-                            placeholder="Enter your password"
-                            required
+                            data-i18n-placeholder="enterPassword"
                         >
                     </div>
-
 
                     <div class="options">
 
                         <label class="remember">
                             <input type="checkbox">
-                            Remember me
+                            <span data-i18n="rememberMe">Remember me</span>
                         </label>
 
-                        <a href="#" id="forgotPassword">
+                        <a href="#" id="forgotPassword" data-i18n="forgotPassword">
                             Forgot Password?
                         </a>
 
                     </div>
 
-
                     <button type="submit">
-                        LOGIN
+                        <span data-i18n="login">LOGIN</span>
                         <span>→</span>
                     </button>
 
                 </form>
 
-
                 <div class="divider">
                     <span></span>
-                    OR
+                    <span data-i18n="or">OR</span>
                     <span></span>
                 </div>
 
-
                 <p class="register-text">
-                    New to Kalasetu?
-                   <a href="customer-register.html" id="registerLink">
-    Create an account
-</a>
+                    <span data-i18n="newToKalasetu">New to Kalasetu?</span>
+
+                    <a href="customer-register.html"
+                       id="registerLink"
+                       data-i18n="createAccount">
+                        Create an account
+                    </a>
                 </p>
 
             </div>
 
-
-            <p class="bottom-text">
+            <p class="bottom-text" data-i18n="handmadeTagline">
                 HANDMADE WITH TRADITION • CONNECTED THROUGH STORIES
             </p>
 
@@ -116,7 +118,8 @@
 
     </div>
 
-
+    <!-- Translation file must load before page JavaScript -->
+    <script src="translations.js"></script>
     <script src="customer-auth.js"></script>
 
 </body>

@@ -35,5 +35,5 @@ function continueToSite() {
 
     localStorage.setItem("selectedLanguage", selectedLanguage);
 
-    window.location.href = "customer-auth.html";
+    window.location.href = "role.html";
 }

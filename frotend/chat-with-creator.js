@@ -1,5 +1,6 @@
 
 const API = "http://localhost:5000/api/chat";
+const CRAFT_API = "http://localhost:5000/api/creators/admin/crafts";
 
 const customer = JSON.parse(
     localStorage.getItem("customerAccount") || "null"
@@ -10,11 +11,13 @@ let currentCreatorId = null;
 let currentCraftId = null;
 let messagePolling = null;
 
+
 // =====================================================
 // INITIALIZE
 // =====================================================
 
 document.addEventListener("DOMContentLoaded", async () => {
+
     if (!customer || !customer.id) {
         alert("Please login as a customer first.");
         window.location.href = "customer-login.html";
@@ -28,9 +31,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentCreatorId = params.get("creatorId");
     currentCraftId = params.get("craftId");
 
+    // Direct chat from Product Details
+    if (currentCraftId) {
+        await loadCraftDetails(currentCraftId);
+    }
+
+    // Load all previous conversations
     await loadCustomerConversations();
 
-    // Open a conversation directly when creatorId is supplied.
+    // If opened from Product Details, open that creator directly
     if (currentCreatorId) {
         await openOrCreateConversation(
             Number(currentCreatorId),
@@ -52,39 +61,201 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 // =====================================================
-// CONVERSATION LIST AREA
+// SHOW CONVERSATION LIST OR CHAT SCREEN
 // =====================================================
 
 function createConversationListArea() {
-    if (document.getElementById("customerConversationList")) return;
 
-    const area = document.createElement("section");
+    const listScreen = document.getElementById(
+        "conversationListScreen"
+    );
 
-    area.id = "customerConversationList";
+    const chatLayout = document.querySelector(".chat-layout");
 
-    area.style.cssText = `
-        padding: 12px;
-        margin-bottom: 12px;
-        border-bottom: 1px solid #ddd;
-        max-height: 220px;
-        overflow-y: auto;
-    `;
+    const params = new URLSearchParams(window.location.search);
 
-    area.innerHTML = `
-        <h3 style="margin:0 0 10px;color:#245b35;">
-            Your Conversations
-        </h3>
-        <div id="conversationItems">
-            Loading conversations...
-        </div>
-    `;
+    const hasDirectChat = params.has("creatorId");
 
-    const messages = document.getElementById("chatMessages");
+    if (!listScreen || !chatLayout) return;
 
-    if (messages && messages.parentElement) {
-        messages.parentElement.insertBefore(area, messages);
+    if (hasDirectChat) {
+
+        listScreen.style.display = "none";
+        chatLayout.style.display = "";
+
     } else {
-        document.body.prepend(area);
+
+        listScreen.style.display = "block";
+        chatLayout.style.display = "none";
+
+    }
+}
+
+
+// =====================================================
+// SHOW SELECTED CHAT
+// =====================================================
+
+function showChatScreen() {
+
+    const listScreen = document.getElementById(
+        "conversationListScreen"
+    );
+
+    const chatLayout = document.querySelector(".chat-layout");
+
+    if (listScreen) {
+        listScreen.style.display = "none";
+    }
+
+    if (chatLayout) {
+        chatLayout.style.display = "";
+    }
+}
+
+
+// =====================================================
+// SHOW ALL CONVERSATIONS
+// =====================================================
+
+function showConversationList() {
+
+    const listScreen = document.getElementById(
+        "conversationListScreen"
+    );
+
+    const chatLayout = document.querySelector(".chat-layout");
+
+    if (listScreen) {
+        listScreen.style.display = "block";
+    }
+
+    if (chatLayout) {
+        chatLayout.style.display = "none";
+    }
+
+    currentConversationId = null;
+
+    if (messagePolling) {
+        clearInterval(messagePolling);
+        messagePolling = null;
+    }
+}
+
+
+// =====================================================
+// LOAD SELECTED CRAFT DETAILS
+// =====================================================
+
+async function loadCraftDetails(craftId) {
+
+    if (!craftId) return;
+
+    try {
+
+        const response = await fetch(CRAFT_API);
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error("Unable to load craft details.");
+        }
+
+        const craft = data.crafts.find(item =>
+            String(item.id) === String(craftId) &&
+            item.status === "Approved"
+        );
+
+        if (!craft) {
+            console.error("Selected craft not found:", craftId);
+            return;
+        }
+
+        // Product image
+        const productImage = document.querySelector(
+            ".product-card .product-image img"
+        );
+
+        if (productImage) {
+            productImage.src =
+                craft.image || "images/kalasetu-logo.png";
+
+            productImage.alt = craft.name || "Craft";
+        }
+
+        // Product name
+        const productName = document.querySelector(
+            ".product-card .product-info h3"
+        );
+
+        if (productName) {
+            productName.textContent =
+                craft.name || "Handmade Craft";
+        }
+
+        // Product category
+        const productCategory = document.querySelector(
+            ".product-card .product-info p"
+        );
+
+        if (productCategory) {
+            productCategory.textContent =
+                craft.category || "Handmade Craft";
+        }
+
+        // Product price
+        const productPrice = document.querySelector(
+            ".product-card .product-info strong"
+        );
+
+        if (productPrice) {
+            productPrice.textContent =
+                "₹" + Number(craft.price || 0).toLocaleString("en-IN");
+        }
+
+        // Creator name in left panel
+        const creatorName = document.querySelector(
+            ".creator-card .creator-info h3"
+        );
+
+        if (creatorName) {
+            creatorName.textContent =
+                craft.creator_name || "Local Artisan";
+        }
+
+        // Creator avatar
+        const creatorAvatar = document.querySelector(
+            ".creator-card .creator-avatar"
+        );
+
+        if (creatorAvatar) {
+            creatorAvatar.textContent =
+                (craft.creator_name || "A").charAt(0).toUpperCase();
+        }
+
+        // Chat header creator name
+        const chatCreatorName = document.querySelector(
+            ".chat-person h2"
+        );
+
+        if (chatCreatorName) {
+            chatCreatorName.textContent =
+                craft.creator_name || "Local Artisan";
+        }
+
+        // Chat header avatar
+        const chatAvatar = document.querySelector(
+            ".small-avatar"
+        );
+
+        if (chatAvatar) {
+            chatAvatar.textContent =
+                (craft.creator_name || "A").charAt(0).toUpperCase();
+        }
+
+    } catch (error) {
+
+        console.error("Craft Details Error:", error);
+
     }
 }
 
@@ -94,11 +265,15 @@ function createConversationListArea() {
 // =====================================================
 
 async function loadCustomerConversations() {
-    const container = document.getElementById("conversationItems");
+
+    const container = document.getElementById(
+        "conversationItems"
+    );
 
     if (!container) return;
 
     try {
+
         const response = await fetch(
             `${API}/customer/${customer.id}`
         );
@@ -106,59 +281,118 @@ async function loadCustomerConversations() {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            throw new Error(data.message || "Unable to load conversations.");
+            throw new Error(
+                data.message || "Unable to load conversations."
+            );
         }
 
         container.replaceChildren();
 
-        if (!data.conversations.length) {
-            container.textContent = "No conversations yet.";
+        const conversations = data.conversations || [];
+
+        if (conversations.length === 0) {
+
+            const emptyMessage = document.createElement("p");
+
+            emptyMessage.textContent =
+                "No conversations yet. Open a craft and chat with its creator.";
+
+            emptyMessage.style.cssText = `
+                padding:20px;
+                color:#777;
+                text-align:center;
+            `;
+
+            container.appendChild(emptyMessage);
             return;
         }
 
-        data.conversations.forEach(conversation => {
+        conversations.forEach(conversation => {
+
             const button = document.createElement("button");
 
             button.type = "button";
+
             button.style.cssText = `
                 display:block;
                 width:100%;
-                padding:10px;
-                margin-bottom:7px;
+                padding:14px;
+                margin-bottom:10px;
                 text-align:left;
-                border:1px solid #ddd;
-                border-radius:8px;
+                border:1px solid #e5cbb5;
+                border-radius:10px;
                 background:#fff;
                 cursor:pointer;
+                transition:background 0.2s;
             `;
 
             const creatorName = document.createElement("strong");
-            creatorName.textContent = conversation.creator_name || "Creator";
+
+            creatorName.textContent =
+                conversation.creator_name || "Creator";
+
+            creatorName.style.cssText = `
+                display:block;
+                color:#593b2e;
+                font-size:15px;
+            `;
 
             const details = document.createElement("div");
-            details.style.cssText = "font-size:12px;color:#777;margin-top:4px;";
+
             details.textContent =
                 conversation.craft_name || "General conversation";
 
+            details.style.cssText = `
+                font-size:13px;
+                color:#9b6245;
+                margin-top:5px;
+            `;
+
             const lastMessage = document.createElement("div");
-            lastMessage.style.cssText = "font-size:12px;margin-top:4px;";
+
             lastMessage.textContent =
                 conversation.last_message || "No messages yet";
 
-            button.append(creatorName, details, lastMessage);
+            lastMessage.style.cssText = `
+                font-size:12px;
+                color:#777;
+                margin-top:6px;
+            `;
 
-            button.addEventListener("click", () => {
+            button.append(
+                creatorName,
+                details,
+                lastMessage
+            );
+
+            button.addEventListener("click", async () => {
+
                 currentCreatorId = conversation.creator_id;
                 currentCraftId = conversation.craft_id;
-                openConversation(conversation.conversation_id);
+
+                showChatScreen();
+
+                if (currentCraftId) {
+                    await loadCraftDetails(currentCraftId);
+                }
+
+                await openConversation(
+                    conversation.conversation_id
+                );
+
             });
 
             container.appendChild(button);
+
         });
 
     } catch (error) {
+
         console.error("Conversation list error:", error);
-        container.textContent = "Unable to load conversations. Please refresh.";
+
+        container.textContent =
+            "Unable to load conversations. Please refresh.";
+
     }
 }
 
@@ -167,33 +401,50 @@ async function loadCustomerConversations() {
 // CREATE OR OPEN CONVERSATION
 // =====================================================
 
-async function openOrCreateConversation(creatorId, craftId = null) {
+async function openOrCreateConversation(
+    creatorId,
+    craftId = null
+) {
+
     try {
-        const response = await fetch(`${API}/conversations`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                customerId: customer.id,
-                creatorId,
-                craftId
-            })
-        });
+
+        const response = await fetch(
+            `${API}/conversations`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    customerId: customer.id,
+                    creatorId,
+                    craftId
+                })
+            }
+        );
 
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            throw new Error(data.message || "Unable to open conversation.");
+            throw new Error(
+                data.message || "Unable to open conversation."
+            );
         }
+
+        showChatScreen();
 
         await loadCustomerConversations();
 
         await openConversation(data.conversation.id);
 
     } catch (error) {
+
         console.error("Open conversation error:", error);
+
         alert(error.message);
+
     }
 }
 
@@ -203,6 +454,7 @@ async function openOrCreateConversation(creatorId, craftId = null) {
 // =====================================================
 
 async function openConversation(conversationId) {
+
     currentConversationId = conversationId;
 
     const messages = document.getElementById("chatMessages");
@@ -218,8 +470,10 @@ async function openConversation(conversationId) {
         clearInterval(messagePolling);
     }
 
-    // Refresh messages periodically to receive creator replies.
-    messagePolling = setInterval(loadMessages, 4000);
+    messagePolling = setInterval(() => {
+        loadMessages();
+    }, 4000);
+
 }
 
 
@@ -228,9 +482,11 @@ async function openConversation(conversationId) {
 // =====================================================
 
 async function loadMessages() {
+
     if (!currentConversationId) return;
 
     try {
+
         const response = await fetch(
             `${API}/conversations/${currentConversationId}/messages?customerId=${customer.id}`
         );
@@ -238,26 +494,41 @@ async function loadMessages() {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            throw new Error(data.message || "Unable to load messages.");
+            throw new Error(
+                data.message || "Unable to load messages."
+            );
         }
 
-        const container = document.getElementById("chatMessages");
+        const container = document.getElementById(
+            "chatMessages"
+        );
 
         if (!container) return;
 
         const wasNearBottom =
-            container.scrollHeight - container.scrollTop -
+            container.scrollHeight -
+            container.scrollTop -
             container.clientHeight < 100;
 
         container.replaceChildren();
 
-        if (!data.messages.length) {
+        if (!data.messages || data.messages.length === 0) {
+
             const empty = document.createElement("p");
+
             empty.textContent = "Start your conversation!";
+
+            empty.style.cssText = `
+                text-align:center;
+                color:#888;
+                padding:20px;
+            `;
+
             container.appendChild(empty);
+
         }
 
-        data.messages.forEach(item => {
+        (data.messages || []).forEach(item => {
             addMessageToScreen(item);
         });
 
@@ -266,17 +537,22 @@ async function loadMessages() {
         }
 
     } catch (error) {
+
         console.error("Load messages error:", error);
+
     }
 }
 
 
 // =====================================================
-// DISPLAY MESSAGE SAFELY
+// DISPLAY MESSAGE
 // =====================================================
 
 function addMessageToScreen(item) {
-    const container = document.getElementById("chatMessages");
+
+    const container = document.getElementById(
+        "chatMessages"
+    );
 
     if (!container) return;
 
@@ -302,15 +578,27 @@ function addMessageToScreen(item) {
     `;
 
     const messageText = document.createElement("div");
+
     messageText.textContent = item.message;
 
     const time = document.createElement("small");
-    time.style.cssText = "display:block;margin-top:5px;color:#777;font-size:10px;";
-    time.textContent = new Date(item.created_at).toLocaleString();
+
+    time.style.cssText = `
+        display:block;
+        margin-top:5px;
+        color:#777;
+        font-size:10px;
+    `;
+
+    time.textContent =
+        new Date(item.created_at).toLocaleString();
 
     bubble.append(messageText, time);
+
     wrapper.appendChild(bubble);
+
     container.appendChild(wrapper);
+
 }
 
 
@@ -319,6 +607,7 @@ function addMessageToScreen(item) {
 // =====================================================
 
 async function sendMessage() {
+
     const input = document.getElementById("messageInput");
 
     if (!input) return;
@@ -328,20 +617,26 @@ async function sendMessage() {
     if (!message) return;
 
     if (!currentConversationId) {
+
         alert("Please select a creator conversation first.");
+
         return;
+
     }
 
     input.disabled = true;
 
     try {
+
         const response = await fetch(
             `${API}/conversations/${currentConversationId}/messages`,
             {
                 method: "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify({
                     senderType: "customer",
                     senderId: customer.id,
@@ -353,35 +648,47 @@ async function sendMessage() {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            throw new Error(data.message || "Message could not be sent.");
+            throw new Error(
+                data.message || "Message could not be sent."
+            );
         }
 
         input.value = "";
 
         await loadMessages();
+
         await loadCustomerConversations();
 
     } catch (error) {
+
         console.error("Send message error:", error);
+
         alert(error.message);
+
     } finally {
+
         input.disabled = false;
         input.focus();
+
     }
+
 }
 
 
 // =====================================================
-// QUICK MESSAGES
+// QUICK QUESTIONS
 // =====================================================
 
 function sendQuickMessage(message) {
+
     const input = document.getElementById("messageInput");
 
     if (!input) return;
 
     input.value = message;
+
     sendMessage();
+
 }
 
 
@@ -390,12 +697,15 @@ function sendQuickMessage(message) {
 // =====================================================
 
 function addEmoji() {
+
     const input = document.getElementById("messageInput");
 
     if (!input) return;
 
     input.value += " 😊";
+
     input.focus();
+
 }
 
 
@@ -404,12 +714,17 @@ function addEmoji() {
 // =====================================================
 
 function contactCreator() {
+
     if (!currentConversationId) {
+
         alert("Please select a conversation first.");
+
         return;
+
     }
 
     alert("You can contact the creator through this chat.");
+
 }
 
 
@@ -418,7 +733,13 @@ function contactCreator() {
 // =====================================================
 
 window.addEventListener("beforeunload", () => {
+
     if (messagePolling) {
         clearInterval(messagePolling);
     }
+
 });
+function backToConversations() {
+    showConversationList();
+    loadCustomerConversations();
+}

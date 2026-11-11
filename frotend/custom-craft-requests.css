@@ -1,355 +1,282 @@
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-
 body {
     min-height: 100vh;
-
     font-family: Arial, sans-serif;
-
     color: #5a3528;
-
     background:
-        linear-gradient(
-            rgba(239, 211, 177, 0.20),
-            rgba(239, 211, 177, 0.20)
-        ),
+        linear-gradient(rgba(246, 235, 221, 0.18), rgba(246, 235, 221, 0.18)),
         url("images/background.png");
-
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
     background-attachment: fixed;
-
-    display: flex;
-    flex-direction: column;
 }
 
-
 /* HEADER */
-
 .top-header {
-    height: 82px;
-
-    padding: 0 12%;
-
+    width: 100%;
+    min-height: 80px;
+    padding: 12px 7%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    background: rgba(255, 250, 240, 0.88);
-
-    border-bottom: 1px solid rgba(160, 120, 90, 0.18);
-
-    backdrop-filter: blur(5px);
+    background: rgba(255, 249, 240, 0.94);
+    border-bottom: 1px solid #e6c9aa;
 }
-
-
-/* BRAND */
 
 .brand {
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 12px;
 }
-
 
 .logo-wrap {
-    width: 58px;
-    height: 58px;
-
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     overflow: hidden;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
-
 
 .logo-wrap img {
-    width: 58px;
-    height: 58px;
-
-    object-fit: contain;
-
-    border-radius: 50%;
-
-    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
-
 
 .brand-text h1 {
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 30px;
-
-    color: #5a3528;
+    font-family: Georgia, serif;
+    font-size: 29px;
+    color: #603827;
 }
-
 
 .brand-text p {
-    margin-top: 5px;
-
     font-size: 10px;
-
     letter-spacing: 2px;
-
-    color: #805c4b;
+    margin-top: 3px;
 }
-
-
-/* BACK BUTTON */
 
 .back-btn {
     text-decoration: none;
-
-    color: #5a3528;
-
-    font-size: 14px;
-
-    padding: 9px 20px;
-
-    border: 1px solid #c9a988;
-
-    border-radius: 22px;
-
-    background: rgba(255, 250, 240, 0.75);
+    color: #75432e;
+    border: 1px solid #c99a72;
+    padding: 10px 22px;
+    border-radius: 25px;
 }
-
-
-.back-btn:hover {
-    background: #fffaf0;
-}
-
 
 /* MAIN */
-
 .main-area {
-    flex: 1;
-
+    min-height: calc(100vh - 140px);
     padding: 45px 20px;
-
     display: flex;
     justify-content: center;
-    align-items: flex-start;
 }
-
 
 .request-container {
     width: 100%;
-    max-width: 760px;
-
-    background: rgba(255, 250, 241, 0.94);
-
-    border-radius: 18px;
-
+    max-width: 1050px;
+    min-height: 400px;
     padding: 38px;
-
-    text-align: center;
-
-    box-shadow:
-        0 12px 35px rgba(74, 46, 31, 0.17);
+    border-radius: 22px;
+    background: rgba(255, 249, 241, 0.95);
+    box-shadow: 0 8px 30px rgba(70, 40, 20, 0.12);
 }
 
-
-.request-container h2 {
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 30px;
-
-    color: #633822;
-
+.request-container > h2 {
+    text-align: center;
+    font-family: Georgia, serif;
+    font-size: 32px;
+    color: #603827;
     margin-bottom: 10px;
 }
 
-
 .description {
-    color: #8a604d;
+    text-align: center;
+    color: #986044;
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
 
+/* REQUEST LIST */
+.requests-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 22px;
+    align-items: stretch;
+}
+
+/* REQUEST CARD */
+.request-item {
+    background: #fffaf3;
+    border: 1px solid #e5c6a5;
+    border-radius: 16px;
+    padding: 23px;
+    box-shadow: 0 5px 15px rgba(90, 53, 40, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.request-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(90, 53, 40, 0.14);
+}
+
+.request-info h3 {
+    font-family: Georgia, serif;
+    color: #79452e;
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+.request-info p {
     font-size: 14px;
-
-    margin-bottom: 30px;
+    line-height: 1.6;
+    color: #684b3b;
+    overflow-wrap: anywhere;
+    margin-bottom: 5px;
 }
 
+.request-info p strong {
+    color: #553323;
+}
 
-/* EMPTY BOX */
+.request-info img {
+    display: block;
+    width: 100%;
+    max-width: 220px;
+    max-height: 200px;
+    object-fit: contain;
+    margin: 14px auto;
+    border-radius: 10px;
+    border: 1px solid #e6c9aa;
+}
 
+/* STATUS */
+.request-status {
+    align-self: flex-start;
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: #f1e1c9;
+    color: #80502e;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.accepted-creator {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f4eadb;
+    border-left: 4px solid #8b6842;
+}
+
+.accepted-creator h4 {
+    color: #67412c;
+    margin-bottom: 8px;
+}
+
+.accepted-creator p {
+    margin-bottom: 4px;
+}
+
+/* EMPTY STATE */
 .empty-box {
-    padding: 45px 30px;
-
-    border: 1px dashed #d4b797;
-
-    border-radius: 15px;
-
-    background: rgba(255, 253, 248, 0.72);
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 45px 20px;
+    border: 1px dashed #d9b48f;
+    border-radius: 18px;
+    background: rgba(255, 252, 246, 0.8);
 }
-
 
 .empty-icon {
     width: 58px;
     height: 58px;
-
     margin: 0 auto 18px;
-
     border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #f6e6cf;
-
-    color: #944d2f;
-
+    background: #f4e5cf;
+    display: grid;
+    place-items: center;
     font-size: 25px;
+    color: #98542e;
 }
 
-
 .empty-box h3 {
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 22px;
-
-    color: #633822;
-
+    font-family: Georgia, serif;
+    font-size: 23px;
     margin-bottom: 10px;
 }
 
-
 .empty-box p {
-    max-width: 480px;
-
-    margin: 0 auto 25px;
-
-    color: #92796a;
-
-    font-size: 13px;
-
+    color: #986044;
     line-height: 1.6;
+    margin-bottom: 22px;
 }
-
-
-/* CREATE BUTTON */
 
 .create-btn {
     display: inline-block;
-
     text-decoration: none;
-
-    background: #944d2f;
-
-    color: #fffaf4;
-
-    padding: 12px 28px;
-
-    border-radius: 22px;
-
-    font-size: 14px;
-
-    font-weight: 700;
-
-    box-shadow:
-        0 5px 12px rgba(91, 49, 30, 0.18);
+    background: #98502f;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: background 0.2s;
 }
-
 
 .create-btn:hover {
-    background: #7e4028;
+    background: #713a25;
 }
 
-
-/* PROFILE LINK */
-
+/* BACK LINK */
 .profile-link {
-    display: inline-block;
-
-    margin-top: 25px;
-
+    display: block;
+    text-align: center;
+    margin-top: 30px;
     text-decoration: none;
+    color: #854a2e;
+}
 
-    color: #7e5a49;
-
+/* FOOTER */
+footer {
+    padding: 18px;
+    text-align: center;
+    color: #76503c;
+    background: rgba(255, 249, 240, 0.92);
     font-size: 13px;
 }
 
-
-.profile-link:hover {
-    color: #633822;
-}
-
-
-/* FOOTER */
-
-footer {
-    padding: 18px;
-
-    text-align: center;
-
-    color: #fffaf0;
-
-    font-size: 11px;
-
-    background:
-        linear-gradient(
-            rgba(90, 53, 40, 0.78),
-            rgba(90, 53, 40, 0.78)
-        ),
-        url("images/background.png");
-
-    background-size: cover;
-    background-position: center;
-}
-
-
 /* MOBILE */
-
-@media (max-width: 650px) {
-
+@media (max-width: 600px) {
     .top-header {
-        height: auto;
-
-        padding: 14px 18px;
+        padding: 12px 4%;
     }
-
-
-    .logo-wrap,
-    .logo-wrap img {
-        width: 50px;
-        height: 50px;
-    }
-
 
     .brand-text h1 {
-        font-size: 25px;
+        font-size: 23px;
     }
-
-
-    .brand-text p {
-        font-size: 8px;
-    }
-
 
     .back-btn {
-        padding: 8px 13px;
+        padding: 8px 12px;
         font-size: 12px;
     }
 
-
-    .main-area {
-        padding: 25px 12px;
-    }
-
-
     .request-container {
-        padding: 28px 18px;
+        padding: 25px 16px;
     }
 
-
-    .request-container h2 {
+    .request-container > h2 {
         font-size: 25px;
+    }
+
+    .requests-list {
+        grid-template-columns: 1fr;
     }
 }

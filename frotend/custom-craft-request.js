@@ -1,40 +1,117 @@
-document.querySelector("form").addEventListener("submit", function (event) {
 
-    event.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
 
-    const craftType = document.getElementById("craftType").value;
-    const occasion = document.getElementById("occasion").value;
-    const budget = document.getElementById("budget").value;
-    const colour = document.getElementById("colour").value;
-    const size = document.getElementById("size").value;
-    const customisation = document.getElementById("customisation").value;
-    const requiredDate = document.getElementById("requiredDate").value;
-    const instructions = document.getElementById("instructions").value;
+    const form = document.querySelector("form");
 
-    const request = {
-        id: Date.now(),
-        craftType: craftType,
-        occasion: occasion,
-        budget: budget,
-        colour: colour,
-        size: size,
-        customisation: customisation,
-        requiredDate: requiredDate,
-        instructions: instructions,
-        status: "OPEN"
-    };
+    form.addEventListener("submit", async function (event) {
 
-    let requests =
-        JSON.parse(localStorage.getItem("customCraftRequests")) || [];
+        event.preventDefault();
 
-    requests.push(request);
+        const customerAccount = JSON.parse(
+            localStorage.getItem("customerAccount") || "null"
+        );
 
-    localStorage.setItem(
-        "customCraftRequests",
-        JSON.stringify(requests)
-    );
+        if (!customerAccount || !customerAccount.id) {
+            alert("Please login first to submit a custom craft request.");
+            window.location.href = "customer-auth.html";
+            return;
+        }
 
-    alert("Custom craft request submitted successfully!");
+        const referenceFile =
+            document.getElementById("reference").files[0];
 
-    window.location.href = "custom-craft-requests.html";
+        // Convert reference image into Base64
+        const readImage = (file) => {
+            return new Promise((resolve, reject) => {
+
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    reject(new Error("Reference image must be under 5 MB."));
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () =>
+                    reject(new Error("Unable to read reference image."));
+
+                reader.readAsDataURL(file);
+            });
+        };
+
+        try {
+
+            const referenceImage = await readImage(referenceFile);
+
+            const requestData = {
+
+                customerId: customerAccount.id,
+
+                craftType:
+                    document.getElementById("craftType").value,
+
+                occasion:
+                    document.getElementById("occasion").value,
+
+                budget:
+                    document.getElementById("budget").value,
+
+                colour:
+                    document.getElementById("colour").value,
+
+                size:
+                    document.getElementById("size").value,
+
+                customisation:
+                    document.getElementById("customisation").value,
+
+                referenceImage: referenceImage,
+
+                requiredDate:
+                    document.getElementById("requiredDate").value,
+
+                instructions:
+                    document.getElementById("instructions").value
+            };
+
+            const response = await fetch(
+                "http://localhost:5000/api/custom-crafts",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(requestData)
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message || "Request submission failed."
+                );
+            }
+
+            alert("Custom craft request submitted successfully!");
+
+            window.location.href = "custom-craft-requests.html";
+
+        } catch (error) {
+
+            console.error("Custom request error:", error);
+
+            alert(error.message || "Something went wrong. Please try again.");
+
+        }
+
+    });
+
 });

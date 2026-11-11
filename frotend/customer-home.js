@@ -1,3 +1,4 @@
+
 /* =========================================================
    KALASETU - CUSTOMER HOME JAVASCRIPT
    Clean version - Git conflicts removed
@@ -94,13 +95,24 @@ function openCategory(categoryName) {
 
 /* ================= PRODUCT ================= */
 
-function openProduct(productName) {
+function openProduct(productName, craftId = null) {
 
-    window.location.href =
+    let productUrl =
         "craft-details.html?product=" +
         encodeURIComponent(productName);
 
+    if (craftId !== null && craftId !== undefined) {
+
+        productUrl +=
+            "&craftId=" + encodeURIComponent(craftId);
+
+    }
+
+    window.location.href = productUrl;
+
 }
+
+
 /* ================= CUSTOMER STOCK STATUS ================= */
 
 function updateCustomerStockStatus() {
@@ -168,7 +180,7 @@ function showMessage(item) {
     );
 
 }
-/* ================= WISHLIST ================= */
+
 
 /* ================= WISHLIST ================= */
 
@@ -205,6 +217,8 @@ function addToWishlist(event, productName, category, price, image) {
 
     alert(productName + " added to Wishlist ❤️");
 }
+
+
 /* ================= SEARCH WITH SUGGESTIONS ================= */
 
 const searchInput = document.getElementById("searchInput");
@@ -341,6 +355,7 @@ if (searchInput) {
     window.searchProducts = searchProducts;
 }
 
+
 /* ================= CUSTOMER STOCK STATUS ================= */
 
 function getCreatorCraftStock(productName) {
@@ -397,9 +412,12 @@ function displayCustomerStockStatus() {
 }
 
 displayCustomerStockStatus();
+
+
 /* ================= INITIAL SLIDE ================= */
 
 showFestival(0);
+
 
 /* ============ DISPLAY APPROVED CREATOR CRAFTS FROM DATABASE ============ */
 
@@ -477,7 +495,7 @@ async function displayCreatorCrafts() {
             card.appendChild(info);
 
             card.addEventListener("click", () => {
-                openProduct(craft.name);
+                openProduct(craft.name, craft.id);
             });
 
             container.appendChild(card);

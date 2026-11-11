@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Choose Your Path</title>
+    <title data-i18n="choosePath">Choose Your Path</title>
 
     <link rel="stylesheet" href="role.css">
 </head>
@@ -13,16 +14,15 @@
 
     <div class="role-page">
 
-        <!-- Background overlay -->
         <div class="overlay"></div>
 
         <div class="content">
 
-            <!-- TOP LOGO / BRAND -->
             <div class="brand">
+
                 <div class="brand-symbol">
-    <img src="images/kalasetu-logo.png" alt="Kalasetu Logo">
-</div>
+                    <img src="images/kalasetu-logo.png" alt="Kalasetu Logo">
+                </div>
 
                 <h1>KALASETU</h1>
 
@@ -31,27 +31,24 @@
                     <p>TRADITION • CRAFT • STORY</p>
                     <span></span>
                 </div>
+
             </div>
 
-
-            <!-- HEADING -->
             <div class="heading">
 
-                <p class="welcome">
+                <p class="welcome" data-i18n="welcome">
                     WELCOME TO KALASETU
                 </p>
 
-                <h2>Choose Your Path</h2>
+                <h2 data-i18n="choosePath">Choose Your Path</h2>
 
-                <p class="description">
+                <p class="description" data-i18n="roleDescription">
                     Every craft carries a story. Choose how you would like
                     to be a part of the journey.
                 </p>
 
             </div>
 
-
-            <!-- ROLE CARDS -->
             <div class="cards">
 
                 <!-- CUSTOMER CARD -->
@@ -64,16 +61,16 @@
                         <img src="images/customer.png" alt="Customer">
                     </div>
 
-                    <h3>Customer</h3>
+                    <h3 data-i18n="customer">Customer</h3>
 
-                    <p>
+                    <p data-i18n="customerDescription">
                         Discover beautiful handmade crafts,
                         explore artisan stories and find
                         something meaningful.
                     </p>
 
                     <button onclick="continueAs('customer')">
-                        CONTINUE
+                        <span data-i18n="continue">CONTINUE</span>
                         <span>→</span>
                     </button>
 
@@ -81,7 +78,6 @@
                     <div class="corner bottom-right">❧</div>
 
                 </div>
-
 
                 <!-- CREATOR CARD -->
                 <div class="card">
@@ -93,16 +89,16 @@
                         <img src="images/creator.png" alt="Creator">
                     </div>
 
-                    <h3>Creator</h3>
+                    <h3 data-i18n="creator">Creator</h3>
 
-                    <p>
+                    <p data-i18n="creatorDescription">
                         Share your handmade creations,
                         tell your story and connect with
                         people who value your craft.
                     </p>
 
                     <button onclick="continueAs('creator')">
-                        CONTINUE
+                        <span data-i18n="continue">CONTINUE</span>
                         <span>→</span>
                     </button>
 
@@ -113,15 +109,13 @@
 
             </div>
 
-
-            <!-- BOTTOM -->
             <div class="bottom-text">
 
                 <span>✦</span>
 
-                HANDMADE WITH TRADITION
-                <b>•</b>
-                CONNECTED THROUGH STORIES
+                <span data-i18n="handmadeTagline">
+                    HANDMADE WITH TRADITION • CONNECTED THROUGH STORIES
+                </span>
 
                 <span>✦</span>
 
@@ -131,7 +125,7 @@
 
     </div>
 
-
+    <script src="translations.js"></script>
     <script src="role.js"></script>
 
 </body>

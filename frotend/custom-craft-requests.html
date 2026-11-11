@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +35,6 @@
 
     </header>
 
-
     <!-- MAIN -->
     <main class="main-area">
 
@@ -45,38 +46,30 @@
                 Create a personalised craft request and connect with talented creators.
             </p>
 
-
-            <!-- EMPTY REQUEST BOX -->
-
-            <div class="empty-box">
-
-                <div class="empty-icon">
-                    ✦
-                </div>
-
-                <h3>No Custom Requests Yet</h3>
-
-                <p>
-                    You haven't created any custom craft requests.
-                    Start by telling creators what you need.
-                </p>
-
-                <a
-                    href="custom-craft-request.html"
-                    class="create-btn"
-                >
-                    + Create New Request
+            <!-- ALWAYS VISIBLE CREATE BUTTON -->
+            <div class="create-request-section">
+                <a href="custom-craft-request.html" class="create-btn">
+                    + Create New Custom Craft Request
                 </a>
+            </div>
+
+            <!-- CUSTOMER REQUESTS LIST -->
+            <div id="requestsList" class="requests-list">
+
+                <div class="empty-box">
+                    <div class="empty-icon">✦</div>
+
+                    <h3>Loading Your Requests...</h3>
+
+                    <p>
+                        Please wait while we load your custom craft requests.
+                    </p>
+                </div>
 
             </div>
 
-
             <!-- BACK -->
-
-            <a
-                href="customer-profile.html"
-                class="profile-link"
-            >
+            <a href="customer-profile.html" class="profile-link">
                 ← Back to Profile
             </a>
 
@@ -84,12 +77,13 @@
 
     </main>
 
-
     <!-- FOOTER -->
-
     <footer>
         © 2026 Kalasetu • Tradition • Craft • Story
     </footer>
-<script src="custom-craft-requests.js"></script>
+
+    <script src="./custom-craft-requests.js"></script>
+
 </body>
 </html>
+///

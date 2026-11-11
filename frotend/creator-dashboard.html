@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,8 +14,6 @@
 <body>
 
 <div class="dashboard-container">
-
-    <!-- Header -->
 
     <header class="dashboard-header">
 
@@ -36,20 +35,14 @@
     </header>
 
 
-    <!-- Main -->
-
     <main class="dashboard-main">
-
-        <!-- Welcome -->
 
         <section class="welcome-section">
 
             <div>
                 <p class="small-title">WELCOME CREATOR</p>
 
-                <h2 id="creatorName">
-                    Creator
-                </h2>
+                <h2 id="creatorName">Creator</h2>
 
                 <p>
                     Manage your crafts and creator profile from here.
@@ -59,15 +52,11 @@
         </section>
 
 
-        <!-- Verification Status -->
-
         <section class="verification-status">
 
             <div class="status-left">
 
-                <div class="status-icon">
-                    ✓
-                </div>
+                <div class="status-icon">✓</div>
 
                 <div>
                     <h3>Verification Status</h3>
@@ -86,17 +75,14 @@
         </section>
 
 
-        <!-- Dashboard Cards -->
+        <!-- DASHBOARD CARDS -->
 
         <section class="dashboard-grid">
 
-            <!-- My Crafts -->
-
+            <!-- MY CRAFTS -->
             <div class="dashboard-card">
 
-                <div class="card-icon">
-                    ◇
-                </div>
+                <div class="card-icon">◇</div>
 
                 <h3>My Crafts</h3>
 
@@ -111,13 +97,10 @@
             </div>
 
 
-            <!-- Add New Craft -->
-
+            <!-- ADD NEW CRAFT -->
             <div class="dashboard-card">
 
-                <div class="card-icon">
-                    +
-                </div>
+                <div class="card-icon">+</div>
 
                 <h3>Add New Craft</h3>
 
@@ -132,13 +115,10 @@
             </div>
 
 
-            <!-- Orders -->
-
+            <!-- ORDERS -->
             <div class="dashboard-card">
 
-                <div class="card-icon">
-                    □
-                </div>
+                <div class="card-icon">□</div>
 
                 <h3>Orders</h3>
 
@@ -153,13 +133,10 @@
             </div>
 
 
-            <!-- Creator Profile -->
-
+            <!-- CREATOR PROFILE -->
             <div class="dashboard-card">
 
-                <div class="card-icon">
-                    ○
-                </div>
+                <div class="card-icon">○</div>
 
                 <h3>Creator Profile</h3>
 
@@ -173,10 +150,44 @@
 
             </div>
 
+
+            <!-- CHAT WITH CUSTOMER -->
+            <div class="dashboard-card">
+
+                <div class="card-icon">✉</div>
+
+                <h3>Chat with Customer</h3>
+
+                <p>
+                    View customer conversations and reply to their craft-related questions.
+                </p>
+
+                <button onclick="window.location.href='chat-with-customer.html'">
+                    OPEN CHATS →
+                </button>
+
+            </div>
+
+
+            <!-- CUSTOM CRAFT REQUESTS -->
+            <div class="dashboard-card">
+
+                <div class="card-icon">✧</div>
+
+                <h3>Custom Craft Requests</h3>
+
+                <p>
+                    View customer requirements and accept requests to create personalised crafts.
+                </p>
+
+                <button onclick="openCustomCraftRequests()">
+                    VIEW REQUESTS →
+                </button>
+
+            </div>
+
         </section>
 
-
-        <!-- Creator Information -->
 
         <section class="creator-info">
 
@@ -186,31 +197,23 @@
 
                 <div>
                     <span>Craft / Art Type</span>
-                    <strong id="creatorCraft">
-                        Not available
-                    </strong>
+                    <strong id="creatorCraft">Not available</strong>
                 </div>
 
                 <div>
                     <span>Location</span>
-                    <strong id="creatorLocation">
-                        Not available
-                    </strong>
+                    <strong id="creatorLocation">Not available</strong>
                 </div>
 
                 <div>
                     <span>Experience</span>
-                    <strong id="creatorExperience">
-                        Not available
-                    </strong>
+                    <strong id="creatorExperience">Not available</strong>
                 </div>
 
             </div>
 
         </section>
 
-
-        <!-- Notice -->
 
         <section class="dashboard-note">
 
@@ -226,8 +229,6 @@
 
     </main>
 
-
-    <!-- Footer -->
 
     <footer>
         HANDMADE WITH TRADITION • CONNECTED THROUGH STORIES

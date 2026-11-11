@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalasetu - Create Account</title>
+    <title data-i18n="createAccountTitle">Kalasetu - Create Account</title>
     <link rel="stylesheet" href="customer-register.css">
 </head>
 
@@ -17,66 +18,81 @@
             <img src="images/kalasetu-logo.png" alt="Kalasetu">
         </div>
 
-        <h1>Create Account</h1>
-        <p class="subtitle">Create your Kalasetu account</p>
+        <h1 data-i18n="createAccount">Create Account</h1>
+        <p class="subtitle" data-i18n="createKalasetuAccount">
+            Create your Kalasetu account
+        </p>
 
         <form id="registerForm">
 
             <div class="input-group">
-                <label for="name">Name</label>
+                <label for="name" data-i18n="name">Name</label>
                 <input
                     type="text"
                     id="name"
+                    data-i18n-placeholder="enterName"
                     placeholder="Enter your name"
                     required
                 >
             </div>
 
             <div class="input-group">
-                <label for="contact">Email or Mobile Number</label>
+                <label for="contact" data-i18n="emailOrMobile">
+                    Email or Mobile Number
+                </label>
                 <input
                     type="text"
                     id="contact"
+                    data-i18n-placeholder="enterEmailOrMobile"
                     placeholder="Enter email or mobile number"
                     required
                 >
             </div>
 
             <div class="input-group">
-                <label for="password">Create Password</label>
+                <label for="password" data-i18n="createPassword">
+                    Create Password
+                </label>
                 <input
                     type="password"
                     id="password"
+                    data-i18n-placeholder="createPasswordPlaceholder"
                     placeholder="Create password"
                     required
                 >
             </div>
 
             <div class="input-group">
-                <label for="confirmPassword">Confirm Password</label>
+                <label for="confirmPassword" data-i18n="confirmPassword">
+                    Confirm Password
+                </label>
                 <input
                     type="password"
                     id="confirmPassword"
+                    data-i18n-placeholder="confirmPasswordPlaceholder"
                     placeholder="Confirm password"
                     required
                 >
             </div>
 
-            <button type="submit" class="create-btn">
+            <button type="submit" class="create-btn" data-i18n="createAccount">
                 Create Account
             </button>
 
         </form>
 
         <p class="login-text">
-            Already have an account?
-           <a href="customer-auth.html" id="loginLink">Login</a>
+            <span data-i18n="alreadyHaveAccount">Already have an account?</span>
+            <a href="customer-auth.html" id="loginLink" data-i18n="login">
+                Login
+            </a>
         </p>
 
     </div>
 
 </div>
 
+<script src="translations.js"></script>
 <script src="customer-register.js"></script>
 
 </body>

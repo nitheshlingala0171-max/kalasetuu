@@ -46,7 +46,25 @@
     <!-- ================= MAIN ================= -->
 
     <main class="chat-page">
+<section id="conversationListScreen" style="
+    display:none;
+    width:90%;
+    max-width:1000px;
+    margin:30px auto;
+    padding:25px;
+    background:#fffaf5;
+    border:1px solid #e5cbb5;
+    border-radius:15px;
+    min-height:400px;
+">
+    <h2 style="color:#245b35;margin-bottom:20px;">
+        Your Conversations
+    </h2>
 
+    <div id="conversationItems">
+        Loading conversations...
+    </div>
+</section>
         <div class="chat-layout">
 
 
@@ -168,6 +186,13 @@
 
 
                <div class="chat-top">
+                <button
+    type="button"
+    class="all-chats-btn"
+    onclick="backToConversations()"
+>
+    ← All Chats
+</button>
 
     <div class="chat-person">
 

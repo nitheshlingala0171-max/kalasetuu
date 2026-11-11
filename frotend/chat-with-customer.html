@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Customer | Kalasetu</title>
+    <link rel="stylesheet" href="chat-with-customer.css">
+</head>
+
+<body>
+
+    <header class="top-header">
+        <div class="brand">
+            <div class="logo-wrap">
+                <img src="images/kalasetu-logo.png" alt="Kalasetu Logo">
+            </div>
+
+            <div class="brand-text">
+                <h1>Kalasetu</h1>
+                <p>TRADITION • CRAFT • STORY</p>
+            </div>
+        </div>
+
+        <a href="creator-dashboard.html" class="back-btn">
+            Back to Dashboard
+        </a>
+    </header>
+
+    <main class="chat-page">
+
+        <div class="page-heading">
+            <span>CREATOR CONNECTION</span>
+            <h2>Chat with Customers</h2>
+            <p>Connect with customers and answer their questions about your crafts.</p>
+        </div>
+
+        <div class="chat-layout">
+
+            <!-- LEFT: CONVERSATION LIST -->
+
+            <aside class="conversation-panel">
+
+                <div class="conversation-heading">
+                    <h3>Your Conversations</h3>
+                    <span id="conversationCount">0</span>
+                </div>
+
+                <div class="search-box">
+                    <input
+                        type="text"
+                        id="conversationSearch"
+                        placeholder="Search customers..."
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div id="conversationList" class="conversation-list">
+                    <p class="loading-text">Loading conversations...</p>
+                </div>
+
+            </aside>
+
+
+            <!-- RIGHT: CHAT AREA -->
+
+            <section class="chat-container">
+
+                <div class="chat-top">
+<button
+    type="button"
+    class="all-chats-btn"
+    onclick="backToCreatorConversations()"
+>
+    ← All Chats
+</button>
+                    <div class="chat-person">
+                        <div class="small-avatar" id="customerAvatar">C</div>
+
+                        <div>
+                            <h2 id="customerName">Select a conversation</h2>
+                            <p id="customerStatus">Customer conversation</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-label">CUSTOMER CHAT</div>
+
+                </div>
+
+
+                <!-- CRAFT DETAILS -->
+
+                <div class="craft-context" id="craftContext">
+                    <div class="craft-placeholder">K</div>
+
+                    <div>
+                        <span>DISCUSSING CRAFT</span>
+                        <h3 id="craftName">No craft selected</h3>
+                        <p id="craftDetails">Select a customer conversation to view details.</p>
+                    </div>
+                </div>
+
+
+                <!-- MESSAGES -->
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-chat">
+                        <div class="empty-icon">✉</div>
+                        <h3>Welcome to Customer Chat</h3>
+                        <p>Select a conversation from the left to read and reply to customer messages.</p>
+                    </div>
+                </div>
+
+
+                <!-- MESSAGE INPUT -->
+
+                <div class="message-input-area">
+
+                    <button
+                        type="button"
+                        class="emoji-btn"
+                        id="emojiButton"
+                        aria-label="Add emoji"
+                    >☺</button>
+
+                    <input
+                        type="text"
+                        id="messageInput"
+                        placeholder="Write a reply..."
+                        autocomplete="off"
+                        disabled
+                    >
+
+                    <button
+                        type="button"
+                        class="send-btn"
+                        id="sendButton"
+                        disabled
+                    >
+                        Send
+                    </button>
+
+                </div>
+
+                <div class="chat-footer">
+                    Your replies are saved to your conversation history.
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <script src="chat-with-customer.js"></script>
+
+</body>
+</html>

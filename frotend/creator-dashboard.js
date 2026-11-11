@@ -161,6 +161,20 @@ function addNewCraft() {
 
 
 // =========================================
+// CUSTOM CRAFT REQUESTS
+// =========================================
+
+function openCustomCraftRequests() {
+
+    if (window.creatorVerificationStatus !== "Approved") {
+        alert("Custom Craft Requests will be available after admin approval.");
+        return;
+    }
+
+    window.location.href = "creator-custom-requests.html";
+}
+
+// =========================================
 // 6. ORDERS
 // =========================================
 

@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings - Kalasetu</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(246,235,221,0.25), rgba(246,235,221,0.25)),
+                url("./images/background.png") center/cover fixed;
+            color: #33231e;
+            padding: 25px 15px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 25px auto;
+            padding: 30px;
+            background: rgba(255,255,255,0.94);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .logo {
+            display: block;
+            width: 95px;
+            height: 95px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+        }
+
+        .tagline {
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            color: #765b43;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #33231e;
+        }
+
+        h3 {
+            margin: 25px 0 15px;
+            color: #066426;
+        }
+
+        label {
+            display: block;
+            margin: 13px 0 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbbba8;
+            border-radius: 7px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #066426;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 18px;
+            border: none;
+            border-radius: 7px;
+            background: #066426;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #066426;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .note {
+            background: #f6ebdd;
+            padding: 13px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .message {
+            margin-top: 12px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        hr {
+            margin: 25px 0;
+            border: 0;
+            border-top: 1px solid #dfd2c4;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="customer-profile.html" class="back-link">
+        ← Back to Profile
+    </a>
+
+    <img src="./images/kalasetu-logo.png"
+         alt="Kalasetu Logo"
+         class="logo">
+
+    <p class="tagline">TRADITION • CRAFT • STORY</p>
+
+    <h2>Account Settings</h2>
+
+    <!-- PROFILE SETTINGS -->
+
+    <form id="settingsForm">
+
+        <h3>Personal Information</h3>
+
+        <label for="customerName">Full Name</label>
+        <input type="text"
+               id="customerName"
+               placeholder="Enter your name"
+               required>
+
+        <label for="customerPhone">Mobile Number</label>
+        <input type="tel"
+               id="customerPhone"
+               maxlength="10"
+               pattern="[0-9]{10}"
+               placeholder="Enter 10-digit mobile number"
+               required>
+
+        <button type="submit" id="saveButton">
+            Save Changes
+        </button>
+
+        <p id="message" class="message"></p>
+
+    </form>
+
+    <hr>
+
+    <!-- PASSWORD SETTINGS -->
+
+    <form id="passwordForm">
+
+        <h3>Password Security</h3>
+
+        <div class="note">
+            Change your password securely using your current password.
+        </div>
+
+        <label for="currentPassword">Current Password</label>
+        <input type="password"
+               id="currentPassword"
+               placeholder="Enter current password"
+               required>
+
+        <label for="newPassword">New Password</label>
+        <input type="password"
+               id="newPassword"
+               minlength="8"
+               placeholder="Minimum 8 characters"
+               required>
+
+        <label for="confirmPassword">Confirm New Password</label>
+        <input type="password"
+               id="confirmPassword"
+               minlength="8"
+               placeholder="Re-enter new password"
+               required>
+
+        <button type="submit" id="passwordButton">
+            Change Password
+        </button>
+
+        <p id="passwordMessage" class="message"></p>
+
+    </form>
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // API URL
+    const API = "http://localhost:5000/api/customers";
+
+    // GET CUSTOMER ACCOUNT
+    let account;
+
+    try {
+        account = JSON.parse(
+            localStorage.getItem("customerAccount") || "null"
+        );
+    } catch (error) {
+        account = null;
+    }
+
+    if (!account || !account.id) {
+        alert("Please login first.");
+        window.location.href = "customer-auth.html";
+        return;
+    }
+
+    // ELEMENTS
+    const nameInput = document.getElementById("customerName");
+    const phoneInput = document.getElementById("customerPhone");
+
+    const message = document.getElementById("message");
+    const passwordMessage = document.getElementById("passwordMessage");
+
+    const settingsForm = document.getElementById("settingsForm");
+    const passwordForm = document.getElementById("passwordForm");
+
+    const saveButton = document.getElementById("saveButton");
+    const passwordButton = document.getElementById("passwordButton");
+
+    // SHOW MESSAGE
+    function showMessage(element, text, success) {
+        element.style.color = success ? "#38713c" : "#b3261e";
+        element.textContent = text;
+    }
+
+    // API REQUEST FUNCTION
+   
+async function apiRequest(url, options = {}) {
+
+    let response;
+
+    try {
+        response = await fetch(API + url, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        });
+    } catch (error) {
+        throw new Error(
+            "Backend connection failed. Check whether server is running on port 5000."
+        );
+    }
+
+    const responseText = await response.text();
+
+    let data = {};
+
+    try {
+        data = JSON.parse(responseText);
+    } catch (error) {
+        data = {};
+    }
+
+    console.log("API URL:", API + url);
+    console.log("HTTP Status:", response.status);
+    console.log("Backend Response:", data);
+
+    if (!response.ok || data.success === false) {
+        throw new Error(
+            data.message ||
+            "HTTP Error: " + response.status + " - " + responseText
+        );
+    }
+
+    return data;
+}
+    // LOAD CUSTOMER DETAILS
+    nameInput.value =
+        account.name ||
+        account.customer_name ||
+        account.fullName ||
+        "";
+
+    phoneInput.value =
+        account.phone ||
+        account.mobile ||
+        account.contact ||
+        account.phone_number ||
+        "";
+
+    // UPDATE PROFILE IN DATABASE
+    settingsForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+
+        if (!name || !/^[0-9]{10}$/.test(phone)) {
+            showMessage(
+                message,
+                "Enter a valid name and 10-digit mobile number.",
+                false
+            );
+            return;
+        }
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
+
+        try {
+
+            const data = await apiRequest(
+                "/profile/" + encodeURIComponent(account.id),
+                {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        name: name,
+                        contact: phone
+                    })
+                }
+            );
+
+            // UPDATE LOCAL ACCOUNT
+            account.name = name;
+            account.customer_name = name;
+            account.fullName = name;
+            account.phone = phone;
+            account.mobile = phone;
+            account.contact = phone;
+
+            localStorage.setItem(
+                "customerAccount",
+                JSON.stringify(account)
+            );
+
+            showMessage(
+                message,
+                data.message || "Profile updated successfully!",
+                true
+            );
+
+        } catch (error) {
+
+            showMessage(message, error.message, false);
+
+        } finally {
+
+            saveButton.disabled = false;
+            saveButton.textContent = "Save Changes";
+
+        }
+
+    });
+
+    // CHANGE PASSWORD
+    passwordForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const currentPassword =
+            document.getElementById("currentPassword").value;
+
+        const newPassword =
+            document.getElementById("newPassword").value;
+
+        const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+        if (newPassword.length < 8) {
+            showMessage(
+                passwordMessage,
+                "New password must contain at least 8 characters.",
+                false
+            );
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showMessage(
+                passwordMessage,
+                "New password and confirm password do not match.",
+                false
+            );
+            return;
+        }
+
+        if (currentPassword === newPassword) {
+            showMessage(
+                passwordMessage,
+                "New password must be different from current password.",
+                false
+            );
+            return;
+        }
+
+        passwordButton.disabled = true;
+        passwordButton.textContent = "Updating...";
+
+        try {
+
+            const data = await apiRequest(
+                "/change-password",
+                {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        customerId: account.id,
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
+                    })
+                }
+            );
+
+            showMessage(
+                passwordMessage,
+                data.message || "Password changed successfully!",
+                true
+            );
+
+            passwordForm.reset();
+
+        } catch (error) {
+
+            showMessage(
+                passwordMessage,
+                error.message,
+                false
+            );
+
+        } finally {
+
+            passwordButton.disabled = false;
+            passwordButton.textContent = "Change Password";
+
+        }
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
