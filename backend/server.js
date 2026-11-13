@@ -47,12 +47,10 @@ const customCraftRoutes = require("./customCraftRoutes");
 app.use("/api/custom-crafts", customCraftRoutes);
 // ================= HOME TEST =================
 
-const path = require("path");
-app.use(express.static(path.join(__dirname, "../frotend")));
-
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frotend/index.html"));
+  res.send("Kalasetu Backend is Running!");
 });
+
 
 
 
