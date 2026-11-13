@@ -21,7 +21,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
     try {
 
-        const response = await fetch("http://localhost:5000/api/customers/register", {
+        const response = await fetch("https://kalasetuu-five.vercel.app/api/customers/register", {
             method: "POST",
 
             headers: {
