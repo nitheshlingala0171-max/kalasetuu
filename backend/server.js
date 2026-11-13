@@ -2,6 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const cors = require("cors");
+const path = require("path");
+app.use(express.static(path.join(__dirname, "../frotend")));
+
 
 const app = express();
 const PORT = 5000;
